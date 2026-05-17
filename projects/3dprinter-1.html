@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First 3D printer · Andreas Lindeman</title>
+  <meta name="description" content="My first kit 3D printer, built in 2016. The entry point into a decade of hardware work." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2016</span>
+    </div>
+
+    <h1 class="project-title">First 3D printer <em>(in pieces, then in a heap, then printing)</em></h1>
+
+    <p class="project-lede">
+      My first kit 3D printer, age thirteen. The entry point into hardware. It taught me
+      the lesson every later hardware project has reinforced: software bugs are polite;
+      mechanical bugs throw filament at the wall and let the room smell like burning
+      plastic.
+    </p>
+
+    <section class="project-section">
+      <h2>What it actually was</h2>
+      <ul>
+        <li>A box of parts that became, after a long weekend, a working Cartesian
+            printer.</li>
+        <li>No auto-bed-levelling, no closed-loop anything, no easy slicer. You levelled
+            with a piece of paper and felt clever when it worked.</li>
+        <li>A separate, host-side slicer that produced gcode the printer's firmware did
+            not always agree with.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What it taught me</h2>
+      <p>
+        That hardware is not software with extra steps. It is its own discipline. A
+        loose belt looks like a calibration problem; a calibration problem looks like a
+        firmware bug; a firmware bug looks like the printer being haunted. You learn to
+        check the cheap explanations first, in order, every time. It is a useful habit to
+        export back to software work.
+      </p>
+      <p>
+        Also: the existence of the <em>spaghetti print</em> as a folk concept, and the
+        relief of having a fire extinguisher within reach.
+      </p>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2016-3dprinter-1/spagetti.jpg" alt="The print bed buried in a nest of tangled white filament. A failed print that came loose mid-job and kept extruding into mid-air.">
+        <figcaption>The eponymous spaghetti, which is what happens when the print pops off the bed and the extruder keeps going.</figcaption>
+      </figure>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

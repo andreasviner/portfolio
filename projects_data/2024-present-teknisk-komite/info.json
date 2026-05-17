@@ -1,0 +1,18 @@
+{
+  "id": "teknisk-komite",
+  "title": "Teknisk Komité",
+  "category": "hobby",
+  "isProject": false,
+  "start": "2024-09",
+  "end": "present",
+  "shortDescription": "Founded and still lead the technical committee in Elektra, NTNU's electronics-student association. We maintain elektra.io and ship the internal tooling the rest of the association runs on.",
+  "tags": [
+    "leadership",
+    "student association",
+    "Elektra"
+  ],
+  "types": [],
+  "importance": 50,
+  "status": "ongoing",
+  "projectPage": "projects/teknisk-komite.html"
+}

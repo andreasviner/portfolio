@@ -1,0 +1,18 @@
+{
+  "id": "tactics-blobs-2021",
+  "title": "Tactic blobs",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2021-12",
+  "shortDescription": "Game-jam mobile game inspired by the Russian variant of tic-tac-toe. Six blobs per player, bigger sizes overtake smaller ones. The board looks one way and is secretly another.",
+  "tags": [
+    "game jam",
+    "mobile",
+    "game design"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 38,
+  "projectPage": "projects/tactic-blobs.html"
+}

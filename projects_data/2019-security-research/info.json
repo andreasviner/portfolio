@@ -1,0 +1,19 @@
+{
+  "id": "security-research-2019",
+  "title": "Security research",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2019-04",
+  "shortDescription": "A year inside Windows internals, remote desktop, and auth systems. Formative.",
+  "tags": [
+    "security",
+    "Python",
+    "C#",
+    "Windows internals"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 65,
+  "projectPage": "projects/security-research-2019.html"
+}

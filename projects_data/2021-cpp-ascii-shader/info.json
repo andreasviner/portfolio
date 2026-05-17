@@ -1,0 +1,19 @@
+{
+  "id": "cpp-ascii-shader-2021",
+  "title": "ASCII shader",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2022-02",
+  "shortDescription": "C++ game with a CUDA ASCII shader that picked the right glyph for each pixel patch.",
+  "tags": [
+    "C++",
+    "CUDA",
+    "GPU",
+    "graphics"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 72,
+  "projectPage": "projects/cpp-ascii-shader.html"
+}

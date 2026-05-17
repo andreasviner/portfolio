@@ -1,0 +1,21 @@
+{
+  "id": "hexaglow-2018",
+  "title": "Hexaglow",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2018-11",
+  "end": "2019-12",
+  "shortDescription": "Co-founded a youth enterprise selling configurable glowing wall panels. I wrote the Unity/C# companion app.",
+  "tags": [
+    "Unity",
+    "C#",
+    "product",
+    "entrepreneurship"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 65,
+  "projectPage": "projects/hexaglow.html"
+}

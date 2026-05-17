@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C++ game with GPU ASCII shader · Andreas Lindeman</title>
+  <meta name="description" content="A C++ game with a CUDA-accelerated ASCII shader that chose the best glyph for each pixel patch in real time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Feb 2022</span>
+    </div>
+
+    <h1 class="project-title">A game that draws itself in <em>ASCII</em></h1>
+
+    <p class="project-lede">
+      A C++ game made during a folkehøyskole game-jam, with a CUDA-accelerated ASCII shader
+      sitting between the renderer and the screen. The shader picked the best glyph for
+      every pixel patch in real time, and the same kernel could read your webcam and turn
+      your face into typography.
+    </p>
+
+    <section class="project-section">
+      <h2>The idea</h2>
+      <p>
+        A "code zone" inside the game switched the renderer into ASCII mode. Not the
+        usual brightness-bucket trick, but a per-patch best-match against a small glyph atlas,
+        running on the GPU so it stayed at frame-rate.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>How the shader works</h2>
+      <ul>
+        <li>The framebuffer is tiled into character-cell sized patches.</li>
+        <li>Each glyph in the atlas is pre-rendered into a tensor at the same size.</li>
+        <li>For each patch, the kernel scores every glyph by structural similarity and picks the best match.</li>
+        <li>If a patch is, say, white only on the bottom edge, it lands on <code>_</code>, because that's the glyph whose mass distribution matches.</li>
+      </ul>
+      <p>
+        The trick was making this cheap enough to run per-frame. CUDA, per-block scoring,
+        and a small atlas got it well under a millisecond at 1080p.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Webcam mode</h2>
+      <p>
+        The kernel is content-agnostic, so feeding it a webcam frame instead of the
+        framebuffer just works. Live ASCII selfie:
+      </p>
+      <div class="video-embed aspect-16-9">
+        <iframe src="https://www.youtube.com/embed/HsvRGanUB4s" title="Webcam ASCII demo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <p class="video-caption">Live ASCII webcam, running on the same kernel.</p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I'd revisit</h2>
+      <p>
+        The matching is purely structural. It doesn't know that <code>O</code> and
+        <code>0</code> look almost the same. Adding a small perceptual term, or running the
+        score against an edge map, would clean up the typography. And the atlas was
+        monospace-only; with a proportional font and a smarter packer there's more visual
+        variety to be had.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

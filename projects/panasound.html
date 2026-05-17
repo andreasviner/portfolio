@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panasound internship · Andreas Lindeman</title>
+  <meta name="description" content="Summer internship at Panasound, a Norwegian audio startup. First taste of Go, Nuxt, and git on a real team." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch work"></span> work</span>
+      <span class="sep"></span>
+      <span>Summer 2021</span>
+    </div>
+
+    <h1 class="project-title">Panasound, first <em>real job</em></h1>
+
+    <p class="project-lede">
+      My first industry job, between high school years, at Panasound, a Norwegian audio
+      startup. The backend was Go, the frontend was Nuxt, and the workflow was the first
+      time I had ever had to share a codebase with people whose mistakes would also become
+      mine. It rewired how I write code.
+    </p>
+
+    <section class="project-section">
+      <h2>The stack</h2>
+      <ul>
+        <li><strong>Go.</strong> The language I fell in love with that summer. Boring on
+            purpose, fast, and very hard to write badly.</li>
+        <li><strong>Nuxt / Vue.</strong> First real frontend framework I used in anger.</li>
+        <li><strong>Git on a team.</strong> Branches, PR review, merge conflicts, the
+            etiquette of not breaking <code>main</code>.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I actually learned</h2>
+      <p>
+        That the part of software that ships is the part other people can read. Up to that
+        point I had been a solo programmer; my code was clever, badly named, undocumented,
+        and worked. None of that survived the first code review. Three months of being
+        told kindly that my code was harder to read than it needed to be did more for my
+        engineering than the previous three years combined.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

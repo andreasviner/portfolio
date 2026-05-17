@@ -1,0 +1,27 @@
+{
+  "id": "lego-drawer-2018",
+  "title": "LEGO plotter",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2018-12",
+  "shortDescription": "Python on a LEGO Mindstorms brick drove a two-axis drawing arm with a pen-lift. Mouse-controlled and surprisingly precise.",
+  "tags": [
+    "LEGO Mindstorms",
+    "Python",
+    "hardware",
+    "mechanics"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 42,
+  "externalLinks": [
+    {
+      "label": "Demo video",
+      "url": "https://www.youtube.com/watch?v=rjY2Qk7qEzs",
+      "type": "youtube"
+    }
+  ],
+  "projectPage": "projects/lego-drawer.html"
+}

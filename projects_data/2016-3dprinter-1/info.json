@@ -1,0 +1,18 @@
+{
+  "id": "3dprinter-1-2016",
+  "title": "first 3D printer",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2016-06",
+  "shortDescription": "First kit 3D printer, age thirteen. Entry point into hardware: paper-thin bed levelling, host-side slicing, and the discovery that mechanical bugs throw filament at the wall.",
+  "tags": [
+    "hardware",
+    "3D printing",
+    "CAD"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 45,
+  "projectPage": "projects/3dprinter-1.html"
+}

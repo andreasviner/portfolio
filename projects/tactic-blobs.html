@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tactic blobs · Andreas Lindeman</title>
+  <meta name="description" content="A game-jam mobile game inspired by Russian tic-tac-toe. Six blobs per player, bigger absorbs smaller." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Dec 2021</span>
+    </div>
+
+    <h1 class="project-title">Tactic <em>blobs</em></h1>
+
+    <p class="project-lede">
+      A game-jam mobile game, inspired by the Russian variant of tic-tac-toe where bigger
+      pieces eat smaller ones. Each player gets six blobs of varying sizes; place them on
+      a board, and a bigger blob can overtake a smaller one underneath it. Quick rounds,
+      easy rule, surprisingly deep play.
+    </p>
+
+    <section class="project-section">
+      <h2>The rule set</h2>
+      <ul>
+        <li>Six blobs per player, in three or four sizes.</li>
+        <li>You can place on an empty cell, or on top of an opponent's blob if yours is
+            bigger.</li>
+        <li>Standard win condition: three in a row of your colour, looking only at the
+            top blob of each stack.</li>
+        <li>What makes it interesting: the "memory" of what is underneath. The board
+            looks one way but is secretly another way, and the player has to track both.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I got out of it</h2>
+      <p>
+        A reminder that the best game-jam ideas are ones a non-programmer can describe
+        out loud in one sentence. The state model behind this game is tiny (half a
+        screen of code), but the choice space is rich enough that we kept finding new
+        openings in playtests.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

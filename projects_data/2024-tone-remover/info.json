@@ -1,0 +1,18 @@
+{
+  "id": "tone-remover-2024",
+  "title": "Tone remover",
+  "category": "school",
+  "isProject": true,
+  "start": "2024-11",
+  "shortDescription": "An analog-electronics assignment asked for a band-stop circuit to remove a single tone from a recording. I solved it in software with spectrograms instead. The right kind of cheating, depending on who you ask.",
+  "tags": [
+    "DSP",
+    "Python",
+    "spectrogram"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 20,
+  "projectPage": "projects/tone-remover.html"
+}

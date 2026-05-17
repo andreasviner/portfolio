@@ -1,0 +1,20 @@
+{
+  "id": "analog-signal-gen-2024",
+  "title": "Sine generator",
+  "category": "school",
+  "isProject": true,
+  "start": "2024-09",
+  "shortDescription": "ESP32-controlled signal-level generator: analog gain stage, software-controlled DAC, potentiometer-set knob. ~26 dB gain, ~21 dB attenuation, single-line hot loop.",
+  "tags": [
+    "analog electronics",
+    "ESP32",
+    "circuits",
+    "NTNU"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 22,
+  "projectPage": "projects/sine-generator.html"
+}

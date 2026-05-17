@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discrete operational amplifier · Andreas Lindeman</title>
+  <meta name="description" content="A discrete operational amplifier built from BC547 and BC557 transistors. Differential pair plus emitter-follower output, characterised open- and closed-loop." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Sep 2025</span>
+    </div>
+
+    <h1 class="project-title">Building an op-amp <em>from transistors</em></h1>
+
+    <p class="project-lede">
+      A discrete operational amplifier, built up from a handful of BC547 NPNs and
+      BC557 PNPs on a breadboard, powered at ±5 V, then measured open-loop, closed-loop,
+      and under two different loads. The point was less to use the op-amp than to see
+      it from the inside.
+    </p>
+
+    <figure class="project-figure narrow">
+      <img src="../projects_data/2025-operasjonsforsterker/designnotat_6_figures/figure3.png" alt="Hand-drawn schematic split into two halves: 'Differensiell forsterker' on the left and 'Buffer' on the right. The differential half shows T1/T2 forming a current mirror at the top, T3/T4 the PNP differential input pair, with a tail-current source built from T5 biased by R1 (47 kΩ) and R2 between V+ and V−. The buffer half shows T6 as an emitter follower into a 1 kΩ source resistor R_S, with output v_o.">
+      <figcaption>The full schematic: differential pair, current mirror, tail source, emitter follower.</figcaption>
+    </figure>
+
+    <section class="project-section">
+      <h2>The architecture</h2>
+      <ul>
+        <li><strong>Differential input pair (T<sub>3</sub>, T<sub>4</sub>):</strong>
+            inputs land on the bases of a PNP pair; the tail-current transistor
+            (T<sub>5</sub>) sets the bias.</li>
+        <li><strong>Current mirror (T<sub>1</sub>, T<sub>2</sub>):</strong> turns the
+            differential current into a single-ended signal.</li>
+        <li><strong>Emitter-follower output (T<sub>6</sub>):</strong> low output
+            impedance so the op-amp can actually drive a load.</li>
+        <li><strong>Bias network:</strong> R₁/R₂ voltage divider sets the tail
+            transistor's reference. R<sub>S</sub> = 1 kΩ at the emitter follower
+            limits the output current.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I measured</h2>
+      <p>
+        1 kHz sine, ±5 V supply, two loads (100 kΩ and 100 Ω), open-loop and with a
+        ×10 inverting feedback network:
+      </p>
+      <table style="border-collapse:collapse;margin:12px 0">
+        <thead>
+          <tr style="border-bottom:1px solid var(--hairline)"><th style="padding:6px 12px;text-align:left">Config</th><th style="padding:6px 12px;text-align:right">R<sub>L</sub></th><th style="padding:6px 12px;text-align:right">V<sub>in</sub></th><th style="padding:6px 12px;text-align:right">A</th><th style="padding:6px 12px;text-align:right">THD<sub>out</sub></th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:4px 12px">Open loop</td><td style="padding:4px 12px;text-align:right">100 kΩ</td><td style="padding:4px 12px;text-align:right">1 mV</td><td style="padding:4px 12px;text-align:right">~400</td><td style="padding:4px 12px;text-align:right">4.8%</td></tr>
+          <tr><td style="padding:4px 12px">Open loop</td><td style="padding:4px 12px;text-align:right">100 Ω</td><td style="padding:4px 12px;text-align:right">3 mV</td><td style="padding:4px 12px;text-align:right">~100</td><td style="padding:4px 12px;text-align:right">1.7%</td></tr>
+          <tr><td style="padding:4px 12px">×10 feedback</td><td style="padding:4px 12px;text-align:right">100 Ω</td><td style="padding:4px 12px;text-align:right">50 mV</td><td style="padding:4px 12px;text-align:right">9.2</td><td style="padding:4px 12px;text-align:right">0.27%</td></tr>
+          <tr><td style="padding:4px 12px">×10 feedback</td><td style="padding:4px 12px;text-align:right">100 kΩ</td><td style="padding:4px 12px;text-align:right">50 mV</td><td style="padding:4px 12px;text-align:right">9.7</td><td style="padding:4px 12px;text-align:right">0.22%</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Open-loop gain crashes by a factor of four when the load drops from 100 kΩ to
+        100 Ω. The discrete output stage cannot keep up. Closed-loop, with the gain
+        nailed to a target of 10 by the feedback network, both load values land within
+        a few percent of the target and the THD drops by an order of magnitude.
+        Feedback does exactly what the textbook says it does, on real hardware.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2025-operasjonsforsterker/designnotat_6_figures/figure14.png" alt="The discrete op-amp built on a stripboard. Six small-signal transistors crammed into a corner with a tangle of red, yellow, orange and black wires running to the breadboard underneath.">
+          <figcaption>The build. Six transistors, one stripboard, more wires than expected.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2025-operasjonsforsterker/designnotat_6_figures/figure13.png" alt="Two overlaid FFTs of the output: orange trace (open loop) sits noticeably higher than blue trace (×10 feedback). THD labels in the corner: 0.223% open loop vs 0.6633%; actually the closed-loop version is the blue, much cleaner, lower-amplitude noise floor.">
+          <figcaption>FFT, open-loop (orange) vs ×10 feedback (blue). Same fundamental, but the harmonic floor drops about 20 dB once feedback is closed.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>What I took away</h2>
+      <p>
+        That seeing closed-loop feedback dominate component variability with your own
+        eyes is more convincing than any number of textbook diagrams. The 9.2 → 9.7
+        spread between loads, and the 9.2 → 10.7 swing I got when swapping one feedback
+        resistor for a nominally identical part, made the case for negative feedback
+        better than any lecture.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2025-operasjonsforsterker/designnotat_6.pdf" target="_blank" rel="noopener" download>Download: designnotat_6.pdf (Operasjonsforsterker)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

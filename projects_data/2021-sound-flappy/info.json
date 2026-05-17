@@ -1,0 +1,18 @@
+{
+  "id": "sound-flappy-2021",
+  "title": "Sound Flappy",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2021-11",
+  "shortDescription": "Flappy Bird controlled by your voice. Microphone loudness mapped to vertical velocity. A short game-jam piece from Torshus, unplayable on the bus.",
+  "tags": [
+    "game jam",
+    "mobile",
+    "audio"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 35,
+  "projectPage": "projects/sound-flappy.html"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "oslo-instructor-2015",
+  "title": "Code teacher",
+  "category": "work",
+  "isProject": false,
+  "start": "2015-02",
+  "end": "2015-08",
+  "shortDescription": "Six months as a kid-instructor for Lær Kidsa Koding's AKS programme, teaching Scratch to fourth-graders in Oslo public schools. The right age to learn that the word 'obvious' is doing a lot of work.",
+  "tags": [
+    "teaching",
+    "Scratch",
+    "Kidsa Koder",
+    "public sector"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 60,
+  "projectPage": "projects/oslo-instructor.html"
+}

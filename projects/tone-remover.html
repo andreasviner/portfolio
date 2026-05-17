@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tone remover · Andreas Lindeman</title>
+  <meta name="description" content="An analog band-stop assignment, solved in software with spectrograms and phase-cancellation. Course report writeup included." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Mar 2024</span>
+    </div>
+
+    <h1 class="project-title">A tone, removed <em>in software</em></h1>
+
+    <p class="project-lede">
+      An analog-electronics assignment asked us to build a band-stop circuit to strip a
+      constant tone out of a music recording. I solved it in software, first with a
+      spectrogram-based band-stop, then with phase cancellation, and compared the two
+      side by side. Phase cancellation won; the writeup is in Norwegian and lives in the
+      repo as a PDF.
+    </p>
+
+    <section class="project-section">
+      <h2>The problem</h2>
+      <p>
+        A music file had been corrupted by a single, constant-frequency tone, the kind
+        of thing that shows up as a bright horizontal line near the bottom of a
+        spectrogram. The brief: remove that tone with minimal damage to the music
+        underneath.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Method 1: spectrogram band-stop</h2>
+      <ul>
+        <li>Take the spectrogram of the input.</li>
+        <li>Find the frequency bin with the most energy in the offending band, which is the
+            tone's centre.</li>
+        <li>Zero out (or attenuate) the centre bin and a small ring around it to absorb
+            spectrogram quantisation slop.</li>
+        <li>Inverse-transform back to time domain.</li>
+      </ul>
+      <p>
+        It works, and the audio sounds clean, but the spectrogram shows a clearly empty
+        slot where the tone used to be: a thin black stripe in the middle of the
+        music. Some original signal was thrown away with the noise.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2024-tone-remover/Fjerning_av_pipetone_figures/figure2.png" alt="Three stacked spectrograms: original with a bright horizontal line, and two processed versions where the line has been cut out.">
+        <figcaption>Top: original with the tone as a bright horizontal stripe. Middle/bottom: band-stop output. Tone gone, but a thin empty band is now visible across the entire clip.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Method 2: phase cancellation</h2>
+      <p>
+        Because the offending tone is just an added sinusoid, you can cancel it by
+        adding back another sinusoid of the same frequency and amplitude, phase-shifted
+        180°. Estimate amplitude, frequency, and phase from the recording; generate the
+        inverse; sum them. In theory, the tone vanishes and the original music is left
+        completely intact.
+      </p>
+
+      <figure class="project-figure narrow">
+        <img src="../projects_data/2024-tone-remover/Fjerning_av_pipetone_figures/figure3.png" alt="Two sine waves of the same frequency, offset 180°. They sum to zero at every point.">
+        <figcaption>The idea: two sinusoids of equal amplitude and 180° apart sum to zero. Estimate the tone, generate its inverse, add.</figcaption>
+      </figure>
+
+      <p>
+        In practice, that is roughly what happened. The output spectrogram looks
+        identical to the original everywhere except where the tone used to be, and even
+        there, the surrounding music spectrum is preserved. The audio sounds natural; no
+        traces of the processing leaked through.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2024-tone-remover/Fjerning_av_pipetone_figures/figure6.png" alt="Two spectrograms compared: original and phase-cancelled output. The bright horizontal tone line is gone in the output, and the rest of the spectrum is unchanged.">
+        <figcaption>Final result. Original (top) vs. phase-cancelled output (bottom). Tone removed, surrounding spectrum intact.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned</h2>
+      <p>
+        That a band-stop filter is the right answer to the question "remove a narrow
+        band of frequencies", and the wrong answer to the question "remove a constant
+        sinusoid". The latter has more structure than the former and a cancellation
+        approach exploits all of it. Whenever the problem hands you that much structure,
+        spend a moment looking before you reach for the generic filter.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <p>
+        The full Norwegian course report (figures, derivations, before/after
+        spectrograms) is in the repo:
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2024-tone-remover/Fjerning%20av%20pipetone.pdf" target="_blank" rel="noopener" download>Download: Fjerning av pipetone.pdf (PDF)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

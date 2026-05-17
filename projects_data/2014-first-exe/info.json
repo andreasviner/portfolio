@@ -1,0 +1,18 @@
+{
+  "id": "first-exe-2014",
+  "title": "First .exe",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2014-05",
+  "shortDescription": "First real Python program compiled to .exe. A rotating ASCII skull animation, age eleven.",
+  "tags": [
+    "Python",
+    "early work",
+    "ASCII art"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 60,
+  "projectPage": "projects/first-exe.html"
+}

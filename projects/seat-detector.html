@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tesla-seat presence sensor · Andreas Lindeman</title>
+  <meta name="description" content="Wiring the seat-occupancy sensor out of a salvaged Tesla seat to an ESP32 so sitting down triggers a smart-light scene." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2024</span>
+    </div>
+
+    <h1 class="project-title">When you sits down, <em>the lights turn red</em></h1>
+
+    <p class="project-lede">
+      My friend Jacob built himself an office chair out of an old Tesla seat. The seat
+      still had its occupancy sensor in it, the same little pad that, in the car, knows
+      when to start nagging you about a seatbelt. We hooked that sensor to an ESP32 and
+      hooked the ESP32 to his smart lights. Sitting down now turns the room red.
+    </p>
+
+    <div class="video-embed aspect-9-16">
+      <iframe src="https://www.youtube.com/embed/sXIeO5_FOLM" title="Tesla-seat sensor demo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="video-caption">Jacob, sitting down, on demand.</p>
+
+    <section class="project-section">
+      <h2>The piece that already existed</h2>
+      <p>
+        Modern car seats ship with a presence detector in the cushion (usually a
+        pressure mat or capacitive pad) wired to the body control module so the car can
+        decide whether to fire the airbag, sound the seatbelt chime, or skip the
+        passenger entirely. Once a seat is out of a car, that sensor is just a switch-ish
+        thing with two wires hanging off it. Exactly the kind of part that wants a second
+        life as an input pin somewhere.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The bit we added</h2>
+      <ul>
+        <li><strong>ESP32.</strong> Reading the sensor on a GPIO with a hardware
+            debounce so a wobble in the chair doesn't cause a strobe.</li>
+        <li><strong>Light control.</strong> A small HTTP call out to the smart-light API
+            on sit-down and another on stand-up, switching between "Jacob is at the desk"
+            and "Jacob is not at the desk" scenes.</li>
+        <li><strong>Wi-Fi reconnect.</strong> The usual ESP32 boilerplate. The rig
+            lives behind the chair, nobody is going to push a reset button.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>Why it's worth talking about</h2>
+      <p>
+        It is a five-minute project that hits every part of the home-automation stack:
+        a real-world sensor, a microcontroller, a network, an API, a physical effect.
+        And the payoff is good. There's something specifically funny about a chair
+        announcing its occupant by changing the colour of the room. Small projects can
+        be high-density.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

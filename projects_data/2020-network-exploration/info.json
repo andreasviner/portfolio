@@ -1,0 +1,19 @@
+{
+  "id": "network-exploration-2020",
+  "title": "Network deep-dive",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2020-03",
+  "shortDescription": "A year teaching myself how networks really work. Captive portals, DNS, traffic shaping, auth.",
+  "tags": [
+    "networking",
+    "Python",
+    "security",
+    "self-taught"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 65,
+  "projectPage": "projects/network-exploration-2020.html"
+}

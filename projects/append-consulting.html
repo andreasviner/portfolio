@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Append Consulting · Andreas Lindeman</title>
+  <meta name="description" content="A year and a half as an ML engineer at Append Consulting in Oslo. Public-sector RAG, industrial optimisation, and competition design." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch work"></span> work</span>
+      <span class="sep"></span>
+      <span>Feb 2024 → Aug 2025</span>
+    </div>
+
+    <h1 class="project-title">Append <em>Consulting</em></h1>
+
+    <p class="project-lede">
+      Eighteen months as an ML engineer at Append, a small AI consultancy in Oslo. Most of
+      the work was shipping production machine learning for Norwegian public-sector and
+      industrial clients, the kind of projects where someone real depends on the model
+      working tomorrow morning. It was also where I learnt that "the model" is usually
+      the smallest part of the job.
+    </p>
+
+    <div class="project-disclosure">
+      <strong>Note.</strong> Client work was confidential. Specifics on this page stay at
+      the level of techniques and lessons; nothing that would identify data or strategy.
+    </div>
+
+    <section class="project-section">
+      <h2>What I shipped</h2>
+      <p>
+        Four production projects over the period. Three were for clients under NDA, so I
+        cannot describe their details. The fourth is its own deep-dive.
+      </p>
+      <ul>
+        <li><strong>Helsedir RAG.</strong> A retrieval-augmented question-answering
+            service for the Norwegian Directorate of Health. <em>(client confidential)</em></li>
+        <li><strong>Digdir analysis.</strong> Embedding clustering and LLM summarisation
+            over a large corpus of public-innovation documents. <em>(client confidential)</em></li>
+        <li><strong>Hydro Aluminium.</strong> Optimisation and ML for an industrial
+            process at a Norwegian aluminium producer. <em>(client confidential)</em></li>
+        <li><strong><a href="kaggle-competition.html">ML competition</a>.</strong>
+            Designed and ran an internal Kaggle-style competition between NTNU students
+            and Hydro engineers, as a way of seeding more ideas around that engagement.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned about consulting</h2>
+      <p>
+        The hard part is rarely the model. It is the data you cannot get cleanly, the
+        stakeholder who needs the explanation in their own vocabulary, the
+        production-environment quirk that nobody flagged until the day of deployment, and
+        the surprisingly long path from a notebook that works to a service that someone
+        else can operate without you. I leave Append more boring than I came in, and I
+        consider that a win.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Why I left</h2>
+      <p>
+        I joined <a href="https://infinigrid.ai" target="_blank" rel="noopener">Infinigrid</a>
+        in January 2026 to work on grid-scale ML full-time. Consulting taught me a great
+        deal; I wanted to go deep on one problem rather than wide across many.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

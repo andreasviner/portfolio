@@ -1,0 +1,21 @@
+{
+  "id": "blink-color-shooter-2021",
+  "title": "Blink shooter",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2022-03",
+  "shortDescription": "Python shooter where webcam-detected blinks flip you between two colour dimensions.",
+  "tags": [
+    "Python",
+    "computer vision",
+    "game"
+  ],
+  "types": [
+    "software",
+    "ml"
+  ],
+  "importance": 52,
+  "status": "lost",
+  "statusNote": "Python server code lost to time.",
+  "projectPage": "projects/blink-shooter.html"
+}

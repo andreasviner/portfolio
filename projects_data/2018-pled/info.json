@@ -1,0 +1,20 @@
+{
+  "id": "pled-2018",
+  "title": "PLED",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2018-12",
+  "end": "2019-09",
+  "shortDescription": "Second youth enterprise. Custom LED lighting with a spectrum tuned to support circadian rhythm: warmer at night, cooler in the day, on a schedule the user could override.",
+  "tags": [
+    "hardware",
+    "LED",
+    "biology",
+    "entrepreneurship"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 60,
+  "projectPage": "projects/pled.html"
+}

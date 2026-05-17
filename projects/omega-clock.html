@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omega · modified clock · Andreas Lindeman</title>
+  <meta name="description" content="A clock retrofitted with addressable LEDs and an ESP32, built as a host-gift for a student-association party." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Sep 2025</span>
+    </div>
+
+    <h1 class="project-title">Omega: a clock, with <em>more lights</em></h1>
+
+    <p class="project-lede">
+      In Norway, a <em>linjeforening</em> leader who visits another linjeforening's party
+      brings a gift to the host. This was ours: an off-the-shelf clock retrofitted with
+      addressable LEDs and an ESP32, capable of doing things a clock should probably not be
+      able to do. A day-long build.
+    </p>
+
+    <div class="video-stack">
+      <div>
+        <div class="video-embed aspect-9-16">
+          <iframe src="https://www.youtube.com/embed/NC8yHYJLOcE" title="Omega clock, front" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p class="video-caption">Front.</p>
+      </div>
+      <div>
+        <div class="video-embed aspect-9-16">
+          <iframe src="https://www.youtube.com/embed/IJQK4zllCUA" title="Omega clock, back" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p class="video-caption">Back.</p>
+      </div>
+    </div>
+
+    <section class="project-section">
+      <h2>The mod</h2>
+      <ul>
+        <li>Pulled the clock apart, kept the mechanism, added an addressable LED strip around the dial.</li>
+        <li>An ESP32 drives the LEDs, talks Wi-Fi, and exposes a small set of effects.</li>
+        <li>Mounted everything inside the original housing so it still looks like a clock until it suddenly doesn't.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What it really was</h2>
+      <p>
+        A reminder that a "small project" is often the most satisfying kind. One day from
+        breadboard to gift-wrapped, no over-engineering, no scope creep, no production
+        deploy. I would like more days like that.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

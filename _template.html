@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE. Copy this file to make a new project deep-dive page.
+  Steps:
+    1. Copy this file to projects/<slug>.html
+    2. Update <title>, the meta description, and the visible content.
+    3. Update the category swatch class (work | school | hobby).
+    4. Add or remove status tags as needed.
+    5. Link it from the matching projects_data/*.json by setting
+       "projectPage": "projects/<slug>.html"
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>[Project Title] · Andreas Lindeman</title>
+  <meta name="description" content="[One-sentence description]" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>YYYY</span>
+      <!-- optional status -->
+      <span class="sep"></span>
+      <span class="status-tag ongoing">Ongoing</span>
+    </div>
+
+    <h1 class="project-title">[Project Title] <em>(optional italic accent)</em></h1>
+
+    <p class="project-lede">
+      A one-paragraph lede that summarises the whole project: what it was,
+      what was interesting, what came of it.
+    </p>
+
+    <!-- Optional NDA / sensitive-content disclosure -->
+    <!--
+    <div class="project-disclosure">
+      <strong>Note.</strong> Details on this project are limited under client NDA.
+    </div>
+    -->
+
+    <section class="project-section">
+      <h2>Overview</h2>
+      <p>Background, context, what problem this was solving.</p>
+    </section>
+
+    <section class="project-section">
+      <h2>Technical details</h2>
+      <h3>Architecture</h3>
+      <p>How it was built.</p>
+      <ul>
+        <li>Bullet one</li>
+        <li>Bullet two</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>Outcome &amp; reflection</h2>
+      <p>What worked, what didn't, what I'd do differently now.</p>
+    </section>
+
+    <!-- Optional links -->
+    <section class="project-section">
+      <h2>Links</h2>
+      <div class="project-links">
+        <a href="#" target="_blank" rel="noopener">External link label</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

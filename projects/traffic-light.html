@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traffic light, retrofitted · Andreas Lindeman</title>
+  <meta name="description" content="A real traffic light retrofitted with a Raspberry Pi, three mains-rated relays, a Flask web UI, and a Sonos-reactive party mode." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Dec 2023 → 2024</span>
+    </div>
+
+    <h1 class="project-title">A real traffic light, <em>under our control</em></h1>
+
+    <p class="project-lede">
+      A genuine pedestrian traffic light arrived as a Christmas gift in late 2023,
+      legitimately acquired, but with no driving electronics. The original controller
+      had been on a separate pole that did not come with it. The project, then: get the
+      thing to light up, then keep going.
+    </p>
+
+    <section class="project-section">
+      <h2>Step 1: getting it open</h2>
+      <p>
+        I 3D-printed an opening tool, took the front off, and figured out the wiring.
+        The original logic had lived elsewhere; the cables coming out of the pole were
+        one per lamp, each switched by whether or not it saw 240V AC. So control meant
+        switching three independent mains connections.
+      </p>
+
+      <figure class="project-figure narrow">
+        <img src="../projects_data/2024-traff-light/trafikklys_figures/figure1.png" alt="The pedestrian traffic light standing in the kitchen, unlit. Three stacked lamp housings on a concrete base.">
+        <figcaption>As received. Three independent 240 V lamps, no controller, ready for retrofit.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Step 2: Raspberry Pi + relays</h2>
+      <ul>
+        <li>A Raspberry Pi Zero 2 sits inside the housing. The original casing has
+            plenty of dead volume, so it fits cleanly out of sight.</li>
+        <li>Three mains-rated relays, one per lamp, switched from the Pi's GPIO.</li>
+        <li>Each lamp is either fully on or fully off. There is no PWM here, just
+            clean AC switching.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>Step 3: web UI</h2>
+      <p>
+        A small web app runs on the Pi, served on the local network at
+        <code>trafikklys.local</code> via mDNS. From any phone in the house: pick a
+        mode, run a sequence, trigger one-off effects.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2024-traff-light/trafikklys_figures/figure2.png" alt="iPhone screenshot of the trafikklys.local web UI: three rendered lamp circles, top red and bottom green active.">
+          <figcaption>Web UI on <code>trafikklys.local</code>. Direct lamp control from any phone on the LAN.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2024-traff-light/trafikklys_figures/figure3.png" alt="The physical traffic light with the top red lamp and the bottom green lamp lit at the same time.">
+          <figcaption>And the same state on the actual hardware: red and green simultaneously, which a real crossing would never do.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Step 4: Sonos-reactive party mode</h2>
+      <p>
+        Hooked into the room's Sonos system. The light blinks along with whatever the
+        speakers are playing, and a separate "drinking games" mode runs scripted timed
+        sequences: green when it is your turn to drink, red when it is not. The most
+        used feature by a wide margin, beating both the original lamp function and the
+        music-reactive mode.
+      </p>
+
+      <figure class="project-figure narrow">
+        <img src="../projects_data/2024-traff-light/trafikklys_figures/figure5.png" alt="The physical traffic light with two red lamps lit and the green lamp dark. A state that exists only because we can now do whatever we want with the three lamps.">
+        <figcaption>Two reds at once. A state the original controller would never have produced.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned</h2>
+      <p>
+        That hardware projects need a product brain, not just an engineering one. The
+        feature I considered the headline (music-reactive) got shown to people once
+        and never demanded again. The scripted party mode is what people actually use.
+        And: when the load is mains-rated, you spend more time double-checking your
+        relay wiring than being clever in software. That is a healthy ratio.
+      </p>
+      <p>
+        Honestly, the whole project was a lot easier than I expected.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <p>
+        A short Norwegian writeup with photos of the light in each state lives in the
+        repo:
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2024-traff-light/trafikklys.pdf" target="_blank" rel="noopener" download>Download: trafikklys.pdf (PDF)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

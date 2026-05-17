@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blink shooter · Andreas Lindeman</title>
+  <meta name="description" content="A Python shooter where webcam-detected blinks flip you between two colour dimensions. Only your colour can damage your colour." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Spring 2022</span>
+      <span class="sep"></span>
+      <span class="status-tag lost">Source lost</span>
+    </div>
+
+    <h1 class="project-title">Blink shooter <em>(two-colour dimensions)</em></h1>
+
+    <p class="project-lede">
+      A Python shooter, made during a game jam at Torshus folkehøyskole. It used the
+      webcam to detect blinks, and every blink flipped the player between two colour
+      dimensions. Only your current colour could damage enemies of the same colour, so
+      you had to control your blinks to stay in the right one.
+    </p>
+
+    <div class="video-embed aspect-16-9">
+      <iframe src="https://www.youtube.com/embed/Wzbi65XwbLQ" title="Blink shooter gameplay" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="video-caption">Two minutes of gameplay.</p>
+
+    <figure class="project-figure">
+      <img src="../projects_data/2021-blink-color-shooter/Capture.PNG" alt="Top-down screenshot of the game on a white background. The player ship sits in the lower-right; the field is scattered with blue and orange polygonal enemies. A left-hand panel lists nine upgrade slots: Movement speed, Max Health, Health Regen, Reload Rate, Bullet Damage, Bullet Speed, Refresh rate, Projectile damage, Projectile speed. A right-hand panel shows the player's blue special-attack icons.">
+      <figcaption>Mid-game, blue dimension. The orange enemies are untouchable until the next blink.</figcaption>
+    </figure>
+
+    <section class="project-section">
+      <h2>The mechanic</h2>
+      <ul>
+        <li><strong>Webcam blink detection.</strong> Simple eye-aspect-ratio heuristic
+            on the webcam stream, calibrated per player.</li>
+        <li><strong>Two dimensions:</strong> red and blue. Each blink flipped you. Your
+            colour could only damage matching enemies; the other half of the field was
+            untouchable until you blinked again.</li>
+        <li><strong>Upgrades.</strong> Standard meta-progression (fire rate, health,
+            move speed), but the mechanic that made it weird was that <em>not blinking</em>
+            became a skill.</li>
+        <li>A loading screen with spinning arrows that was completely unnecessary and
+            entirely worth it.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned</h2>
+      <p>
+        That a game's "core mechanic" is whatever the player still talks about the next
+        day. Nobody remembered the upgrade tree; everybody remembered trying not to
+        blink. Constraint-driven design beats feature-driven design.
+      </p>
+      <p>
+        The Python server code is lost; folkehøyskole files did not survive the move.
+        The video above is most of what is left.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

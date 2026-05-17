@@ -1,0 +1,19 @@
+{
+  "id": "analog-buffer-2025",
+  "title": "Analog buffer",
+  "category": "school",
+  "isProject": true,
+  "start": "2025-02",
+  "shortDescription": "BC547 emitter-follower buffer between a 5.6 kΩ source and a 680 Ω load. Designed, biased, tuned with a potentiometer to hit the predicted 90% gain at 1 kHz.",
+  "tags": [
+    "analog electronics",
+    "BC547",
+    "buffer",
+    "NTNU"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 20,
+  "projectPage": "projects/analog-buffer.html"
+}

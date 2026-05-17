@@ -1,0 +1,19 @@
+{
+  "id": "fpga-dice-2025",
+  "title": "FPGA dice",
+  "category": "school",
+  "isProject": true,
+  "start": "2025-09",
+  "shortDescription": "Seven-LED dice on a Lattice ICE40 FPGA. Button-gated clock, 3-bit counter wrapping 1→6, LED logic derived from a truth table. First hands-on FPGA project, built in IceStudio.",
+  "tags": [
+    "FPGA",
+    "digital design",
+    "IceStudio",
+    "NTNU"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 26,
+  "projectPage": "projects/fpga-dice.html"
+}

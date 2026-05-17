@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ViT + LoRA fish classifier · Andreas Lindeman</title>
+  <meta name="description" content="LoRA fine-tuning of a DINOv2 vision transformer for underwater salmon species classification, part of a five-person NTNU project on fjord fish monitoring." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Spring 2026</span>
+    </div>
+
+    <h1 class="project-title">A vision transformer that <em>knows its salmon</em></h1>
+
+    <p class="project-lede">
+      The ML half of a five-person NTNU project on monitoring invasive pink salmon
+      (<em>pukkellaks</em>) in Norwegian fjord straits. Underwater cameras watch fish
+      pass through a 1×2-metre observation chamber; a small CNN detects them locally on
+      a Raspberry Pi; a DINOv2 vision transformer, fine-tuned with LoRA, classifies
+      species and estimates length on the server. I shared hardware responsibility for
+      the camera rig and built the server-side classifier.
+    </p>
+
+    <section class="project-section">
+      <h2>Why pink salmon</h2>
+      <p>
+        Norwegian wild salmon (<em>laks</em>) is classified as <em>near threatened</em>
+        on the national red list. The fastest-growing threat is pink salmon, an
+        invasive Pacific species that spawns earlier and more aggressively, displaces
+        wild salmon and sea trout from their best spawning grounds, and then dies en
+        masse (the species has a fixed two-year life cycle), polluting the watercourse
+        with rotting fish. In 2025 control efforts ran in 63 Norwegian rivers.
+      </p>
+      <p>
+        Existing fish-monitoring tech is mostly designed for inside salmon farms or for
+        river-mouth traps. Nobody is watching what comes <em>into</em> the fjords before
+        the fish move upstream. That is the gap our project tries to address.
+      </p>
+
+      <figure class="project-figure narrow">
+        <img src="../projects_data/2026-visual-tranformer/Elsys_prosjekt_rapport_(17)_figures/figure5.png" alt="Hand-drawn top-down sketch of a river mouth: a green guide-net ('Ledenett') angles out from the land, funnelling fish into a black observation chamber. Fish drawings show the intended swim direction; a blue arrow labelled 'Svømmeretning' marks the natural current.">
+        <figcaption>Concept sketch. A guide-net funnels fish through the observation chamber on their way upstream.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>The system, briefly</h2>
+      <ul>
+        <li><strong>Observation chamber.</strong> 2040×2040×1000 mm aluminium-profile
+            frame with a white tarp back wall, mounted in-stream.</li>
+        <li><strong>Cameras.</strong> 1× 8MP IMX179 (detail capture; lice
+            identification) and 3× 2MP IMX290 low-light cameras (0.001 lux). Each in a
+            sealed acrylic-dome housing with the lens at the dome's geometric centre to
+            minimise refraction.</li>
+        <li><strong>Sensors.</strong> Three ESP32 nodes at depths 0.5/1.0/1.5 m, each
+            with a DS18B20 temperature sensor and a Keyestudio TDS probe (a
+            cost-effective proxy for salinity). I²C bus to a Raspberry Pi 4B.</li>
+        <li><strong>Edge compute.</strong> Raspberry Pi 4B handles four parallel USB-3
+            video streams, runs the local detection model, and uplinks over 4G.</li>
+      </ul>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2026-visual-tranformer/Elsys_prosjekt_rapport_(17)_figures/figure11.png" alt="Isometric CAD render of the chamber: an aluminium-profile frame, approximately 2 × 1 × 2 metres, with labelled numbers for the camera mounts, tarp back wall, depth-sensor positions, and overhead detail camera.">
+          <figcaption>Chamber CAD. Aluminium-profile frame, white tarp back wall, camera mounts at three depths.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2026-visual-tranformer/Elsys_prosjekt_rapport_(17)_figures/figure7.png" alt="System dataflow diagram in Norwegian. Inputs 'Fisk' (fish) and 'Vann' (water) feed into 'Fanger video' and 'Innhenter data' nodes via cameras and a temperature/salinity sensor. The MPU forwards data to a 'Server' which performs 'Gjenkjenne lengde og art' (recognise length and species), then forwards to a 'Nettside' (website) and a 'Resultat' (result) node.">
+          <figcaption>End-to-end dataflow. Cameras and sensors → edge MPU → server → web UI.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>The two-stage ML pipeline</h2>
+      <p>
+        The interesting design choice was splitting detection from classification:
+      </p>
+      <ul>
+        <li><strong>Local CNN (YOLO) on the Pi.</strong> A small detector watches the
+            video stream in real time, produces bounding boxes and a tracking ID per
+            fish. Most of the time, all it sees is water. When it triggers, only the
+            relevant frames get sent over 4G, which saves bandwidth and storage and
+            keeps the pipeline alive when the cellular link drops.</li>
+        <li><strong>Server-side ViT (DINOv2).</strong> A much heavier transformer runs
+            on the server, where compute is cheap and the model can afford to be
+            careful. It classifies species (salmon / pink salmon / sea trout / sea char
+            / "no fish") and estimates length, jointly, in a multi-task head.</li>
+      </ul>
+      <p>
+        The "no fish" class is what filters false positives (branches, waves, shadows)
+        that the small local model lets through. Tracking IDs let the server pool
+        multiple frames of the <em>same</em> fish during its passage and vote, which
+        makes the final classification far more robust than any single frame.
+      </p>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2026-visual-tranformer/Elsys_prosjekt_rapport_(17)_figures/figure28.png" alt="A frame from an underwater camera inside the chamber. A dark salmon-shaped fish is in the lower-right, with a cyan YOLO bounding box around it labelled 'fish'. Tick-marks along the chamber wall act as a length reference.">
+          <figcaption>Local YOLO output. The small detector running on the Pi, drawing a box around a fish in the chamber.</figcaption>
+      </figure>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2026-visual-tranformer/Elsys_prosjekt_rapport_(17)_figures/figure45.png" alt="Demo of the full pipeline using a desk webcam: a person walks past holding paper printouts of two salmon. The web UI overlays bounding boxes on each printout, assigns 'FISK ID: 1' and 'FISK ID: 2', and reports estimated lengths (13.7 cm and 39.0 cm) and species confidence around 96–98%.">
+          <figcaption>End-to-end demo. A test rig with paper-printout fish; the server returns IDs, estimated lengths, and species confidence.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>The LoRA part</h2>
+      <p>
+        DINOv2 is a strong general-purpose ViT, but it has not seen pink salmon in low
+        light through an acrylic dome. Full fine-tuning would update hundreds of
+        millions of parameters; that is expensive and overkill for our dataset size.
+      </p>
+      <p>
+        LoRA (Low-Rank Adaptation) assumes the changes you actually need to make
+        during adaptation have low intrinsic rank. For each frozen weight matrix
+        <code>W ∈ ℝ<sup>d×k</sup></code>, you inject a trainable low-rank update
+        <code>ΔW = B·A</code> where <code>A ∈ ℝ<sup>r×k</sup></code> and
+        <code>B ∈ ℝ<sup>d×r</sup></code> with <code>r ≪ min(d, k)</code>. The original
+        weights stay put; only the adapters are trained.
+      </p>
+      <p>
+        In practice this gave us a model that handled our domain well, trained in hours
+        instead of days, and didn't need a massive amount of labelled data to land
+        somewhere useful.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>My slice of the project</h2>
+      <p>
+        Five-person team. From the report's work-allocation section, my share was:
+      </p>
+      <ul>
+        <li><strong>Hardware (shared):</strong> physical camera-system layout,
+            component interconnection, power distribution.</li>
+        <li><strong>Species classifier:</strong> adapting and validating DINOv2 with
+            LoRA for the species task, and integrating the classifier with the video
+            pipeline.</li>
+      </ul>
+      <p>
+        Teammates owned sensors, detection &amp; length estimation, frontend, and
+        backend respectively. Everyone wrote.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <p>
+        Full Norwegian report: system design, hardware bill of materials, ML method,
+        validation, all of it.
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2026-visual-tranformer/Elsys_prosjekt_rapport%20%2817%29.pdf" target="_blank" rel="noopener" download>Download: Elsys_prosjekt_rapport.pdf</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "id": "first-course-2011",
+  "title": "Coding class",
+  "category": "school",
+  "isProject": false,
+  "start": "2011",
+  "shortDescription": "First school coding course at age nine. Visual programming in Scratch, which was a disappointment to my batch-script-trained nine-year-old self, but a useful lesson in how forgiving syntax lets the ideas come through.",
+  "tags": [
+    "Scratch",
+    "school",
+    "early work"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 18,
+  "projectPage": "projects/first-course.html"
+}

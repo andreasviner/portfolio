@@ -1,0 +1,31 @@
+{
+  "id": "reddit-recap-2022",
+  "title": "AI content channels",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2023-03",
+  "shortDescription": "Automated pipeline scraping top Reddit content and publishing to YouTube, Instagram, TikTok.",
+  "tags": [
+    "automation",
+    "Python",
+    "video",
+    "social media"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 75,
+  "projectPage": "projects/reddit-recap.html",
+  "externalLinks": [
+    {
+      "label": "YouTube channel",
+      "url": "https://www.youtube.com/@RedditRecapV2",
+      "type": "youtube"
+    },
+    {
+      "label": "TikTok account",
+      "url": "https://www.tiktok.com/@redditrecap2",
+      "type": "tiktok"
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oda · Norwegian voice assistant · Andreas Lindeman</title>
+  <meta name="description" content="Oda — a Norwegian voice assistant on a Raspberry Pi Zero W, with custom wake-word, Whisper STT, an offline LLM, and a mesh of ESP32 sensor modules." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Nov 2023</span>
+    </div>
+
+    <h1 class="project-title">Oda — a Norwegian voice <em>assistant</em></h1>
+
+    <p class="project-lede">
+      A two-month project for NTNU's <em>avansert parallell</em> track: a Norwegian-speaking
+      voice assistant called Oda, running on a Raspberry Pi Zero W. Custom RNN wake-word
+      trained on 30k Norwegian audio clips I filtered myself, Whisper for speech-to-text,
+      an offline GPT for open questions, and a mesh of ESP32 sensor modules for the things
+      a chatbot can't know.
+    </p>
+
+    <section class="project-section">
+      <h2>What it does</h2>
+      <p>
+        You say "Oda," then ask something. If it's a command the system recognises
+        ("what's the time", "what's the temperature in the room") it answers from cache or
+        sensor data. If it's an open question ("what's the meaning of life") it routes to a
+        local LLM. Everything runs offline by default — no cloud APIs in the answer path.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2023-raspberry-assistant/Rapport2_figures/figure1.png" alt="The assistant on the workbench mid-assembly: a Bumblebee helmet enclosure with wiring spilling out the back, breadboard and modules behind it.">
+        <figcaption>Mid-build. Bumblebee enclosure, Pi Zero inside, ESP32 sensor modules behind.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Wake-word from scratch</h2>
+      <p>
+        The hardest part of the project was data, not modelling. There is very little
+        public Norwegian speech data with reliable captions, so I built my own pipeline:
+        the 27k clips from the Norwegian språkbank, plus ~750k clips scraped from 251
+        captioned Norwegian YouTube channels. Caption quality varied wildly — TV channels
+        like NRK and TV2 sometimes had Norwegian text over English audio — so I re-ran
+        every clip through Whisper-large and only kept the ones where Whisper agreed with
+        the original caption. About 30% survived. That left me ~30k high-quality clips to
+        train on.
+      </p>
+      <p>
+        To make the model smaller, I swapped the standard Norwegian alphabet for a
+        phonetic one with two extra letters: <code>ɵ</code> for the "ng" sound and
+        <code>ʂ</code> for the "sj/kj/sjk/tj" cluster. Fewer, more evenly distributed
+        labels — easier to learn. The wake-word model itself is a small GRU with CTC loss,
+        chosen for efficiency on the Zero W.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The pipeline</h2>
+      <ul>
+        <li><strong>Always-on RNN</strong> watches a stream of mel-spectrograms for the word "Oda."</li>
+        <li><strong>Once it fires</strong>, the server records until ~0.36s of silence, then hands the audio to <strong>Whisper-medium</strong> for transcription.</li>
+        <li><strong>Command router</strong> checks if the transcript matches a known intent. If yes, fulfil it. If no, route to the LLM.</li>
+        <li><strong>Offline LLM</strong>: <code>orca-mini-3b-gguf2-q4_0</code> via gpt4all. Doesn't speak Norwegian well, so the system translates NO→EN→prompt→EN→NO using deep_translator.</li>
+        <li><strong>TTS cache</strong> for repetitive answers ("klokka er…", every number under 10¹¹) — 419 KB on disk, keeps the response path offline for simple queries.</li>
+      </ul>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2023-raspberry-assistant/Rapport2_figures/figure10.png" alt="Side-by-side diagram: an RNN encoder processing tokens one at a time, versus a transformer encoder seeing all tokens at once.">
+        <figcaption>RNN for the wake-word (cheap, always on), transformer for transcription (heavy, fires once per command).</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>ESP32 sensor mesh</h2>
+      <p>
+        The assistant can answer questions about the physical world because cheap ESP32
+        modules with sensors are scattered around — a thermometer, a PIR motion sensor,
+        a dust sensor. Each ESP32 boots into Bluetooth-server mode if it hasn't seen the
+        Wi-Fi before; saying "oppstart" makes the Pi scan for them and hand over credentials
+        over Bluetooth (weakly encrypted so the SSID/password isn't broadcast in clear text).
+        Once on the network they're addressable over local sockets — a single byte over the
+        socket means "ping," "name," or "value."
+      </p>
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2023-raspberry-assistant/Rapport2_figures/figure5.png" alt="A Raspberry Pi Zero W single-board computer.">
+          <figcaption>Pi Zero W. Brain.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2023-raspberry-assistant/Rapport2_figures/figure4.png" alt="INMP441 I²S MEMS microphone modules with header pins.">
+          <figcaption>Two INMP441 mics, slightly angled, to catch the room.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2023-raspberry-assistant/Rapport2_figures/figure3.png" alt="An HW-104 PAM8403 class-D amplifier board.">
+          <figcaption>PAM8403 class-D amp into a 3Ω speaker.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Demo</h2>
+      <div class="video-embed aspect-9-16">
+        <iframe src="https://www.youtube.com/embed/IZjGK_iDyQI" title="Oda assistant demo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <p class="video-caption">Asking the time, the room temperature, and the meaning of life, in Norwegian.</p>
+    </section>
+
+    <section class="project-section">
+      <h2>What it taught me</h2>
+      <p>
+        The model was never the bottleneck. Norwegian speech data was, and figuring out how
+        to mine and filter it from YouTube — using a bigger model to grade a smaller one —
+        was the most useful skill I picked up. The second-most-useful was learning where
+        PyTorch and TensorFlow each pull their weight: PyTorch felt better for training
+        and iterating; TF felt faster once the model was frozen.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Course report</h2>
+      <p>
+        Full Norwegian IELS1001 report — "Talestyrt smart assistent med ESP moduler" —
+        covers the full architecture, training pipeline, the sensor protocol, and the budget:
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2023-raspberry-assistant/Rapport2.pdf" target="_blank" rel="noopener" download>Download: Rapport2.pdf (voice-assistant report)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

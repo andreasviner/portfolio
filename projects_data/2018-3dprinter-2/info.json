@@ -1,0 +1,17 @@
+{
+  "id": "3dprinter-2-2018",
+  "title": "3D printer v2",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2018-09",
+  "shortDescription": "Second kit printer, built with a friend. Bigger frame, beefier extruder, auto-bed-levelling, and dozens of benchies on the windowsill while I tuned each new filament in.",
+  "tags": [
+    "hardware",
+    "3D printing"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 35,
+  "projectPage": "projects/3dprinter-2.html"
+}

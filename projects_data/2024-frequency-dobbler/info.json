@@ -1,0 +1,18 @@
+{
+  "id": "freq-doubler-2024",
+  "title": "Freq doubler",
+  "category": "school",
+  "isProject": true,
+  "start": "2024-10",
+  "shortDescription": "Analog frequency doubler. Diode for the non-linearity, two cascaded LC band-passes with an op-amp buffer between them. SDR ≈ 21 dB at 2525 → 5050 Hz.",
+  "tags": [
+    "analog electronics",
+    "circuits",
+    "NTNU"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 18,
+  "projectPage": "projects/freq-doubler.html"
+}

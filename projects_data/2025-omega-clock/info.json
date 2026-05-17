@@ -1,0 +1,32 @@
+{
+  "id": "omega-clock-2025",
+  "title": "Omega clock",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2025-09",
+  "shortDescription": "A clock modded with LEDs and an ESP32, made as a host-gift for a student-association party. Day-long build.",
+  "tags": [
+    "ESP32",
+    "LEDs",
+    "hardware",
+    "gift"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 30,
+  "externalLinks": [
+    {
+      "label": "Back-of-clock demo",
+      "url": "https://youtube.com/shorts/IJQK4zllCUA",
+      "type": "youtube"
+    },
+    {
+      "label": "Front-of-clock demo",
+      "url": "https://youtube.com/shorts/NC8yHYJLOcE",
+      "type": "youtube"
+    }
+  ],
+  "projectPage": "projects/omega-clock.html"
+}

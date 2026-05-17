@@ -1,0 +1,16 @@
+{
+  "id": "ntnu-bachelor",
+  "title": "NTNU bachelor",
+  "category": "school",
+  "isProject": false,
+  "start": "2023-07",
+  "end": "2024-07",
+  "shortDescription": "First year of the Electronic Systems Engineer bachelor on the advanced-parallel track at NTNU, as the only person in my year offered the spot. Moved to the integrated master after.",
+  "tags": [
+    "NTNU",
+    "electronics",
+    "bachelor"
+  ],
+  "types": [],
+  "importance": 32
+}

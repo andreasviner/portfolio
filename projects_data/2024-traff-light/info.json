@@ -1,0 +1,20 @@
+{
+  "id": "traffic-light-2024",
+  "title": "Traffic light",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2024-12",
+  "shortDescription": "A road-grade traffic light retrofitted with a Raspberry Pi, a Flask web UI, and a sound-reactive mode. Bass goes red, treble goes green. The party mode ended up being the headline feature.",
+  "tags": [
+    "Raspberry Pi",
+    "hardware",
+    "audio",
+    "web"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 50,
+  "projectPage": "projects/traffic-light.html"
+}

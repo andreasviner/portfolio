@@ -1,0 +1,18 @@
+{
+  "id": "minecraft-server-2009",
+  "title": "Minecraft server",
+  "category": "hobby",
+  "isProject": false,
+  "start": "2009",
+  "shortDescription": "Ran a public Minecraft server with my dad, port-forwarded from the house. First taste of command syntax, server uptime, and most of the English I knew before school taught me the rest.",
+  "tags": [
+    "Minecraft",
+    "early work",
+    "self-hosted"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 22,
+  "projectPage": "projects/minecraft-server.html"
+}

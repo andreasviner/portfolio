@@ -1,0 +1,14 @@
+{
+  "id": "born",
+  "title": "Born",
+  "category": "hobby",
+  "isProject": false,
+  "hideOnMobile": true,
+  "start": "2002-10",
+  "shortDescription": "An engineer arrives. October 24th.",
+  "tags": [
+    "origin"
+  ],
+  "types": [],
+  "importance": 8
+}

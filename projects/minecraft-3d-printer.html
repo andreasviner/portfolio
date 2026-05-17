@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minecraft 3D printer · Andreas Lindeman</title>
+  <meta name="description" content="A pipeline that takes any 3D model or scan and builds it inside Minecraft via generated commands." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2021</span>
+    </div>
+
+    <h1 class="project-title">A 3D printer that prints in <em>Minecraft</em></h1>
+
+    <p class="project-lede">
+      A pipeline that takes any 3D model (STL, OBJ, even a raw 3D scan) and generates a
+      sequence of Minecraft commands that build the model in-world, with colour support and
+      block-palette controls.
+    </p>
+
+    <div class="video-embed aspect-9-16">
+      <iframe src="https://www.youtube.com/embed/uJcUUhq8S-c" title="Minecraft 3D printer demo: 3D-scanned friend, stone-only" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="video-caption">Demo: a 3D-scanned friend, restricted to stone blocks for a statue feel.</p>
+
+    <section class="project-section">
+      <h2>The pipeline</h2>
+      <ul>
+        <li><strong>Load:</strong> Any common 3D format, including meshes, point clouds, or coloured 3D scans.</li>
+        <li><strong>Voxelise:</strong> Resample the model into a voxel grid at the target resolution.</li>
+        <li><strong>Colour-match:</strong> Map each voxel's colour to the closest Minecraft block from a configurable palette (e.g. "stone only" for a statue look).</li>
+        <li><strong>Emit:</strong> Generate <code>/setblock</code> command sequences, batched so Minecraft doesn't choke when you paste them in.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What was fun about this</h2>
+      <p>
+        Minecraft's block palette is small but the colour space is real. Getting good
+        likenesses out of stone-only or wool-only restrictions turned the project into a
+        small exercise in palette quantisation, which, as it happens, generalises directly
+        to image-processing problems I'd hit later.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

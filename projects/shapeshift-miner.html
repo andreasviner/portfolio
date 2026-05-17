@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shape-shift miner · Andreas Lindeman</title>
+  <meta name="description" content="A Python mining game where the OS window itself extends as you upgrade, giving you a non-rectangular play space." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Spring 2022</span>
+    </div>
+
+    <h1 class="project-title">Shape-shift miner. The window <em>is the game</em></h1>
+
+    <p class="project-lede">
+      A Python game jammed together at Torshus folkehøyskole. You mined, built turrets
+      and mines, upgraded yourself (standard small-game stuff), but the trick was the
+      window. Some upgrades did not just buff your character; they extended the OS window
+      itself, sprouting irregular limbs out of the rectangle so the play space became a
+      shape no game window has any business being.
+    </p>
+
+    <div class="video-embed aspect-16-9">
+      <iframe src="https://www.youtube.com/embed/Owjntg7CXBw" title="Shape-shift miner gameplay" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="video-caption">A minute of testing.</p>
+
+    <section class="project-section">
+      <h2>The mechanic</h2>
+      <ul>
+        <li><strong>Mine.</strong> Swing a pickaxe at procedurally generated stone, get
+            resources, build turrets and mines.</li>
+        <li><strong>Upgrade.</strong> Normal upgrade-tree stuff, plus one strange
+            upgrade type: extend the window. Each extension stuck a new rectangle onto
+            the existing window at some angle.</li>
+        <li><strong>Result.</strong> A play space that was no longer a rectangle.
+            Different game-feel, weird occlusion problems, lots of fun edge cases.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The state of the build</h2>
+      <p>
+        The latest copy I recovered is a half-finished testing version: still on Python
+        3.8, the shop is mostly empty, only one stone type is generated, and a mining bot
+        is just standing around as a placeholder. The video above shows me poking at it
+        alone, but the core mechanic is visible: the window changes shape as the game
+        progresses.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I took from it</h2>
+      <p>
+        That the OS window is part of the game, even when nobody is looking. Most games
+        treat the window like a passive frame; treating it as a piece of state the
+        player can deform is a whole design space I would happily come back to.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

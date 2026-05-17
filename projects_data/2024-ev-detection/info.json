@@ -1,0 +1,21 @@
+{
+  "id": "ev-detection-2024",
+  "title": "EV detector",
+  "category": "school",
+  "isProject": true,
+  "start": "2024-03",
+  "shortDescription": "Detects if a car is electric. YOLOv8 for plate detection, custom CNN for plate reading, Statens vegvesen lookup.",
+  "tags": [
+    "YOLOv8",
+    "CNN",
+    "computer vision",
+    "PyTorch",
+    "API"
+  ],
+  "types": [
+    "software",
+    "ml"
+  ],
+  "importance": 70,
+  "projectPage": "projects/ev-detection.html"
+}

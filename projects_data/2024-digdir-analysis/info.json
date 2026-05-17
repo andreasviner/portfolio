@@ -1,0 +1,21 @@
+{
+  "id": "digdir-analysis-2024",
+  "title": "Digdir analysis",
+  "category": "work",
+  "isProject": true,
+  "start": "2024-10",
+  "shortDescription": "Embedding clustering plus LLM summarisation over a large body of public documents.",
+  "tags": [
+    "embeddings",
+    "LLM",
+    "NLP",
+    "public sector"
+  ],
+  "types": [
+    "software",
+    "ml"
+  ],
+  "importance": 68,
+  "status": "nda",
+  "statusNote": "Details limited under client NDA."
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First standalone Python program · Andreas Lindeman</title>
+  <meta name="description" content="The first real Python program I shipped: a rotating ASCII skull animation packaged as a standalone .exe, age eleven." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2014</span>
+    </div>
+
+    <h1 class="project-title">First standalone <em>.exe</em></h1>
+
+    <p class="project-lede">
+      I was eleven. I'd been writing batch scripts and Python for a couple of years, but
+      this was the first program I built that could leave my computer. A real,
+      double-clickable executable.
+    </p>
+
+    <section class="project-section">
+      <h2>What it actually did</h2>
+      <p>
+        On a secret keypress it threw open a fullscreen terminal and ran a rotating ASCII
+        skull animation that I'd hand-built frame by frame. To eleven-year-old me it was the
+        coolest thing imaginable.
+      </p>
+      <p>
+        Honest context: this lived inside a wider program that also experimented with input
+        capture, a project I'd handle very differently today. I wasn't doing anything
+        targeted; I was a kid copying patterns from forums and being awed by what the
+        machine would let me do. I include it here because it's the moment Python stopped
+        being homework and started being a real tool.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The skull</h2>
+      <p>
+        Every rotation frame was a hand-drawn ASCII grid. The animation cycled through them
+        with a fixed sleep between frames. The "3D-ness" was an illusion, the same trick
+        old demoscene intros used, and it taught me a useful lesson: a small set of
+        carefully-chosen frames beats a complicated renderer for impact.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Why it matters now</h2>
+      <p>
+        Two things stuck. First, the leap from <em>script</em> to <em>program someone else
+        can run</em>. Packaging, paths, the bit where it has to work on a machine that
+        isn't yours. Second, the discovery that I cared more about the craft than the
+        prank. I've been chasing the craft ever since.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

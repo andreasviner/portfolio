@@ -1,0 +1,24 @@
+{
+  "id": "ligmax-2026",
+  "title": "Ligmax",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2026-01",
+  "end": "present",
+  "shortDescription": "Custom boat platform with full sensor suite, dual cameras, buoy detection, custom hull, and integrated electronics.",
+  "tags": [
+    "hardware",
+    "computer vision",
+    "naval",
+    "sensors",
+    "CAD"
+  ],
+  "types": [
+    "hardware",
+    "software",
+    "ml"
+  ],
+  "importance": 72,
+  "status": "ongoing",
+  "projectPage": "projects/ligmax.html"
+}

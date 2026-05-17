@@ -1,0 +1,16 @@
+{
+  "id": "highschool",
+  "title": "High school",
+  "category": "school",
+  "isProject": false,
+  "hideOnMobile": true,
+  "start": "2018-07",
+  "end": "2021-07",
+  "shortDescription": "Upper-secondary on the technology track (studiespesialiserende med teknologi). The three years where coding stopped being a hobby and started looking like a future.",
+  "tags": [
+    "high school",
+    "Norway"
+  ],
+  "types": [],
+  "importance": 25
+}

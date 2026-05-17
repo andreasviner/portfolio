@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LEGO drawing machine · Andreas Lindeman</title>
+  <meta name="description" content="A two-axis LEGO Mindstorms drawing arm driven by Python, with a pen-lift, controlled from a PC mouse." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2018</span>
+    </div>
+
+    <h1 class="project-title">A drawing arm out of <em>LEGO</em></h1>
+
+    <p class="project-lede">
+      Python running on a LEGO Mindstorms EV3 brick, driving a two-axis drawing arm with a
+      mouse-controlled cursor and a pen-lift servo. Coarse hardware, surprisingly precise
+      output.
+    </p>
+
+    <div class="video-embed aspect-16-9">
+      <iframe src="https://www.youtube.com/embed/rjY2Qk7qEzs" title="LEGO drawing machine demo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="video-caption">Demo. Drawing in Norwegian.</p>
+
+    <section class="project-section">
+      <h2>How it worked</h2>
+      <ul>
+        <li>Two motors drove an X/Y carriage over a paper bed.</li>
+        <li>A third small motor lifted and dropped the pen, isolating start/stop strokes.</li>
+        <li>Python on the EV3 read a stream of (x, y, pen-down?) tuples from a host PC over Bluetooth.</li>
+        <li>The host could either play back a saved stroke list or feed it live from the mouse, so drawing on the screen mirrored to ink on paper.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned</h2>
+      <p>
+        That mechanical play is a force you cannot ignore. Backlash, flex, and an uneven
+        paper surface ate more accuracy than my code ever did. A surprising chunk of the
+        project was characterising those errors and compensating for them. My first taste
+        of "real" robotics, where the math meets the physics.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

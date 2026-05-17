@@ -1,0 +1,21 @@
+{
+  "id": "anti-alias-filter-2025",
+  "title": "Anti-alias filter",
+  "category": "school",
+  "isProject": true,
+  "start": "2025-03",
+  "shortDescription": "6th-order Butterworth anti-alias filter for a 3 kHz ADC. Three cascaded Sallen-Key sections, with weird capacitance values built from parallel combinations of standard parts.",
+  "tags": [
+    "analog electronics",
+    "DSP",
+    "filters",
+    "Butterworth",
+    "Sallen-Key",
+    "NTNU"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 22,
+  "projectPage": "projects/anti-alias-filter.html"
+}

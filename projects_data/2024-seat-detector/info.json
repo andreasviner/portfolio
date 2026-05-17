@@ -1,0 +1,27 @@
+{
+  "id": "seat-detector-2024",
+  "title": "Tesla-seat presence sensor → smart lights",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2024",
+  "shortDescription": "Wired the seat-occupancy sensor from a Tesla seat (repurposed as an office chair) to an ESP32. Sitting down turns the room red.",
+  "tags": [
+    "hardware",
+    "ESP32",
+    "automotive",
+    "home automation"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 28,
+  "projectPage": "projects/seat-detector.html",
+  "externalLinks": [
+    {
+      "label": "Demo video",
+      "url": "https://youtube.com/shorts/sXIeO5_FOLM",
+      "type": "youtube"
+    }
+  ]
+}

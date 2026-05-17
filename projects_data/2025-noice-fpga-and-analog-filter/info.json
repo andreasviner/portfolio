@@ -1,0 +1,20 @@
+{
+  "id": "fpga-analog-noise-2025",
+  "title": "FPGA noise filter",
+  "category": "school",
+  "isProject": true,
+  "start": "2025-11",
+  "shortDescription": "FPGA-generated white noise (LFSR) shaped by a Delyiannis-Friend active band-pass filter into a tonal output around 920 Hz. Digital pseudo-random source, analog band-limiter, audible result.",
+  "tags": [
+    "FPGA",
+    "LFSR",
+    "analog electronics",
+    "active filter",
+    "NTNU"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 26,
+  "projectPage": "projects/fpga-noise-filter.html"
+}

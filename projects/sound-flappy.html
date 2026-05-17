@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sound Flappy · Andreas Lindeman</title>
+  <meta name="description" content="Flappy Bird, but the bird flaps to your voice: volume equals altitude. A game-jam project from Torshus." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Nov 2021</span>
+    </div>
+
+    <h1 class="project-title">Sound <em>Flappy</em></h1>
+
+    <p class="project-lede">
+      Flappy Bird, except your microphone is the controller. The louder you are, the
+      higher the bird climbs; silence lets it fall. A small mobile game jam at Torshus
+      folkehøyskole, in the same wave as <a href="tactic-blobs.html">Tactic Blobs</a>
+      and <a href="blink-shooter.html">Blink Shooter</a>.
+    </p>
+
+    <section class="project-section">
+      <h2>How it worked</h2>
+      <ul>
+        <li>Microphone input sampled and reduced to a smoothed loudness signal.</li>
+        <li>Loudness mapped to vertical velocity. Soft floor, no ceiling.</li>
+        <li>The usual Flappy obstacle pattern, but tuned for a control surface that is
+            very different from a tap.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The thing about voice-controlled games</h2>
+      <p>
+        They are unplayable in public, which is funny once and a problem after that. The
+        most interesting design constraint of the project was making the game readable
+        enough to play at <em>quiet</em> volumes (humming, not shouting) so that more
+        than five people on Earth would ever finish it.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

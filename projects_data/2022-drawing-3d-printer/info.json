@@ -1,0 +1,27 @@
+{
+  "id": "drawing-3d-printer-2022",
+  "title": "Drawing plotter",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2022-05",
+  "shortDescription": "A broken 3D printer became a pen plotter for one-continuous-line drawings. PC-controlled, slow, hypnotic.",
+  "tags": [
+    "3D printer",
+    "art",
+    "Python",
+    "plotter"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 45,
+  "externalLinks": [
+    {
+      "label": "Demo: plotter in motion",
+      "url": "https://youtube.com/shorts/aqdEn8t7d0w",
+      "type": "youtube"
+    }
+  ],
+  "projectPage": "projects/drawing-3d-printer.html"
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPGA dice · Andreas Lindeman</title>
+  <meta name="description" content="A seven-LED electronic dice on a Lattice ICE40 FPGA. Fast counter, button-gated clock, LED logic from a truth table." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>May 2025</span>
+    </div>
+
+    <h1 class="project-title">An electronic dice <em>on an FPGA</em></h1>
+
+    <p class="project-lede">
+      Seven LEDs in a dice pattern, one button, one Lattice ICE40 FPGA. Hold the button
+      and the dice cycles through 1–6 too fast to follow; let go and it stops on a face.
+      My first hands-on FPGA project, built in IceStudio, the graphical alternative to
+      writing Verilog.
+    </p>
+
+    <section class="project-section">
+      <h2>How "randomness" works here</h2>
+      <p>
+        It is not random. There is a 3-bit counter wrapping 1 → 6 → 1, driven by a
+        button-gated clock signal:
+      </p>
+      <pre><code>tick = (CLK + Button) XOR Button</code></pre>
+      <p>
+        When the button is up, the counter input is permanently low. When the button
+        is held, the counter input follows CLK and ticks at the FPGA's full speed,
+        millions of times faster than a finger can release. By the time you let go
+        the counter has effectively forgotten where it started. That gives the illusion
+        of a real dice without any actual entropy source.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2025-fpga-dice/designnotat_2_figures/figure7.png" alt="IceStudio screenshot of the counter sub-block: a 3-bit counter wired to wrap 1→6.">
+        <figcaption>Counter in IceStudio. Graphical wiring instead of Verilog, 3-bit modulo-6 wrap.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>LED logic</h2>
+      <p>
+        Seven LEDs but only four logical groups (centre, two NE/SW yellows, two NW/SE
+        yellows, two side oranges). With the counter outputs <code>(C, B, A)</code> =
+        binary, a small truth table gives:
+      </p>
+      <pre><code>Red    = A
+Yellow / = B + C
+Yellow \ = C
+Orange   = B · C</code></pre>
+      <p>
+        Implemented in IceStudio as a few gates straight from the table.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2025-fpga-dice/designnotat_2_figures/figure3.png" alt="Diagram mapping each dice face (1–6) to which of the seven LEDs light up.">
+        <figcaption>Face-to-LED mapping. Seven physical LEDs, four logical groups. The truth table falls out directly.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>The current-limiting story</h2>
+      <p>
+        The first design had a per-LED series resistor (~65 Ω for red, 60 Ω for orange,
+        55 Ω for yellow at 20 mA). The realised design uses a single shared 66.6 Ω
+        resistor across all the LEDs. Slightly under-driving each LED, but they still
+        light cleanly, and the total brightness varies less between faces because the
+        more LEDs that turn on, the less current each one gets.
+      </p>
+      <p>
+        Measured currents per face: 13 mA (1) → 19 mA (6). Realised power ≈ 0.044 W
+        (1) → 0.063 W (6), substantially below the theoretical numbers in the
+        per-LED design.
+      </p>
+
+      <figure class="project-figure narrow">
+        <img src="../projects_data/2025-fpga-dice/designnotat_2_figures/figure14.png" alt="The physical build: Lattice ICE40 FPGA breakout with seven LEDs arranged in a dice pattern, plus a button and the shared series resistor.">
+        <figcaption>Final build. ICE40 breakout, seven LEDs in the dice pattern, single shared 66.6 Ω current-limit resistor.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2025-fpga-dice/designnotat_2.pdf" target="_blank" rel="noopener" download>Download: designnotat_2.pdf (Terning simulator)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

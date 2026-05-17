@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First coding course · Andreas Lindeman</title>
+  <meta name="description" content="My first school coding course, in fourth grade. Visual programming in Scratch, after years of batch scripts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>2011</span>
+    </div>
+
+    <h1 class="project-title">First coding class <em>(in fourth grade)</em></h1>
+
+    <p class="project-lede">
+      My first school coding course, fourth grade, age nine. By that point I had been
+      writing batch scripts and Minecraft commands for a couple of years, so when the
+      teacher introduced Scratch (visual programming, drag-the-blocks) I was
+      enthusiastically disappointed. It still turned out to be a fun year.
+    </p>
+
+    <section class="project-section">
+      <h2>What we did</h2>
+      <ul>
+        <li>Block-based programming in Scratch. Sprites, simple loops, event handlers
+            wired up by dragging.</li>
+        <li>A handful of small games, the kind you can finish in an afternoon and show
+            to a parent in the evening.</li>
+        <li>Group projects with classmates who had never written code before, which
+            turned out to be the more interesting part.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The "real coding" misconception</h2>
+      <p>
+        I had a strong opinion, at age nine, that Scratch did not count. That opinion was
+        wrong, and I have made it a habit to revisit it every few years. Visual programming
+        is real programming. The syntax has just been made forgiving so the ideas can
+        come through. The kids in the class who had never touched a keyboard before were
+        learning the same skills I had picked up from batch scripts, just in less time and
+        with fewer typos.
+      </p>
+      <p>
+        Still, once class was over I went home and wrote more batch scripts.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

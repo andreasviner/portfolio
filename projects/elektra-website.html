@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>elektra.io · Andreas Lindeman</title>
+  <meta name="description" content="The student-association website I built from scratch: accounts, events, billing, posters, dark mode, animated seasonal backgrounds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Sep 2024 → present</span>
+    </div>
+
+    <h1 class="project-title">elektra.io, a website that does <em>everything</em></h1>
+
+    <p class="project-lede">
+      The website for Elektra, the student association for electronics students at NTNU.
+      Built from scratch: frontend, backend, database, auth, billing, event management, the
+      whole thing. It started as a redesign and turned into the operating system of a
+      student association.
+    </p>
+
+    <div class="video-embed aspect-16-9">
+      <iframe src="https://elektra.io" title="elektra.io student association website" loading="lazy"></iframe>
+    </div>
+    <p class="video-caption">Live preview at elektra.io.</p>
+
+    <section class="project-section">
+      <h2>What it does</h2>
+      <ul>
+        <li><strong>Accounts &amp; roles:</strong> Full user hierarchy. Groups, roles, admin levels, public vs. private profile fields.</li>
+        <li><strong>Events:</strong> Create, edit, price, locate (on a custom campus map or via Google Maps off-campus), gate by group, cap attendance, ticket via QR codes branded with the Elektra logo.</li>
+        <li><strong>Billing:</strong> Receipts post directly into the økonomiansvarlig's accounting software.</li>
+        <li><strong>Job posts:</strong> stillingsannonser, oppslag, classifieds, with moderation.</li>
+        <li><strong>Calendar:</strong> All events in one view, filtered by group.</li>
+        <li><strong>POV:</strong> An event-photography mode where attendees can shoot but not see photos until the event ends.</li>
+        <li><strong>Help &amp; access:</strong> User manuals; room-access requests routed to the right approvers.</li>
+        <li><strong>Theme:</strong> Full dark mode. Seasonal animated backgrounds: snow in winter, hearts on Valentine's, ghosts at Halloween.</li>
+        <li><strong>Profile:</strong> Custom profile pictures, descriptions, public and private contact info, allergies for event hosts.</li>
+        <li><strong>Auth:</strong> Google sign-in plus an internal flow.</li>
+        <li><strong>Safety:</strong> Sensitive fields encrypted at rest; least-privilege role checks at every endpoint.</li>
+        <li><strong>Ops:</strong> Separate dev environment at <a href="https://dev.elektra.io" target="_blank" rel="noopener">dev.elektra.io</a>; deploys via CI.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What it taught me</h2>
+      <p>
+        Building software for a real community is a different game from building it for
+        yourself. Every feature touches a real person's evening or wallet. The biggest
+        change in how I write code came from this project: less cleverness, more clarity,
+        far more tests around the bits where money and access live.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

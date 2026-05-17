@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ML Engineer · Infinigrid · Andreas Lindeman</title>
+  <meta name="description" content="ML engineer at Infinigrid. AI that watches the electrical power grid and predicts its risks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch work"></span> work</span>
+      <span class="sep"></span>
+      <span>Jan 2026 → present</span>
+      <span class="sep"></span>
+      <span class="status-tag ongoing">Ongoing</span>
+    </div>
+
+    <h1 class="project-title">Infinigrid, AI for the <em>power grid</em></h1>
+
+    <p class="project-lede">
+      ML engineer at <a href="https://infinigrid.ai" target="_blank" rel="noopener">Infinigrid</a>.
+      We build AI systems that watch the electrical grid in real time and predict the risks
+      that have been historically hard to see: overloads, equipment degradation, cascading
+      failures before they cascade.
+    </p>
+
+    <div class="video-embed aspect-16-9">
+      <iframe src="https://infinigrid.ai" title="Infinigrid" loading="lazy"></iframe>
+    </div>
+    <p class="video-caption">Live preview at infinigrid.ai.</p>
+
+    <section class="project-section">
+      <h2>Why this work matters</h2>
+      <p>
+        The electrical grid was designed for a world that doesn't exist anymore. Loads are
+        peakier, generation is more distributed and weather-dependent, and the data
+        infrastructure to react in real time is still being built. Forecasting and
+        risk-prediction at grid scale is one of the few applied-ML problems where the
+        downstream consequences are measured in megawatts, not click-through rate.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I work on</h2>
+      <p>
+        Production ML pipelines on grid-scale time-series data. I can't share specifics yet,
+        but the broad strokes are forecasting (load, generation, weather-coupled effects),
+        anomaly detection on streaming telemetry, and the boring-but-load-bearing
+        engineering that makes the ML actually run in production.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Where I am in the journey</h2>
+      <p>
+        Early. Started January 2026. Plenty more to come on this page over time, so check
+        back, or follow my work via the contact links on the main page.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

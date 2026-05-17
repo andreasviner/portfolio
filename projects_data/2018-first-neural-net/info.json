@@ -1,0 +1,22 @@
+{
+  "id": "first-nn-2018",
+  "title": "First NN",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2018-10",
+  "shortDescription": "First deep self-learning neural net. Played the browser game Slope from extracted screen lines.",
+  "tags": [
+    "machine learning",
+    "computer vision",
+    "Python",
+    "reinforcement"
+  ],
+  "types": [
+    "software",
+    "ml"
+  ],
+  "importance": 70,
+  "projectPage": "projects/first-neural-net.html",
+  "status": "lost",
+  "statusNote": "Code archived but not currently available."
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BC547 emitter-follower buffer · Andreas Lindeman</title>
+  <meta name="description" content="A discrete BC547 emitter-follower buffer between a 5.6 kΩ source and a 680 Ω load. Biased, characterised, and tuned to 90% gain at 1 kHz." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Sep 2025</span>
+    </div>
+
+    <h1 class="project-title">A discrete <em>emitter-follower buffer</em></h1>
+
+    <p class="project-lede">
+      An NPN emitter-follower built around a BC547 (the canonical small-signal
+      transistor) for buffering a 500 mV / 1 kHz sine between a 5.6 kΩ source and a
+      680 Ω load. The project is half "design the bias point", half "measure how reality
+      diverges from the textbook."
+    </p>
+
+    <section class="project-section">
+      <h2>The design choices</h2>
+      <ul>
+        <li><strong>V<sub>CC</sub></strong> = 7 V, with <strong>V<sub>E</sub></strong>
+            set to 3.5 V, halfway up the rail, so the signal has equal swing
+            headroom in both directions.</li>
+        <li><strong>I<sub>E</sub></strong> = 1 mA → <strong>R<sub>E</sub></strong> =
+            3.5 kΩ.</li>
+        <li>Base bias from a voltage divider. The "stiffness" factor k = 3 is on the
+            soft side, on purpose. The source resistance is 5.6 kΩ, so the
+            divider must not load the input. With k = 3:
+            <strong>R<sub>2</sub></strong> = 280 kΩ, <strong>R<sub>1</sub></strong> =
+            140 kΩ.</li>
+        <li>22 µF AC-coupling capacitors at input and output.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The numbers</h2>
+      <p>
+        Calculated input impedance: ~52 kΩ, predicting a source-side voltage divider of
+        <code>52k / (5.6k + 52k) ≈ 0.903</code>. So the buffer should hand the base
+        roughly 90% of the source amplitude, and from there an emitter-follower
+        almost-unity-gains the signal to the load.
+      </p>
+      <p>
+        Measured: input 492 mV, output 410 mV → ratio 0.83. Below target. Tuning
+        <strong>R<sub>E</sub></strong> down to 1.52 kΩ (which raises I<sub>E</sub> to
+        ~23 mA, giving better r<sub>e</sub>) brought it up to 441 mV / 490 mV =
+        <strong>0.90</strong>, exactly the predicted ratio. Lower-frequency knee from
+        measurement: f<sub>−3dB</sub> ≈ 13 Hz.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2025-buffer/designnotat_5_figures/figure2.png" alt="Oscilloscope trace of the theoretically-valued circuit, showing input and output sinusoids with the output noticeably smaller than the input.">
+          <figcaption>Designed values: input 492 mV, output 410 mV. Ratio 0.83, short of the 0.90 target.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2025-buffer/designnotat_5_figures/figure3.png" alt="Oscilloscope trace after lowering R_E to 1.52 kΩ. Input and output sinusoids are now much closer in amplitude.">
+          <figcaption>R<sub>E</sub> retuned to 1.52 kΩ. 441 mV / 490 mV = 0.90, exactly the predicted ratio.</figcaption>
+        </figure>
+      </div>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2025-buffer/designnotat_5_figures/figure4.png" alt="Measured frequency response of the buffer: flat above ~20 Hz, rolling off below, with the −3 dB point near 13 Hz.">
+        <figcaption>Low-frequency response. The −3 dB knee at ~13 Hz, set by the 22 µF coupling caps.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>What I would do differently</h2>
+      <p>
+        Higher divider stiffness if the source could tolerate it (5–20× I<sub>B</sub>
+        instead of 3×) for more β-independence. Bigger coupling caps if low-frequency
+        response matters. And if precision is the goal, do not build an emitter
+        follower at all. Use an op-amp with a buffered output. The discrete transistor was
+        the assignment, not the optimum.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2025-buffer/designnotat_5.pdf" target="_blank" rel="noopener" download>Download: designnotat_5.pdf (Buffer)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

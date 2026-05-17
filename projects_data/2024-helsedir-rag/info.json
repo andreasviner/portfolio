@@ -1,0 +1,21 @@
+{
+  "id": "helsedir-rag-2024",
+  "title": "Helsedir RAG",
+  "category": "work",
+  "isProject": true,
+  "start": "2024-03",
+  "shortDescription": "RAG service for the Norwegian Directorate of Health. Embedding pipeline, vector store, LLM, frontend.",
+  "tags": [
+    "RAG",
+    "LLM",
+    "embeddings",
+    "public sector"
+  ],
+  "types": [
+    "software",
+    "ml"
+  ],
+  "importance": 72,
+  "status": "nda",
+  "statusNote": "Details limited under client NDA."
+}

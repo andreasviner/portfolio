@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analog frequency doubler · Andreas Lindeman</title>
+  <meta name="description" content="A diode-and-band-pass analog frequency doubler from discrete components. First attempt, SDR around 21 dB." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Oct 2024</span>
+    </div>
+
+    <h1 class="project-title">Doubling a frequency, <em>analog</em></h1>
+
+    <p class="project-lede">
+      First attempt at an analog frequency doubler. Take <code>x₁(t) = cos(2πft)</code>
+      in, get a clean <code>x₂(t) = k·cos(2π·2f·t + φ)</code> out, using only the kind
+      of passives a student has lying around. Built around a diode for the non-linearity
+      plus two cascaded band-pass filters with an op-amp buffer in between.
+    </p>
+
+    <section class="project-section">
+      <h2>The idea</h2>
+      <ul>
+        <li><strong>Non-linearity.</strong> Push the input through a diode. The diode's
+            non-linear V-I curve generates harmonics, including the one we want at
+            <code>2f</code>.</li>
+        <li><strong>Band-pass 1.</strong> Isolate the <code>2f</code> component out of
+            the harmonic soup.</li>
+        <li><strong>Buffer.</strong> An op-amp follower so the two filters do not
+            load each other.</li>
+        <li><strong>Band-pass 2.</strong> A second pass tightens the spectrum further.</li>
+      </ul>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2024-frequency-dobbler/Fordobling_av_frekvens_figures/figure3.png" alt="Block-level schematic: diode, band-pass filter, op-amp buffer, band-pass filter.">
+        <figcaption>Topology. Diode for the non-linearity, two cascaded LC band-pass stages, op-amp follower between them.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>The numbers</h2>
+      <ul>
+        <li>Input: 2525 Hz, target output: 5050 Hz.</li>
+        <li>Available inductors measured at ~70 mH, which fixed the capacitor target.
+            For <code>2π·5050·√(LC) = 1</code> with <code>L = 70 mH</code>:
+            <code>C ≈ 14 nF</code>. I used pairs of 10 nF.</li>
+        <li>Resistors were tuned in with a potentiometer, then frozen.</li>
+        <li>Measured SDR after tuning: ~21.4 dB. Every other half-cycle came out 12–13%
+            short of the others, visible in the scope trace and audible in the spectrum.</li>
+      </ul>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2024-frequency-dobbler/Fordobling_av_frekvens_figures/figure4.png" alt="Full circuit schematic with component values: 70 mH inductors, 10 nF capacitors, 1 kΩ / 0.7 kΩ / 1.5 kΩ resistors.">
+          <figcaption>Final values. 70 mH inductors paired with 10 nF caps; resistors tuned, then frozen.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2024-frequency-dobbler/Fordobling_av_frekvens_figures/figure7.png" alt="Breadboard with the analog frequency doubler wired up. Two hand-wound inductors on a custom 3D-printed mount; potentiometers for resistor tuning.">
+          <figcaption>Build photo. Hand-wound 70 mH inductors mounted on a 3D-printed jig, potentiometers for tuning.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Outcome</h2>
+      <p>
+        A clear, identifiable 2f sinusoid. Visibly imperfect at the half-cycle level,
+        but unmistakably doubled. Closing the gap to 25 dB SDR would require trimming
+        the per-half-cycle amplitude error below ~7%, which probably needs better
+        matched components and a more symmetric non-linearity than a single diode.
+        Improving on that is what
+        <a href="freq-doubler-v2.html">Freq doubler v2</a> was about.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2024-frequency-dobbler/Fordobling_av_frekvens_figures/figure6.png" alt="Oscilloscope trace: orange input sinusoid at 2.5 kHz, blue output sinusoid at twice the frequency.">
+        <figcaption>Scope trace. Orange: 2.5 kHz input. Blue: doubled output at 5 kHz, smaller in amplitude as expected.</figcaption>
+      </figure>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2024-frequency-dobbler/Fordobling_av_frekvens_figures/figure8.png" alt="Zoomed-in scope view: every second half-cycle is visibly shorter, the asymmetry that limits SDR.">
+          <figcaption>The flaw. Every second half-cycle comes out 12–13% short. Single-diode rectification is the culprit.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2024-frequency-dobbler/Fordobling_av_frekvens_figures/figure5.png" alt="Spectrum analyser: dominant peak at 5 kHz, residual peak at the input fundamental, smaller harmonics.">
+          <figcaption>Output spectrum. Clean 2f peak with a residual fundamental and odd harmonics. SDR ≈ 21.4 dB.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2024-frequency-dobbler/Fordobling%20av%20frekvens.pdf" target="_blank" rel="noopener" download>Download: Fordobling av frekvens.pdf</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "id": "op-amp-2025",
+  "title": "Op-amp",
+  "category": "school",
+  "isProject": true,
+  "start": "2025-02",
+  "shortDescription": "Operational amplifier built from discrete BC547/BC557 transistors: differential pair, current mirror, emitter-follower output. Characterised open-loop (A ≈ 400) and with ×10 negative feedback (A ≈ 9.7, THD < 0.3%).",
+  "tags": [
+    "analog electronics",
+    "op-amp",
+    "transistor",
+    "feedback",
+    "NTNU"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 22,
+  "projectPage": "projects/op-amp.html"
+}

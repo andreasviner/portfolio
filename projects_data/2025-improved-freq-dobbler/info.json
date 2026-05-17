@@ -1,0 +1,18 @@
+{
+  "id": "improved-freq-doubler-2025",
+  "title": "Freq doubler v2",
+  "category": "school",
+  "isProject": true,
+  "start": "2025-04",
+  "shortDescription": "Second pass at the analog frequency doubler. Same topology, much more careful. Measured inductors, hand-built capacitor values, Analog Discovery for the SDR estimate. SDR ≈ 26.7 dB at 3725 → 7450 Hz.",
+  "tags": [
+    "analog electronics",
+    "circuits",
+    "NTNU"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 22,
+  "projectPage": "projects/freq-doubler-v2.html"
+}

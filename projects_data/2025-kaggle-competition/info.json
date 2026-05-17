@@ -1,0 +1,19 @@
+{
+  "id": "kaggle-competition-2025",
+  "title": "ML competition",
+  "category": "work",
+  "isProject": true,
+  "start": "2025-05",
+  "shortDescription": "Designed and led an internal Kaggle-style ML competition between NTNU students and Hydro engineers. Wrote the brief, prepared the dataset, set the scoring metric, and learned that the metric is the whole project.",
+  "tags": [
+    "leadership",
+    "machine learning",
+    "competition design",
+    "Hydro"
+  ],
+  "types": [
+    "ml"
+  ],
+  "importance": 58,
+  "projectPage": "projects/kaggle-competition.html"
+}

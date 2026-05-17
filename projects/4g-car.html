@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Long-range 4G RC car · Andreas Lindeman</title>
+  <meta name="description" content="An RC car streaming dual cameras over 4G with a custom UDP hole-punching protocol for low-latency P2P video without static IPs." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2025</span>
+    </div>
+
+    <h1 class="project-title">An RC car that <em>doesn't care</em> how far you drive it</h1>
+
+    <p class="project-lede">
+      A long-range RC car streaming two camera feeds over 4G, driven from a PC anywhere on
+      the internet. The interesting bit isn't the hardware, it's the networking: a custom
+      UDP hole-punching protocol so the car and the controller find each other peer-to-peer,
+      with no static IPs, no relay servers, and the lowest practical latency.
+    </p>
+
+    <figure class="project-figure">
+      <img src="../projects_data/2025-4g-car/5g_bil_interface.jpg" alt="Driving station mid-session: two large monitors above a laptop, each monitor showing one of the car's two cameras (a low forward view down a road and a wider chase view). A picture-in-picture overlay in the corner shows the actual RC car on tarmac next to a person's shoe. The laptop screen is split between code on the left and live telemetry numbers (steering, throttle, axis values) on the right.">
+      <figcaption>The driving station. Two camera feeds on the monitors, telemetry on the laptop, and an inset frame of the actual car on the ground somewhere across town.</figcaption>
+    </figure>
+
+    <section class="project-section">
+      <h2>Why this got hard</h2>
+      <p>
+        Home 5G was the trigger. Most consumer mobile connections sit behind carrier-grade
+        NAT, which means: no incoming connections, no static IP, no port forwarding. The
+        usual fix is a relay server somewhere in the middle, but a relay adds latency, and
+        latency kills RC driving.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The protocol</h2>
+      <h3>UDP hole-punching</h3>
+      <ul>
+        <li>Both endpoints register with a lightweight rendezvous service that does nothing but exchange public-IP + port pairs.</li>
+        <li>Each endpoint then UDP-sprays toward the other's pair. NAT mappings line up on both sides and traffic flows P2P from then on.</li>
+        <li>The rendezvous service is out of the path the moment the handshake completes.</li>
+      </ul>
+      <h3>Reconnect &amp; bad-link handling</h3>
+      <ul>
+        <li>Periodic keep-alives keep NAT mappings open.</li>
+        <li>When the link drops, both sides re-handshake without operator intervention.</li>
+        <li>Backpressure on the video pipeline so a brief drop doesn't cause a long queue of stale frames.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>Video</h2>
+      <p>
+        Two cameras on the car (a forward-facing primary and a wider situational camera),
+        encoded and shipped as parallel UDP streams. The receiver renders both feeds side by
+        side. Encoder bitrate adapts to the measured link quality so picture degrades
+        gracefully instead of stalling.
+      </p>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2025-4g-car/car_flask_server.png" alt="Web dashboard with a dark theme. Top-left panel: a live navigation map of Trondheim with the car's path drawn in blue. Top-right: large speed reading '53 km/h' and a battery indicator at 73.6%. Below, a power-draw line chart in watts. Right side panels show system telemetry: odometer 1245.5 km, uptime 00:00:27, network ping 21 ms, packet loss 0.02%, ambient 12.5 °C, raspberry pi 45.0 °C, motor 86.4 °C, battery pack 31.4 °C.">
+        <figcaption>The operator dashboard. Position, link health, and the temperatures that decide how long a run lasts.</figcaption>
+      </figure>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2025-4g-car/GUIserver.png" alt="Point-of-view shot of two hands holding a Nintendo Switch Pro controller in front of a curved monitor showing the live navigation map.">
+        <figcaption>Steering input is whatever HID device the driver wants: controller, wheel, keyboard.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Demos</h2>
+      <div class="video-stack">
+        <div>
+          <div class="video-embed aspect-9-16">
+            <iframe src="https://www.youtube.com/embed/g1MPa4ORc44" title="Early indoor demo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <p class="video-caption">Early indoor demo.</p>
+        </div>
+        <div>
+          <div class="video-embed aspect-9-16">
+            <iframe src="https://www.youtube.com/embed/RsilI_ro8J4" title="Outdoor follow-along demo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <p class="video-caption">Outdoor follow-along.</p>
+        </div>
+        <div>
+          <div class="video-embed aspect-9-16">
+            <iframe src="https://www.youtube.com/embed/bM9p-2OPraI" title="Long-range demo, driving out of sight" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <p class="video-caption">Long-range. Driving out of sight.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>What I'd change</h2>
+      <p>
+        Move to QUIC for the video path so I get congestion control and connection migration
+        for free. Add a forward-error-correction layer for the keyframes; losing a keyframe
+        on a bad link is still the worst-case failure. And, predictably, give the car a
+        better antenna.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

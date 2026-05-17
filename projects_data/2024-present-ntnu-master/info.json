@@ -1,0 +1,18 @@
+{
+  "id": "ntnu-master",
+  "title": "NTNU master",
+  "category": "school",
+  "isProject": false,
+  "start": "2024-07",
+  "end": "present",
+  "shortDescription": "Integrated master in Electronic Systems Design and Innovation at NTNU. Hardware, signal processing, and the systems that connect them. A deliberate counterweight to the software-only path.",
+  "tags": [
+    "NTNU",
+    "master",
+    "electronics",
+    "innovation"
+  ],
+  "types": [],
+  "importance": 48,
+  "status": "ongoing"
+}

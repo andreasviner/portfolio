@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From noise to tone · Andreas Lindeman</title>
+  <meta name="description" content="FPGA-generated pseudo-random noise band-limited by a Delyiannis-Friend active filter, turning white noise into a hearable tone around 920 Hz." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Dec 2025</span>
+    </div>
+
+    <h1 class="project-title">From noise <em>to tone</em></h1>
+
+    <p class="project-lede">
+      Generate white noise digitally on an FPGA, then band-pass it sharply enough in
+      the analog domain that the output sounds like a tone instead of a hiss. Digital
+      side: a Linear Feedback Shift Register on a Lattice ICE40HX1K. Analog side: a
+      Delyiannis-Friend active band-pass on a soldered veroboard.
+    </p>
+
+    <section class="project-section">
+      <h2>The noise generator</h2>
+      <p>
+        A Linear Feedback Shift Register (LFSR) is a shift register whose input is an
+        XOR of a few selected taps. If the taps are chosen by a primitive polynomial,
+        the register produces a maximum-length pseudo-random sequence of length
+        <code>2<sup>L</sup> − 1</code> before repeating. This is a so-called m-sequence,
+        whose autocorrelation properties make it look like white noise on the relevant
+        time scale.
+      </p>
+      <p>
+        Built in IceStudio with a button on the dev board feeding the reset line, so a
+        button-press kicks the register out of any all-zeros lock-up state. The FPGA
+        output is a 3.3 V pulse stream, effectively a 1-bit DAC, passed through a
+        passive RC lowpass to take the worst of the switching edges off.
+      </p>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2025-noice-fpga-and-analog-filter/designnotat_8_figures/figure3.png" alt="IceStudio block diagram of the LFSR: a clock and prescaler on the left, four parallel rows of shift-register stages making up a 31-bit register, with the tap signals XORed together and fed back into the input. The reset 'stoy' signal comes off a button and an LED.">
+        <figcaption>The LFSR in IceStudio. 31 bits, XOR-fed, with a button-driven reset.</figcaption>
+      </figure>
+
+      <figure class="project-figure narrow">
+        <img src="../projects_data/2025-noice-fpga-and-analog-filter/designnotat_8_figures/figure6.png" alt="Spectrum analyser plot from 0 to 2000 Hz. A wide scatter of points sits roughly flat around −20 dB across the whole range. Visually 'white' noise.">
+        <figcaption>FFT of the raw FPGA output. Flat-ish across the audio band. Looks like white noise, sounds like a hiss.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>The Delyiannis-Friend filter</h2>
+      <p>
+        A single-op-amp active band-pass topology that gets high Q with a small
+        component count. Design centre <code>f₀ = 920 Hz</code>, <code>Q = 12</code>.
+        Component-value formulas:
+      </p>
+      <pre><code>R₃ = 1 / (πBC)
+R₁ = R₃ / (2H₀)
+R₂ = R₃ / (4Q² − 2H₀)</code></pre>
+      <p>
+        With C = 22 nF, the ideal values worked out to R₃ ≈ 189 kΩ, R₁ ≈ 18.9 kΩ,
+        R₂ ≈ 333 Ω. Realised as series combinations of stock resistors (120 k + 68 k,
+        12 k + 6.8 k).
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2025-noice-fpga-and-analog-filter/designnotat_8_figures/figure5.png" alt="Close-up of a black Elektra Verksted veroboard with a couple of through-hole resistors and a violet wire soldered between pads.">
+          <figcaption>Veroboard, mid-assembly.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2025-noice-fpga-and-analog-filter/designnotat_8_figures/figure4.png" alt="Wider view of the same Elektra Verksted veroboard with the full filter populated: series resistor pairs, capacitors, and the op-amp soldered in.">
+          <figcaption>Fully populated, ready for measurement.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Measured vs designed</h2>
+      <ul>
+        <li><strong>Centre frequency:</strong> 958 Hz measured (920 Hz design). About
+            4% high.</li>
+        <li><strong>Q-factor:</strong> 6.6 measured (12 design). Significant drop.</li>
+      </ul>
+      <p>
+        The Q drop is the headline failure mode. Three plausible culprits: capacitor
+        tolerances at this frequency are 5%+ and dominate the band shape; the op-amp
+        has finite gain-bandwidth at higher Q-factors and effectively rolls off the
+        peak; and the breadboard / veroboard layout introduces stray capacitance and
+        resistance in parallel with the design.
+      </p>
+      <p>
+        Despite the lower Q, the output FFT shows a clear spectral peak around f₀ and
+        the listening test confirmed a recognisable tonal character. Mission
+        accomplished, even if the bandwidth was wider than designed.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2025-noice-fpga-and-analog-filter/designnotat_8_figures/figure7.png" alt="Magnitude-vs-frequency curve (Hz, log scale) for the filter, peaking at 957.99 Hz, with the −3 dB points marked at 906.74 Hz and 1051.27 Hz. The 920 Hz design target is shown as a green vertical line just left of the measured peak.">
+          <figcaption>Measured filter response. Peak 958 Hz, −3 dB band 145 Hz wide → Q ≈ 6.6.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2025-noice-fpga-and-analog-filter/designnotat_8_figures/figure8.png" alt="FFT of the full system output ('System utgang') from 0 to 2000 Hz. A clear amplitude bump rises around 1 kHz against the otherwise flat noise floor.">
+          <figcaption>System output FFT. The band-pass has carved a tone out of the flat noise.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2025-noice-fpga-and-analog-filter/designnotat_8.pdf" target="_blank" rel="noopener" download>Download: designnotat_8.pdf (Fra støy til tone)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EV-or-not detection · Andreas Lindeman</title>
+  <meta name="description" content="Detecting whether a passing car is electric or not, by chaining a YOLOv8 detector, a from-scratch licence-plate CNN, and the Statens vegvesen API." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Mar 2024</span>
+    </div>
+
+    <h1 class="project-title">Is that car <em>electric?</em></h1>
+
+    <p class="project-lede">
+      A group project at NTNU that detects whether a passing car is electric, end-to-end
+      from a single frame. I built the vision side: a fine-tuned YOLOv8 to find the licence
+      plate, then a CNN trained from scratch to read it, and finally a Statens vegvesen
+      lookup to resolve the engine type.
+    </p>
+
+    <section class="project-section">
+      <h2>The pipeline</h2>
+      <ul>
+        <li><strong>Plate detection:</strong> YOLOv8, after-trained on a small custom dataset of Norwegian plates from varied angles.</li>
+        <li><strong>Plate reading:</strong> A purpose-built CNN trained from scratch on plate crops. Small, fast, surprisingly accurate.</li>
+        <li><strong>Vehicle lookup:</strong> The plate text goes to the Statens vegvesen API, which returns the engine type. Electric vs. not falls out directly.</li>
+      </ul>
+
+      <figure class="project-figure narrow">
+        <img src="../projects_data/2024-ev-detection/IELS2001___Smart_City_Prosjekt_figures/figure6.png" alt="Four-step pipeline: image captured, plate located in the image, plate text read, vehicle data fetched. Final classification: 'Motor 1: Elektrisk (ELBIL)'.">
+        <figcaption>End-to-end: capture, detect, read, look up. The last box is a one-liner from the vegvesen API.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Why train a plate-reader from scratch</h2>
+      <p>
+        Generic OCR works on plates, but it's overkill: too many parameters, too little
+        domain. Norwegian plates have a fixed alphabet, a fixed font, two predictable
+        layouts. A small CNN with the right inductive bias outperformed off-the-shelf OCR on
+        the data I had, and ran an order of magnitude faster.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2024-ev-detection/IELS2001___Smart_City_Prosjekt_figures/figure12.png" alt="Ten-panel training dashboard: train/val losses converging, precision and recall climbing into the high-90s, mAP@50 and mAP@50-95.">
+        <figcaption>YOLOv8 fine-tune metrics. Losses converging cleanly, precision ~0.98, recall ~0.95, mAP@50 ≈ 0.98.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>End-to-end results</h2>
+      <p>
+        On test footage from real Trondheim streets, the system tagged each car with the
+        right engine class in a single frame. EVs got highlighted green; combustion cars
+        red.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2024-ev-detection/IELS2001___Smart_City_Prosjekt_figures/figure22.png" alt="Server-side visualization: a black EV on a city street with its plate boxed in green, marking it as fully electric.">
+          <figcaption>EV: plate read, vegvesen API confirms electric, box drawn green.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2024-ev-detection/IELS2001___Smart_City_Prosjekt_figures/figure23.png" alt="Server-side visualization: a red car with its plate redacted, classified as non-electric.">
+          <figcaption>Non-EV: same path, different answer from the API.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Walkthrough</h2>
+      <div class="video-embed aspect-16-9">
+        <iframe src="https://www.youtube.com/embed/8dSGcUOESZk" title="EV-or-not detection: full walkthrough" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <p class="video-caption">Full walkthrough of the pipeline.</p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I'd improve</h2>
+      <p>
+        The classifier sometimes hesitates on plates with strong motion blur, the kind that
+        come off cars actually moving. A small temporal stack of frames, or a quick
+        deblurring pre-pass, would close that gap. The vegvesen API was also the slowest
+        step by a wide margin; caching by plate prefix would have helped.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Course report</h2>
+      <p>
+        The Smart City project report (IELS2001), covering methodology, dataset choices
+        and results, is in the repo:
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2024-ev-detection/IELS2001___Smart_City_Prosjekt.pdf" target="_blank" rel="noopener" download>Download: IELS2001 Smart City Project (PDF)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

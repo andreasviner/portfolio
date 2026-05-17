@@ -1,0 +1,26 @@
+{
+  "id": "minecraft-3d-printer-2021",
+  "title": "Minecraft 3D printer",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2021-05",
+  "shortDescription": "Converted any 3D model (including colour and scans) into a generated set of Minecraft commands that build the model in-world.",
+  "tags": [
+    "Minecraft",
+    "Python",
+    "3D models",
+    "voxelisation"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 58,
+  "externalLinks": [
+    {
+      "label": "Demo: 3D-scanned friend, stone-only build",
+      "url": "https://youtube.com/shorts/uJcUUhq8S-c",
+      "type": "youtube"
+    }
+  ],
+  "projectPage": "projects/minecraft-3d-printer.html"
+}

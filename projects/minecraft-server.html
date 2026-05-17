@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Public Minecraft server · Andreas Lindeman</title>
+  <meta name="description" content="A public Minecraft server I ran with my dad as a kid. First taste of command syntax, server admin, and English." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>circa 2009</span>
+    </div>
+
+    <h1 class="project-title">A Minecraft server, with <em>my dad</em></h1>
+
+    <p class="project-lede">
+      Around 2009, with the help of my dad (also a software developer), I hosted a
+      public Minecraft server other kids played on. The server itself was barely
+      anything; the experience was where I picked up command syntax, the idea of an
+      uptime, and most of the English I knew before school taught me the rest.
+    </p>
+
+    <section class="project-section">
+      <h2>What it actually was</h2>
+      <ul>
+        <li>A vanilla Minecraft server running on a box at home, port-forwarded to the
+            internet.</li>
+        <li>Commands like <code>/stop</code> and <code>/give @a</code>, which were the
+            first computer commands I ever ran that felt like real instructions instead of
+            menus.</li>
+        <li>A small group of regulars; the occasional drama that comes with letting other
+            children onto your server.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>Why it matters in retrospect</h2>
+      <p>
+        Minecraft was the entry drug. Command syntax, scaling (even at a tiny scale),
+        and the creative freedom of a system whose rules you could see and abuse, all
+        at once. By the time I sat down in a "real" coding class two years later, I had
+        already met most of the ideas; the class just gave them names. The server is
+        also the reason my English is what it is. Most of it came from the chat box.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

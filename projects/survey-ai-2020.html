@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colour-preference predictor · Andreas Lindeman</title>
+  <meta name="description" content="A 2020 study of 20,000 survey responses that learned to predict age, gender, and mood from colour-click patterns alone." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2020</span>
+    </div>
+
+    <h1 class="project-title">Colour-preference <em>predictor</em></h1>
+
+    <p class="project-lede">
+      A self-directed experiment from upper-secondary school. Built a 20-question colour survey,
+      shipped it to ~160,000 inboxes, trained a model on the 20,000 completed responses, and
+      ended up with a small neural net that could guess a participant's age, gender, and
+      self-reported mood from nothing but their click pattern.
+    </p>
+
+    <section class="project-section">
+      <h2>The question</h2>
+      <p>
+        Does <em>which colours you prefer</em>, and <em>how you click on them</em>, carry
+        enough signal to predict who you are? I had a hunch the answer was yes, and I wanted
+        the dataset to be big enough that the answer wasn't a coincidence.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The survey</h2>
+      <p>
+        Participants answered three demographic questions (age, gender, and a 1–10 mood
+        rating), then completed twenty trials. Each trial presented four colour swatches and
+        asked them to pick the one they liked best.
+      </p>
+      <p>
+        Alongside the picks, the survey quietly logged the meta-signal: how long each
+        response took, where on the swatch the click landed, whether the cursor wavered, and
+        the order participants tended to scan the options.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Reach &amp; response</h2>
+      <ul>
+        <li>~160,000 mails delivered through the Oslo school directory</li>
+        <li>~20,000 completed surveys (≈12.5% completion)</li>
+        <li>Every response stored with a timestamp and a session-local salt</li>
+      </ul>
+      <blockquote>
+        At sixteen, the most surprising part wasn't the model. It was watching a dataset of
+        twenty thousand human responses arrive in two days.
+      </blockquote>
+    </section>
+
+    <section class="project-section">
+      <h2>The model</h2>
+      <h3>Features</h3>
+      <ul>
+        <li>Per-trial: chosen colour (one-hot), three rejected colours, dwell time, click coordinates relative to swatch centre</li>
+        <li>Per-session: total time, time variance, first-click bias</li>
+      </ul>
+      <h3>Architecture</h3>
+      <p>
+        A small fully-connected network. Three targets, trained jointly: age (regression),
+        gender (binary classification), mood (1–10 ordinal). I used the meta-features as
+        much as the colour picks themselves; those turned out to carry a lot of the signal.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned</h2>
+      <p>
+        Two things. First, that the way you click is at least as informative as what you
+        click. Second, that running a study at scale is less about the model and more about
+        the boring engineering: surveys, storage, deduplication, abuse-handling, a clean
+        export pipeline. The model was the smallest file in the project.
+      </p>
+      <p>
+        I'd do this differently now: clearer consent, better aggregation, a published
+        write-up. It was a high-school project and it shows, but it taught me that data
+        beats cleverness, and I've never quite let go of that.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

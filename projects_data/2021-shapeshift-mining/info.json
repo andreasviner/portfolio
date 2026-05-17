@@ -1,0 +1,18 @@
+{
+  "id": "shapeshift-mining-2021",
+  "title": "Shape-shift miner",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2022-04",
+  "shortDescription": "Python mining-and-upgrading game where the OS window itself is part of the game. Buy the right upgrades and the window sprouts new rectangles at odd angles, turning the play space into a shape no game has any business being.",
+  "tags": [
+    "Python",
+    "game design",
+    "OS window manipulation"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 45,
+  "projectPage": "projects/shapeshift-miner.html"
+}

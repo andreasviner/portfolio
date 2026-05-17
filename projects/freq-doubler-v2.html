@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequency doubler v2 · Andreas Lindeman</title>
+  <meta name="description" content="A more careful take on the analog frequency doubler. Measured inductors, cascaded LC band-pass filters around 7.45 kHz, SDR ≈ 26.7 dB." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>May 2025</span>
+    </div>
+
+    <h1 class="project-title">Frequency doubler, <em>better this time</em></h1>
+
+    <p class="project-lede">
+      A second pass at the analog frequency doubler. Same topology as
+      <a href="freq-doubler.html">the 2024 attempt</a>, but tighter at every step.
+      Measured inductances first, cascaded two LC band-passes centred at 7.45 kHz,
+      tuned potentiometers down with an Analog Discovery, and ended at an SDR of
+      roughly 26.7 dB. A real, audible step up.
+    </p>
+
+    <section class="project-section">
+      <h2>What I did differently</h2>
+      <ul>
+        <li><strong>Measured the actual inductors:</strong> 92 mH and 102 mH, instead
+            of assuming the nominal value. Capacitor targets fall straight out of the
+            resonance formula once the inductance is real.</li>
+        <li><strong>Built the capacitors I wanted:</strong> 5 nF as two 10 nF in
+            series; ~4.5 nF as that 5 nF in series with a parallel pair of 22 nF
+            caps. Not standard values, but built from standard parts.</li>
+        <li><strong>Used the Analog Discovery</strong> for the AC-RMS reading of the
+            full output and the isolated tone, so the SDR estimate was based on actual
+            measurements instead of scope eyeballing.</li>
+        <li><strong>Op-amp buffer between filters,</strong> same as before, but with
+            the two filter stages now actually decoupled.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The numbers</h2>
+      <ul>
+        <li>Input: 3725 Hz, target output: 7450 Hz.</li>
+        <li>Output AC-RMS: 14.77 mV. Tone AC-RMS at 7450 Hz: ~14.75 mV (rounded down
+            for conservatism). Noise power therefore ~4.7×10⁻⁷ V².</li>
+        <li><strong>SDR ≈ 26.66 dB.</strong> Clean enough that the side-by-side scope
+            traces of the doubled signal and a reference sinusoid are visually almost
+            indistinguishable.</li>
+      </ul>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2025-improved-freq-dobbler/designnotat_4_figures/figure3.png" alt="Oscilloscope screen capture: orange input sinusoid at 3.7 kHz at ±2 V, with a blue output waveform on top at twice the frequency but much smaller amplitude, hugging the input zero-crossings.">
+        <figcaption>Input (orange) and doubled output (blue) on the same time axis. Frequency is doubled; amplitude is far lower. That is the cost of band-pass filtering a half-wave-rectified signal.</figcaption>
+      </figure>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2025-improved-freq-dobbler/designnotat_4_figures/figure6.png" alt="Spectrum analyser screenshot from 0 to ~20 kHz. A single sharp peak at roughly 7.45 kHz reaches ~15 mV. The noise floor and any input-fundamental leakage is barely visible.">
+        <figcaption>FFT of the output. One dominant peak at the doubled frequency, residual leakage near the noise floor.</figcaption>
+      </figure>
+
+      <figure class="project-figure">
+        <img src="../projects_data/2025-improved-freq-dobbler/designnotat_4_figures/figure7.png" alt="Oscilloscope trace comparing the doubled output (blue) against a clean reference sinusoid at 7.45 kHz (orange). The two waveforms overlap closely across the screen, visually almost the same curve.">
+        <figcaption>Output vs reference. Visually indistinguishable for a 26.7 dB SDR.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2025-improved-freq-dobbler/designnotat_4.pdf" target="_blank" rel="noopener" download>Download: designnotat_4.pdf (Frekvensdobler v2)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

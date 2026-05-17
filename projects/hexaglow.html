@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hexaglow UB · Andreas Lindeman</title>
+  <meta name="description" content="A youth enterprise selling configurable glowing wall panels. I wrote the Unity/C# companion app." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2018 → 2019</span>
+    </div>
+
+    <h1 class="project-title">Hexaglow <em>UB</em></h1>
+
+    <p class="project-lede">
+      A youth enterprise founded in first year of high school. We sold configurable glowing
+      wall panels you could rearrange at will. I wrote the Unity/C# companion app that drove
+      the panels' colour, animation, and grouping.
+    </p>
+
+    <section class="project-section">
+      <h2>The product</h2>
+      <p>
+        Hexagonal panels that snap together into arbitrary wall arrangements. Each panel
+        carried its own controller and addressable LEDs, and the whole array was visible to
+        a phone app as one device: set a colour, set an animation, group panels into
+        zones.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I built</h2>
+      <ul>
+        <li><strong>App:</strong> Unity / C#, cross-platform, talked to the panels over BLE.</li>
+        <li><strong>UI:</strong> Drag-to-arrange a virtual mirror of the user's wall.</li>
+        <li><strong>Effects:</strong> A small effect engine, with solid, gradient, breathing, chase, and audio-reactive modes.</li>
+        <li><strong>Pairing:</strong> A first-time setup flow that scanned, named, and ordered the panels with minimal user input.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What it was, really</h2>
+      <p>
+        My first time shipping software to people who weren't me. Onboarding, error states,
+        the moment when a panel doesn't pair and the user has no idea why. All the
+        un-fun-but-essential parts of consumer software. I learned more from one
+        unimpressed customer than from any tutorial I'd ever followed.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

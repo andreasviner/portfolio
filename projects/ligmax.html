@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ligmax · autonomous boat · Andreas Lindeman</title>
+  <meta name="description" content="A custom autonomous-capable boat with a designed hull, integrated electronics, lidar, dual gimballed cameras, and onboard buoy detection." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+  <style>
+    .ligmax-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 20px 0 8px;
+    }
+    .ligmax-gallery figure {
+      margin: 0;
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .ligmax-gallery img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+    .ligmax-gallery figcaption {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      padding: 8px 10px;
+      border-top: 1px solid var(--hairline);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Jan 2026 → present</span>
+      <span class="sep"></span>
+      <span class="status-tag ongoing">Ongoing</span>
+    </div>
+
+    <h1 class="project-title">Ligmax, an <em>autonomous</em> boat</h1>
+
+    <p class="project-lede">
+      A custom boat designed from scratch. Hull, electronics, perception, and software. The
+      goal is an autonomous-capable platform with full situational awareness: dual gimballed
+      cameras, lidar, integrated battery pack, and onboard buoy detection. In progress
+      throughout 2026.
+    </p>
+
+    <section class="project-section">
+      <h2>What's on board</h2>
+      <ul>
+        <li><strong>Hull:</strong> Designed and modelled from scratch, with every component placed before fabrication.</li>
+        <li><strong>Perception:</strong> Lidar plus two cameras on independent gimbals. A buoy-detection CNN runs onboard for navigation reference.</li>
+        <li><strong>Power:</strong> Custom battery pack with active mass-balance, located to keep the centre of gravity low and trim controllable.</li>
+        <li><strong>Compute:</strong> Onboard SBC handling perception, control, and telemetry uplink.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>Design imagery</h2>
+      <div class="ligmax-gallery">
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/sketch_top_view.png" alt="Top-view sketch of the hull">
+          <figcaption>Hull, top view sketch</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/sketch_front_veiw.png" alt="Front-view sketch of the hull">
+          <figcaption>Hull, front view sketch</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/Main_hull.png" alt="Main hull rendering">
+          <figcaption>Main hull</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/V2.png" alt="V2 model rendering">
+          <figcaption>V2</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/components-mh.png" alt="Components layout">
+          <figcaption>Internal components</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/Batterypack.jpeg" alt="Battery pack">
+          <figcaption>Custom battery pack</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/battery_movement_bright.png" alt="Battery movement actuator">
+          <figcaption>Battery mass-balance</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/side_movement.png" alt="Side movement">
+          <figcaption>Side trim control</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/front_gimbal.png" alt="Front gimbal">
+          <figcaption>Front gimbal</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/front_camera_square.png" alt="Front camera assembly">
+          <figcaption>Front camera</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/front_camera_side_square.png" alt="Side view of the front camera assembly">
+          <figcaption>Front camera, side view</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/cameras_top_light.png" alt="Both cameras and top light">
+          <figcaption>Cameras &amp; top light</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/front_sensor_rectangle.png" alt="Front sensor housing">
+          <figcaption>Front sensor housing</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/back_sensor_sqare.png" alt="Rear sensor housing">
+          <figcaption>Rear sensor housing</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/sensors_top.png" alt="Top-mounted sensors">
+          <figcaption>Top sensors</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/Lidar_test.png" alt="Lidar test output">
+          <figcaption>Lidar test</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/bouy_detection.png" alt="Buoy detection model output">
+          <figcaption>Buoy detection model</figcaption>
+        </figure>
+        <figure>
+          <img src="../projects_data/2026-ligmax/images/full_bright.png" alt="Full assembly under bright light">
+          <figcaption>Full assembly</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Status</h2>
+      <p>
+        Mechanical design is locked. Electronics are bench-tested and integrating now.
+        Perception models are training against a custom buoy dataset. On-water trials
+        scheduled for later this year. This page will grow with the project, so check back.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Design document</h2>
+      <p>
+        Full design document (CAD overview, sensor stack, electrical, control):
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2026-ligmax/Ligmax.pdf" target="_blank" rel="noopener" download>Download: Ligmax.pdf (full design document)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

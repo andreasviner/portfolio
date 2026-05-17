@@ -1,0 +1,38 @@
+{
+  "id": "4g-car-2025",
+  "title": "4G RC car",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2025-07",
+  "shortDescription": "RC car streaming two camera feeds over 4G with a custom UDP hole-punching protocol for low-latency P2P video without static IPs.",
+  "tags": [
+    "networking",
+    "UDP",
+    "video streaming",
+    "hardware",
+    "RC"
+  ],
+  "types": [
+    "hardware",
+    "software"
+  ],
+  "importance": 78,
+  "projectPage": "projects/4g-car.html",
+  "externalLinks": [
+    {
+      "label": "Early indoor demo",
+      "url": "https://youtube.com/shorts/g1MPa4ORc44",
+      "type": "youtube"
+    },
+    {
+      "label": "Outdoor follow demo",
+      "url": "https://youtube.com/shorts/RsilI_ro8J4",
+      "type": "youtube"
+    },
+    {
+      "label": "Long-range demo",
+      "url": "https://youtube.com/shorts/bM9p-2OPraI",
+      "type": "youtube"
+    }
+  ]
+}

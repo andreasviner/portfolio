@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anti-alias filter · Andreas Lindeman</title>
+  <meta name="description" content="A 6th-order Butterworth anti-aliasing filter (three cascaded Sallen-Key sections) for a 3 kHz sampling ADC." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Dec 2025</span>
+    </div>
+
+    <h1 class="project-title">A 6th-order Butterworth <em>anti-alias filter</em></h1>
+
+    <p class="project-lede">
+      Anti-aliasing for an ADC sampled at 3 kHz: the signal must be attenuated by at
+      least 10 dB at the Nyquist frequency of 1.5 kHz, while keeping the cutoff above
+      1.125 kHz so the passband stays useful. A Butterworth response gives flatness in
+      the passband; doing the math says sixth order; the implementation is three
+      cascaded Sallen-Key stages with one op-amp each.
+    </p>
+
+    <section class="project-section">
+      <h2>The math, briefly</h2>
+      <p>
+        For a Butterworth filter, the order needed to hit attenuation <code>A</code>
+        at frequency <code>f<sub>stop</sub></code> while keeping the −3 dB cutoff
+        <code>f<sub>c</sub></code> elsewhere is
+      </p>
+      <pre><code>n = (1/2) · ln(A⁻² − 1) / ln(f_stop / f_c)</code></pre>
+      <p>
+        With <code>A = 10<sup>−0.5</sup></code>, a 5% margin on both sides, and
+        <code>f<sub>stop</sub>/f<sub>c</sub> ≈ 1.21</code>, this gives
+        <code>n ≈ 5.86</code>, rounded up to <code>n = 6</code>.
+      </p>
+      <p>
+        Three Sallen-Key sections, each with the same <code>ω₀ = 2π·1181 Hz</code>
+        but different Q-factors set by the Butterworth pole layout:
+        <code>Q₁ ≈ 0.518</code>, <code>Q₂ ≈ 0.707</code>, <code>Q₃ ≈ 1.93</code>.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Building odd capacitor values from standard parts</h2>
+      <p>
+        With every R fixed at 10 kΩ, the per-stage capacitances came out to weird
+        non-standard values (14, 13, 19, 9.5, 52, 3.5 nF). All were built as
+        parallel combinations of stock components:
+      </p>
+      <ul>
+        <li><strong>14 nF</strong> = 10 ∥ 1.5 ∥ 1.5 ∥ 1 nF</li>
+        <li><strong>13 nF</strong> = 10 ∥ 1.5 ∥ 1.5 nF</li>
+        <li><strong>19 nF</strong> = 10 ∥ 6.8 ∥ 2.2 nF</li>
+        <li><strong>9.5 nF</strong> = 4.7 ∥ 3.3 ∥ 1.5 nF</li>
+        <li><strong>52 nF</strong> = 15 ∥ 15 ∥ 22 nF</li>
+        <li><strong>3.5 nF</strong> = 1 ∥ 1 ∥ 1.5 nF</li>
+      </ul>
+      <p>
+        Parallel-only on purpose: fewer wires on the breadboard, and no risk of the
+        series formula tripping you up at 2 a.m.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2025-anti-alias-filter/designnotat_7_figures/figure6.png" alt="Breadboard with three cascaded Sallen-Key sections: three op-amps, banks of parallel capacitors making the odd values.">
+          <figcaption>Breadboard build. Three Sallen-Key stages, parallel-cap stacks for the non-standard values.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2025-anti-alias-filter/designnotat_7_figures/figure7.png" alt="The same circuit transferred to an Elektra-branded stripboard, soldered.">
+          <figcaption>Second build on stripboard. Same topology, cleaner layout.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Measured vs predicted</h2>
+      <p>
+        Two complete builds, both came out the same way: the stop-band attenuation hit
+        the 10 dB target with margin (measured 11.67 dB at 1.5 kHz), but the cutoff sat
+        at ~1.07 kHz instead of the designed 1.18 kHz, about 10% low and below the spec.
+        Simulation in Falstad with ideal parts puts cutoff exactly where the
+        calculations predict, which fingers component tolerance, stray
+        capacitance/inductance, and the op-amp's finite gain-bandwidth as the
+        culprits.
+      </p>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2025-anti-alias-filter/designnotat_7_figures/figure4.png" alt="Falstad simulation: three cascaded Sallen-Key stages with the designed values, plus the resulting frequency response sweep showing the −3 dB point near 1.18 kHz.">
+        <figcaption>Falstad simulation with ideal parts. Cutoff lands at the designed 1.18 kHz, as the math predicts.</figcaption>
+      </figure>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2025-anti-alias-filter/designnotat_7_figures/figure2.png" alt="Measured amplitude response of build 1: flat passband, −3 dB at 1.07 kHz.">
+          <figcaption>Build 1. −3 dB at 1.07 kHz (designed 1.18 kHz).</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2025-anti-alias-filter/designnotat_7_figures/figure3.png" alt="Detailed measurement around 1.5 kHz showing −11.67 dB attenuation.">
+          <figcaption>Stop-band measurement. −11.67 dB at 1.5 kHz, comfortably past the 10 dB requirement.</figcaption>
+        </figure>
+      </div>
+
+      <p>
+        Easiest fix is to design the cutoff a little high to compensate for that
+        systematic downshift. Tighter-tolerance parts and better board layout would
+        also help.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2025-anti-alias-filter/designnotat_7.pdf" target="_blank" rel="noopener" download>Download: designnotat_7.pdf (Anti-alias filter)</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

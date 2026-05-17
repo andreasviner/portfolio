@@ -1,0 +1,20 @@
+{
+  "id": "append-consulting",
+  "title": "Append Consulting",
+  "category": "work",
+  "isProject": false,
+  "start": "2024-02",
+  "end": "2025-08",
+  "shortDescription": "Eighteen months at Append, a small AI consultancy in Oslo. Shipped four production ML projects for Norwegian public-sector and industrial clients. Most days, the model was the smallest part of the job.",
+  "tags": [
+    "consulting",
+    "machine learning",
+    "Python"
+  ],
+  "types": [
+    "software",
+    "ml"
+  ],
+  "importance": 72,
+  "projectPage": "projects/append-consulting.html"
+}

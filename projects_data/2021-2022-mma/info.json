@@ -1,0 +1,15 @@
+{
+  "id": "torshus",
+  "title": "Torshus",
+  "category": "school",
+  "isProject": false,
+  "hideOnMobile": true,
+  "start": "2021-07",
+  "end": "2022-07",
+  "shortDescription": "A folkehøyskole year at Torshus (MMA line). Mostly mats and gloves; somehow also produced a surprising number of game-jam projects in the evenings.",
+  "tags": [
+    "folkehøyskole"
+  ],
+  "types": [],
+  "importance": 22
+}

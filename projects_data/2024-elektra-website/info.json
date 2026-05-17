@@ -1,0 +1,25 @@
+{
+  "id": "elektra-website-2024",
+  "title": "elektra.io",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2024-09",
+  "shortDescription": "Designed and built the Elektra student association site from scratch.",
+  "tags": [
+    "frontend",
+    "web",
+    "design"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 85,
+  "externalLinks": [
+    {
+      "label": "elektra.io",
+      "url": "https://elektra.io",
+      "type": "website"
+    }
+  ],
+  "projectPage": "projects/elektra-website.html"
+}

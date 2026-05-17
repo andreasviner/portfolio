@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drawing 3D printer · Andreas Lindeman</title>
+  <meta name="description" content="A broken 3D printer repurposed into a pen plotter for one-continuous-line drawings." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2022</span>
+    </div>
+
+    <h1 class="project-title">A printer that draws in <em>one continuous line</em></h1>
+
+    <p class="project-lede">
+      My 3D printer died. Before I fixed it I taped a permanent marker to the extruder, told
+      it to follow a path generated from photographs, and discovered an obsession with
+      one-continuous-line drawings. The fix to the printer took weeks longer than it should
+      have.
+    </p>
+
+    <div class="video-embed aspect-16-9">
+      <iframe src="https://www.youtube.com/embed/aqdEn8t7d0w" title="Drawing 3D printer in motion" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <p class="video-caption">Demo. The printer drawing, in motion.</p>
+
+    <section class="project-section">
+      <h2>The pipeline</h2>
+      <ul>
+        <li><strong>Input:</strong> A reference photograph (usually a portrait).</li>
+        <li><strong>Edge map:</strong> A classical edge-detection pass plus a thresholded gradient.</li>
+        <li><strong>Path solver:</strong> A travelling-salesman-style heuristic finds an ordering that visits every "ink point" with the shortest total travel, and, crucially, without ever lifting the pen.</li>
+        <li><strong>G-code:</strong> Emit motion commands for the printer; Z stays flat, only X/Y move.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I'd revisit</h2>
+      <p>
+        The path solver is a greedy heuristic; on portraits it sometimes gives away the
+        first-stroke direction. A proper two-opt pass (or a tiny RL agent) would clean
+        that up. I'd also love to try this with a real ink pen on a real plotter; the
+        marker-on-printer rig made the lines too thick to compete with the algorithm.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

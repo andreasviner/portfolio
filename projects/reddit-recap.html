@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI content channels · Andreas Lindeman</title>
+  <meta name="description" content="A fully-automatic content pipeline that scraped top Reddit posts and published video recaps to YouTube, Instagram, and TikTok." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2023</span>
+    </div>
+
+    <h1 class="project-title">AI <em>content channels</em></h1>
+
+    <p class="project-lede">
+      A fully-automatic content pipeline built during my year at Solborg folkehøyskole. It
+      scraped top posts from a roster of subreddits, generated narrated video recaps, and
+      published to YouTube, Instagram, and TikTok with no human in the loop.
+    </p>
+
+    <section class="project-section">
+      <h2>The pipeline</h2>
+      <ul>
+        <li><strong>Scrape:</strong> Pull top posts and comments from configured subreddits on a schedule.</li>
+        <li><strong>Filter:</strong> Heuristics for length, language, and content-safety.</li>
+        <li><strong>Compose:</strong> Stitch a video, with background gameplay, text overlays, TTS narration, beat-aligned cuts.</li>
+        <li><strong>Publish:</strong> Upload to YouTube via API, Instagram &amp; TikTok via the channels available at the time.</li>
+        <li><strong>Reconcile:</strong> Track which posts had been used so the system never repeated content.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The platforms</h2>
+      <p>
+        YouTube was the well-behaved member of the trio: clean API, predictable rate
+        limits, manageable rules. TikTok was workable. Instagram banned the account, which
+        was the project's most-honest performance review.
+      </p>
+      <div class="project-links">
+        <a href="https://www.youtube.com/@RedditRecapV2" target="_blank" rel="noopener">YouTube channel</a>
+        <a href="https://www.tiktok.com/@redditrecap2" target="_blank" rel="noopener">TikTok account</a>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned</h2>
+      <p>
+        Most of the project's hours went into the boring middle: making sure the same clip
+        never went out twice, that the TTS didn't choke on emoji, that the gameplay
+        background never showed a logo that would get the video demonetised. The model bits
+        were almost incidental.
+      </p>
+      <p>
+        It was also my first long-running production system. Something that had to keep
+        working when I wasn't watching it. That changes how you write code.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

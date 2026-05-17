@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First neural network · Andreas Lindeman</title>
+  <meta name="description" content="A deep self-learning network that played the browser game Slope from screen-extracted lines." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2018</span>
+      <span class="sep"></span>
+      <span class="status-tag lost">Lost to time</span>
+    </div>
+
+    <h1 class="project-title">My first <em>neural network</em></h1>
+
+    <p class="project-lede">
+      A self-learning network that played the browser game <em>Slope</em>. The model didn't
+      see pixels directly. A hand-rolled preprocessing pass extracted the lane geometry
+      first, and the net learned to steer from that.
+    </p>
+
+    <section class="project-section">
+      <h2>Why preprocess?</h2>
+      <p>
+        Training a convnet from raw pixels on a 2018 personal GPU, as a high-school student,
+        was not going to happen. So I cheated: a small computer-vision pass extracted the
+        lanes' edges and turned them into a tiny feature vector. The neural net was small
+        enough to train at home and still learned the game.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The loop</h2>
+      <ul>
+        <li>Screen capture pinned to the browser window</li>
+        <li>Edge detection → lane lines → a fixed-length feature vector</li>
+        <li>Network outputs a steering decision (left / straight / right)</li>
+        <li>Reward from survival time; episodes batched into training data</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What it taught me</h2>
+      <p>
+        That representation matters more than architecture. The model architecture was a
+        few dense layers; the magic was in the features it got handed. I still think about
+        that. It's a lesson that re-shows up in every applied ML project I've done since.
+      </p>
+      <p>
+        The source code is archived somewhere on a dead hard drive. If I dig it out it'll
+        show up here.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

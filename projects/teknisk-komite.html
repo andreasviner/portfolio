@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teknisk Komité · Andreas Lindeman</title>
+  <meta name="description" content="Founded and lead the technical committee for Elektra, NTNU's electronics-student association. We maintain elektra.io and build internal tooling." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Sep 2024 → present</span>
+      <span class="sep"></span>
+      <span class="status-tag ongoing">Ongoing</span>
+    </div>
+
+    <h1 class="project-title">Teknisk Komité, Elektra's <em>engineering team</em></h1>
+
+    <p class="project-lede">
+      I founded the technical committee inside Elektra, the student association for
+      electronics students at NTNU, and have led it since. It is the engineering team for
+      the association: small, volunteer, and responsible for the software the rest of
+      the association runs on.
+    </p>
+
+    <section class="project-section">
+      <h2>What we own</h2>
+      <ul>
+        <li><strong><a href="elektra-website.html">elektra.io</a>.</strong> The main
+            association website. Accounts, events, billing, calendar, profile pages, role
+            management, the lot.</li>
+        <li><strong>Internal tooling.</strong> Small services that solve real problems
+            for the board and the rest of the association, from event-day
+            utilities to integrations with the tools the association already uses.</li>
+        <li><strong>The development process.</strong> Code review, deployments, an
+            environment where new committee members can ship without breaking things.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The leadership part</h2>
+      <p>
+        Most of the work that matters is not code. It is onboarding the next committee
+        member, deciding which features are worth our limited evenings, saying no to
+        well-meaning requests, and writing the documentation that means the committee
+        survives me leaving for industry. Running a small engineering team (even a
+        volunteer one) has been one of the most useful things I have done as a student.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

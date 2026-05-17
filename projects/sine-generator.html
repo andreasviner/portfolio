@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sine-level generator · Andreas Lindeman</title>
+  <meta name="description" content="ESP32-controlled signal-level generator with a potentiometer-driven gain stage between an amplifier and a software-controlled DAC." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Apr 2024</span>
+    </div>
+
+    <h1 class="project-title">A signal-level generator <em>with an ESP32</em></h1>
+
+    <p class="project-lede">
+      Designprosjekt 1 in NTNU's electronic-systems design course. The brief: take an
+      analog sinusoidal input <code>X₁(t)</code> and produce an output <code>X₂(t) =
+      A·X₁(t)</code>, where <code>A</code> is set by a knob the user can turn. The whole
+      gain control runs through an ESP32 in the middle of the chain: analog in, analog
+      back out, software in between.
+    </p>
+
+    <section class="project-section">
+      <h2>The pipeline</h2>
+      <ul>
+        <li>Input: a 229 Hz, 75 mV-amplitude sine on the input.</li>
+        <li>An analog gain &amp; level-shift stage maps the bipolar signal into the
+            ESP32 ADC's 0–3.3 V window.</li>
+        <li>Inside the ESP32: read the signal sample <em>and</em> the potentiometer
+            position; multiply; write to the 8-bit DAC.</li>
+        <li>Output: the same sinusoid, attenuated or amplified by whatever the knob
+            currently demands.</li>
+      </ul>
+
+      <figure class="project-figure wide">
+        <img src="../projects_data/2024-analog-singlal-generator/Signalniv%C3%A5generator_figures/figure3.png" alt="Block diagram of the signal-level generator. Input 75 mV → LM741 22× amp → 1650 mV bipolar → level shift to 0–3.3 V → ESP32 ADC + DAC controlled by a potentiometer → output.">
+        <figcaption>Full chain. LM741 to push the signal into the ADC window, ESP32 multiplies sample × pot, DAC reconstructs the output.</figcaption>
+      </figure>
+    </section>
+
+    <section class="project-section">
+      <h2>Numbers</h2>
+      <ul>
+        <li><strong>Max gain:</strong> 3300/(75·2) = 22 (≈ 26.85 dB).</li>
+        <li><strong>Max attenuation:</strong> (3300/255)/150 = 0.086 (≈ −21.28 dB).</li>
+        <li><strong>Resolution:</strong> the pot is read through a 12-bit ADC (4096
+            steps), so the gain control has a theoretical step of
+            (26.85 − (−21.28))/4096 ≈ 0.0118 dB.</li>
+        <li><strong>SNR:</strong> measured on the analog front-end at roughly 24–28 dB,
+            mostly limited by the input stage rather than the ESP32 itself.</li>
+      </ul>
+      <p>
+        The hot loop is a single line, intentionally:
+      </p>
+      <pre><code>void loop() {
+  dacWrite(25, ((int)analogRead(35) * (int)analogRead(potPin)) &gt;&gt; 16);
+}</code></pre>
+      <p>
+        Casting to <code>int32</code> before the multiply, then bit-shifting 16 places,
+        keeps the result in the DAC's 0–255 range without paying for a division. The
+        whole thing runs as fast as the ADC will allow.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2024-analog-singlal-generator/Signalniv%C3%A5generator_figures/figure4.png" alt="Detailed schematic showing the LM741 amplifier wiring, 22k and 20k feedback resistors, ESP32 power rails, and the potentiometer on pin 13.">
+          <figcaption>Final wiring. LM741 around 22k/20k feedback, ESP32 ADC on the bipolar-shifted output, pot into pin 13.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2024-analog-singlal-generator/Signalniv%C3%A5generator_figures/figure5.png" alt="The breadboard build: ESP32, op-amp, potentiometer, and a Digilent Analog Discovery cable.">
+          <figcaption>Bench build. ESP32, LM741, potentiometer, Digilent Analog Discovery feeding the input.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Where it falls down, and the next step</h2>
+      <p>
+        At very low gain the DAC's quantisation dominates, and the output looks like a
+        staircase between 0 and 6.47 mV. A passive smoothing stage on the output would
+        clean that up considerably; that is the obvious next iteration.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2024-analog-singlal-generator/Signalniv%C3%A5generator_figures/figure6.png" alt="Oscilloscope: smooth orange input sinusoid; blue DAC reconstruction follows it closely but with visible staircase steps at the peaks.">
+          <figcaption>Mid-gain output. DAC steps are visible at the peaks but the shape tracks.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2024-analog-singlal-generator/Signalniv%C3%A5generator_figures/figure7.png" alt="Same scope view at low gain: the DAC output is a coarse staircase oscillating between just a few quantisation levels.">
+          <figcaption>Low-gain output, where staircase quantisation dominates. Passive smoothing on the output is the obvious next iteration.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Writeup</h2>
+      <div class="project-links">
+        <a href="../projects_data/2024-analog-singlal-generator/Signalniv%C3%A5generator.pdf" target="_blank" rel="noopener" download>Download: Signalnivågenerator.pdf</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

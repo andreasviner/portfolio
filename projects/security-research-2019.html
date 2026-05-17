@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Self-taught cybersecurity research · Andreas Lindeman</title>
+  <meta name="description" content="A year teaching myself how Windows, remote desktop, and auth systems actually work, and what that experience left me with." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2019</span>
+    </div>
+
+    <h1 class="project-title">A year inside the <em>operating system</em></h1>
+
+    <p class="project-lede">
+      In first year of high school I spent a serious chunk of my free time trying to
+      understand, from first principles, how Windows actually worked under the hood:
+      processes, remote desktop, input handling, authentication. Some of what I built was a
+      classic teenager-with-too-much-knowledge mistake; the technical foundation it left me
+      with is something I still draw on every week.
+    </p>
+
+    <section class="project-section">
+      <h2>What I was learning</h2>
+      <ul>
+        <li>How Windows organises processes, sessions, and desktops, and why those distinctions matter.</li>
+        <li>How remote-desktop protocols negotiate, frame, and stream input.</li>
+        <li>How a process can read or restrict another process's input, and what the OS is doing under the hood when it allows or denies that.</li>
+        <li>How auth flows actually work. Tokens, sessions, the boring middle that everyone forgets is where security lives.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The thing I'd undo</h2>
+      <p>
+        I built a remote-access tool and used it on a classmate's machine. I got caught. I
+        deserved to get caught. There is a long distance between <em>"I want to understand
+        how this works"</em> and <em>"I have the right to run this on someone else's
+        computer"</em>, and at fifteen I hadn't internalised it. I do now. I include this
+        page so that distance is on the record, because <em>"I was young and curious"</em>
+        doesn't excuse it, and pretending it didn't happen would be worse.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What stayed</h2>
+      <p>
+        A real working knowledge of how systems are put together, the kind you only get
+        when you spend a year reading docs that were written for someone five years more
+        senior than you are. It pays off constantly. When I write production ML or back-end
+        services today, I think about auth surfaces, process boundaries, and the unhappy
+        path because that year forced me to.
+      </p>
+      <p>
+        It also taught me, the hard way, that <em>any</em> capability needs a clear answer
+        to "whose system, whose data, who agreed?". That answer comes first now.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

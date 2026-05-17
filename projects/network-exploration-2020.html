@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network exploration · Andreas Lindeman</title>
+  <meta name="description" content="A year teaching myself how networks actually work (captive portals, DNS, traffic shaping, auth) and what that did to my software engineering since." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2020</span>
+    </div>
+
+    <h1 class="project-title">A year teaching myself <em>how networks work</em></h1>
+
+    <p class="project-lede">
+      Second year of high school. After the OS-internals year I rolled into networking the
+      same way, by reading the standards, then building small tools that exercised every
+      corner of them. The output was less interesting than the curriculum I gave myself.
+    </p>
+
+    <section class="project-section">
+      <h2>What I was learning</h2>
+      <ul>
+        <li>DNS, DHCP, ARP. The protocols that make a network feel like one.</li>
+        <li>Captive portals: how they work, why they sometimes fail, and the surprising number of layers involved.</li>
+        <li>Traffic shaping, packet timing, and the bit where TCP congestion control is more like a feedback control system than a protocol.</li>
+        <li>Web auth surfaces, and what a browser actually trusts, and why.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>The honest part</h2>
+      <p>
+        Some of what I built during this year ended up being used inside my school's network
+        in ways I shouldn't have used it. I got caught for that too. Same shape of mistake
+        as the year before: I wanted to understand, and I confused understanding with
+        permission. I do not condone any of it now. I'm leaving the page up because the
+        learning was real, but it lives next to a footnote that says: that was the wrong
+        place to learn it.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What it gave me</h2>
+      <p>
+        A working mental model of the internet. When I wrote the UDP hole-punching layer for
+        the 4G car five years later, I wasn't learning it from scratch. I was reaching for
+        something I'd already understood. The same is true every time I have to debug a
+        flaky API call, or reason about why a service can't reach another one in a
+        production environment.
+      </p>
+      <p>
+        It's also the year that solidified my interest in <em>systems</em>, not just code.
+        Networks, OSes, hardware, ML pipelines. At a certain level they're all the same
+        thing: state moving through layers, and someone has to know what the layers are
+        doing.
+      </p>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

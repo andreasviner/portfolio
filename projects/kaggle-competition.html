@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NTNU × Hydro ML competition · Andreas Lindeman</title>
+  <meta name="description" content="Designed and led a Kaggle-style ML competition for NTNU TDT4173 students on a real Hydro raw-material forecasting problem, with a custom asymmetric quantile loss." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#timeline">Timeline</a></li>
+      <li><a href="../index.html#stack">Stack</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="project-page">
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch work"></span> work</span>
+      <span class="sep"></span>
+      <span>Spring 2025</span>
+    </div>
+
+    <h1 class="project-title">An ML competition for <em>NTNU TDT4173</em></h1>
+
+    <p class="project-lede">
+      Out of Append's engagement with Hydro Aluminium, we wanted more eyes on a real
+      forecasting problem from the smelter line. I designed and led a Kaggle-style
+      competition for NTNU's TDT4173 ("Modern Machine Learning in Practice") course.
+      Students built models, Hydro engineers benchmarked, and the metric measured the
+      thing the business actually cared about.
+    </p>
+
+    <section class="project-section">
+      <h2>The forecasting task</h2>
+      <p>
+        Each raw material has a <code>rm_id</code> and a stream of historical deliveries
+        through the end of 2024. Given any end date between 1 January and 31 May 2025,
+        the model has to predict the <em>cumulative</em> incoming weight of each raw
+        material from 1 January up to that date.
+      </p>
+      <p>
+        The dataset was split into a required core (<code>receivals.csv</code>,
+        <code>sales_orders.csv</code>) and optional extensions (material metadata,
+        suppliers, transportation). Anonymised, but real.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The metric: asymmetric quantile loss</h2>
+      <p>
+        Per-material loss at the 0.8 quantile:
+      </p>
+      <pre><code>QuantileLoss_0.8(F, A) = max( 0.8·(A − F),  0.2·(F − A) )</code></pre>
+      <p>
+        averaged across all materials. The asymmetry is deliberate: underestimating
+        available raw material is cheap (the smelter just runs with what is on hand);
+        overestimating is expensive (you plan a smelt that can't be completed).
+        Penalising overestimation 4× harder than underestimation pushes models toward
+        cautious forecasts, which is what the operations team actually wants.
+      </p>
+      <p>
+        The metric was implemented and unit-tested as a Jupyter notebook so participants
+        could reproduce the leaderboard score locally.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I built and led</h2>
+      <ul>
+        <li><strong>Brief.</strong> A course-ready task description with motivation,
+            data definitions, and the metric, written for both NTNU students and Hydro
+            engineers. Approved on both sides.</li>
+        <li><strong>Dataset.</strong> A curated slice of real operational data with a
+            held-out test set the participants never saw.</li>
+        <li><strong>Scoring code.</strong> The quantile metric, in Python, packaged so
+            anyone could compute their own leaderboard score before submitting.</li>
+        <li><strong>Rules &amp; submissions.</strong> Who could submit what, how often,
+            how leakage was prevented.</li>
+        <li><strong>Coordination</strong> with Hydro's domain experts, NTNU's course
+            staff, and Append's team. The technical work was the smaller half.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What it taught me</h2>
+      <p>
+        Designing a competition is a useful inversion of doing one. You learn very fast
+        which parts of an ML brief are ambiguous, because the ambiguity comes back as a
+        hundred student questions in the first week. And the scoring metric is the
+        whole project. If it does not reward what you actually want, the leaderboard
+        will Goodhart its way to a wrong answer in days.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Course material</h2>
+      <p>
+        The brief handed to students and the data-table documentation are both in the
+        repo:
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2025-kaggle-competition/Machine%20learning%20task%20for%20TDT4173.pdf" target="_blank" rel="noopener" download>Download: Machine learning task for TDT4173.pdf</a>
+        <a href="../projects_data/2025-kaggle-competition/Dataset%20definitions%20and%20explanation.pdf" target="_blank" rel="noopener" download>Download: Dataset definitions and explanation.pdf</a>
+      </div>
+    </section>
+
+    <a href="../index.html#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

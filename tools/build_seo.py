@@ -164,9 +164,12 @@ def build_sitemap(entries: list[dict], base_url: str) -> str:
         mtime = datetime.fromtimestamp(
             on_disk.stat().st_mtime, tz=timezone.utc
         ).strftime("%Y-%m-%d")
+        
+        clean_page = page.removesuffix(".html")
+
         lines += [
             "  <url>",
-            f"    <loc>{base}/{page}</loc>",
+            f"    <loc>{base}/{clean_page}</loc>",
             f"    <lastmod>{mtime}</lastmod>",
             "    <changefreq>monthly</changefreq>",
             "  </url>",

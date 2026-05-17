@@ -2078,6 +2078,7 @@ a:hover { border-color: var(--text); }
     align-items: stretch;
     gap: 12px;
     margin-bottom: 20px;
+    min-width: 0;
   }
   .filters {
     flex-wrap: nowrap;
@@ -2089,6 +2090,8 @@ a:hover { border-color: var(--text); }
     padding-right: 18px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    min-width: 0;
+    max-width: 100vw;
   }
   .filters::-webkit-scrollbar { display: none; }
   .filter-chip {

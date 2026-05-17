@@ -45,7 +45,7 @@ SITEMAP_XML   = ROOT / "sitemap.xml"
 MANIFEST_JSON = ROOT / "projects_data" / "manifest.json"
 
 # ← edit this if you deploy somewhere else, or pass --base-url at runtime.
-DEFAULT_BASE_URL = "https://andreaslindeman.com"
+DEFAULT_BASE_URL = "https://andreaslindeman.no"
 
 # Mirrors statusLabel() in script.js so the fallback reads identically to the
 # hover tooltip a sighted user sees on the desktop timeline.

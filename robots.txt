@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /projects_data/
 Disallow: /tools/
 
-Sitemap: https://andreaslindeman.no/sitemap.xml
+Sitemap: https://andreaslindeman.com/sitemap.xml

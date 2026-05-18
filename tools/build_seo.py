@@ -45,7 +45,7 @@ SITEMAP_XML   = ROOT / "sitemap.xml"
 MANIFEST_JSON = ROOT / "projects_data" / "manifest.json"
 
 # ← edit this if you deploy somewhere else, or pass --base-url at runtime.
-DEFAULT_BASE_URL = "https://andreaslindeman.no"
+DEFAULT_BASE_URL = "https://andreaslindeman.com"
 
 # Mirrors statusLabel() in script.js so the fallback reads identically to the
 # hover tooltip a sighted user sees on the desktop timeline.
@@ -156,20 +156,19 @@ def build_sitemap(entries: list[dict], base_url: str) -> str:
         page = entry.get("projectPage")
         if not page:
             continue
-        on_disk = ROOT / page
+        # projectPage is the clean URL (no .html); the file on disk still has .html.
+        on_disk = ROOT / (page + ".html")
         if not on_disk.exists():
-            print(f"  warn: projectPage refers to missing file {page}, "
+            print(f"  warn: projectPage refers to missing file {on_disk.name}, "
                   f"skipping in sitemap", file=sys.stderr)
             continue
         mtime = datetime.fromtimestamp(
             on_disk.stat().st_mtime, tz=timezone.utc
         ).strftime("%Y-%m-%d")
-        
-        clean_page = page.removesuffix(".html")
 
         lines += [
             "  <url>",
-            f"    <loc>{base}/{clean_page}</loc>",
+            f"    <loc>{base}/{page}</loc>",
             f"    <lastmod>{mtime}</lastmod>",
             "    <changefreq>monthly</changefreq>",
             "  </url>",

@@ -42,7 +42,7 @@ point your DNS at GitHub.
      "end": "YYYY",             // optional; can also be "YYYY-MM" or "present"
      "shortDescription": "Shown in the tooltip and mobile list.",
      "tags": ["python", "ml"],
-     "projectPage": "projects/<slug>.html",       // optional
+     "projectPage": "projects/<slug>",             // optional; clean URL, no .html
      "externalLinks": [                            // optional
        { "label": "GitHub", "url": "https://...", "type": "github" }
      ],

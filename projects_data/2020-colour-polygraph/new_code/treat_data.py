@@ -13,7 +13,7 @@ A weighted "love" score is then computed per voxel:
 
 The script also extracts overall favourite / least-favourite hex colours
 and a few session-level stats. The output lands in
-main/projects_data/2020-survey-ai/preferences.json.
+main/projects_data/2020-colour-polygraph/preferences.json.
 """
 
 import json

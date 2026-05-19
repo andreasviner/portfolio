@@ -1,5 +1,5 @@
 {
-  "id": "security-research-2019",
+  "id": "security-research",
   "title": "Security research",
   "category": "hobby",
   "isProject": true,
@@ -15,5 +15,5 @@
     "software"
   ],
   "importance": 65,
-  "projectPage": "projects/security-research-2019"
+  "projectPage": "projects/security-research"
 }

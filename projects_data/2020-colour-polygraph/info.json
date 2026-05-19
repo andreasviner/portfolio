@@ -1,0 +1,19 @@
+{
+  "id": "colour-polygraph",
+  "title": "Colour Polygraph",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2020-09",
+  "shortDescription": "A colour polygraph trained on 20,000 survey clicks. Guessed age, gender, and mood from nothing but which swatches people picked.",
+  "tags": [
+    "machine learning",
+    "data collection",
+    "behavioural data"
+  ],
+  "types": [
+    "software",
+    "ml"
+  ],
+  "importance": 100,
+  "projectPage": "projects/colour-polygraph"
+}

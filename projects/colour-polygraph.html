@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Colour-preference predictor · Andreas Lindeman</title>
-  <meta name="description" content="A 2020 study of 20,000 survey responses that learned to predict age, gender, and mood from colour-click patterns alone." />
+  <title>Colour Polygraph · Andreas Lindeman</title>
+  <meta name="description" content="A 2020 colour polygraph trained on 20,000 survey responses. Guessed age, gender, and mood from nothing but which colour swatches people picked." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
@@ -331,14 +331,14 @@
       <span>2020</span>
     </div>
 
-    <h1 class="project-title">Colour-preference <em>predictor</em></h1>
+    <h1 class="project-title">Colour <em>Polygraph</em></h1>
 
     <p class="project-lede">
       A self-directed experiment from the second year of upper-secondary school. I built a
       twenty-question colour survey, sent it to around 160,000 students through the Oslo
       school directory, and ended up with 6,731 cleaned sessions and a small neural net that
-      could guess a participant's age, gender and self-reported mood from nothing but their
-      colour clicks.
+      could guess a participant's age, gender and self-reported mood from nothing but which
+      colour swatches they picked.
     </p>
 
     <section class="project-section">
@@ -530,10 +530,10 @@
         binning, a different filter, or train your own little net on it, this is where to start.
       </p>
       <div class="project-links">
-        <a href="https://github.com/andreasviner/portfolio/tree/main/main/projects_data/2020-survey-ai" target="_blank" rel="noopener">Project folder on GitHub</a>
-        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-survey-ai/code/save.ligma" target="_blank" rel="noopener">Raw cleaned export (save.ligma, JSON, ~10 MB)</a>
-        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-survey-ai/new_code/treat_data.py" target="_blank" rel="noopener">Aggregator script (treat_data.py)</a>
-        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-survey-ai/preferences.json" target="_blank" rel="noopener">Aggregated voxel data (preferences.json)</a>
+        <a href="https://github.com/andreasviner/portfolio/tree/main/main/projects_data/2020-colour-polygraph" target="_blank" rel="noopener">Project folder on GitHub</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-colour-polygraph/code/save.ligma" target="_blank" rel="noopener">Raw cleaned export (save.ligma, JSON, ~10 MB)</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-colour-polygraph/new_code/treat_data.py" target="_blank" rel="noopener">Aggregator script (treat_data.py)</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-colour-polygraph/preferences.json" target="_blank" rel="noopener">Aggregated voxel data (preferences.json)</a>
       </div>
     </section>
 
@@ -549,7 +549,7 @@
 
   <script>
   (function () {
-    const DATA_URL = '../projects_data/2020-survey-ai/preferences.json';
+    const DATA_URL = '../projects_data/2020-colour-polygraph/preferences.json';
 
     const canvas   = document.getElementById('surveyCanvas');
     const ctx      = canvas.getContext('2d');

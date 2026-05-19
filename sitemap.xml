@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://andreaslindeman.com/</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -123,7 +123,7 @@
   </url>
   <url>
     <loc>https://andreaslindeman.com/projects/drawing-3d-printer</loc>
-    <lastmod>2026-05-18</lastmod>
+    <lastmod>2026-05-19</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
@@ -162,17 +162,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andreaslindeman.com/projects/survey-ai-2020</loc>
+    <loc>https://andreaslindeman.com/projects/colour-polygraph</loc>
+    <lastmod>2026-05-19</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://andreaslindeman.com/projects/network-exploration</loc>
     <lastmod>2026-05-18</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andreaslindeman.com/projects/network-exploration-2020</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://andreaslindeman.com/projects/security-research-2019</loc>
+    <loc>https://andreaslindeman.com/projects/security-research</loc>
     <lastmod>2026-05-18</lastmod>
     <changefreq>monthly</changefreq>
   </url>

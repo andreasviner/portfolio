@@ -1,5 +1,5 @@
 {
-  "id": "network-exploration-2020",
+  "id": "network-exploration",
   "title": "Network deep-dive",
   "category": "hobby",
   "isProject": true,
@@ -15,5 +15,5 @@
     "software"
   ],
   "importance": 65,
-  "projectPage": "projects/network-exploration-2020"
+  "projectPage": "projects/network-exploration"
 }

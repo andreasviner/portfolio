@@ -10,6 +10,302 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="icon" type="image/png" href="../icon.png" />
+  <style>
+    .survey-viz {
+      margin: 24px 0 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .survey-viz-canvas-wrap {
+      position: relative;
+      background: radial-gradient(circle at 50% 45%, #131829 0%, #060810 80%);
+      border: 1px solid var(--hairline);
+      border-radius: 6px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+    }
+    .survey-viz-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    .survey-viz-canvas-wrap canvas:active { cursor: grabbing; }
+    .survey-viz-legend {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      display: flex;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--text-mute);
+      pointer-events: none;
+    }
+    .sv-axis::before {
+      content: '';
+      display: inline-block;
+      width: 8px; height: 8px;
+      margin-right: 6px;
+      vertical-align: 1px;
+      border-radius: 50%;
+    }
+    .sv-axis-r::before { background: #ff6464; }
+    .sv-axis-g::before { background: #66dd6e; }
+    .sv-axis-b::before { background: #6aa6ff; }
+    .survey-viz-readout {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      pointer-events: none;
+    }
+    .sv-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 2px;
+      background: rgba(245, 185, 92, 0.14);
+      color: var(--hobby);
+      border: 1px solid rgba(245, 185, 92, 0.28);
+    }
+    .sv-tag-mute {
+      background: rgba(235, 230, 218, 0.06);
+      color: var(--text-mute);
+      border-color: var(--hairline);
+    }
+    .survey-viz-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 6px;
+      padding: 18px 20px;
+    }
+    .survey-preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .sv-preset {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: var(--text-mute);
+      cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .sv-preset:hover { color: var(--text); border-color: var(--hairline-2); }
+    .sv-preset.is-active {
+      background: rgba(245, 185, 92, 0.12);
+      color: var(--hobby);
+      border-color: rgba(245, 185, 92, 0.32);
+    }
+    .sv-slider {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sv-slider-label {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+    }
+    .sv-slider-label > :first-child { text-align: left; }
+    .sv-slider-label > :last-child  { text-align: right; }
+    .sv-slider-name {
+      color: var(--text);
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sv-age-toggle {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 2px;
+      background: transparent;
+      color: var(--text-mute);
+      border: 1px solid var(--hairline);
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .sv-age-toggle:hover { color: var(--text); border-color: var(--hairline-2); }
+    .sv-age-toggle[aria-pressed="true"] {
+      background: rgba(245, 185, 92, 0.12);
+      color: var(--hobby);
+      border-color: rgba(245, 185, 92, 0.32);
+    }
+    .sv-age-readout {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .sv-slider.is-disabled input[type="range"] { opacity: 0.35; cursor: not-allowed; }
+    .sv-slider.is-disabled .sv-age-readout { display: none; }
+    .sv-slider input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--hairline-2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .sv-slider input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(245, 185, 92, 0.4);
+      cursor: pointer;
+    }
+    .sv-slider input[type="range"]::-moz-range-thumb {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+    .survey-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .survey-stats-card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 6px;
+      padding: 16px 18px;
+    }
+    .survey-stats-card h3 {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      margin: 0 0 6px;
+      font-style: normal;
+      font-weight: 500;
+    }
+    .sv-card-sub {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-mute);
+      margin: 0 0 12px;
+    }
+    .sv-swatch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .sv-swatch {
+      width: 38px;
+      height: 38px;
+      border-radius: 3px;
+      border: 1px solid var(--hairline);
+      position: relative;
+    }
+    .sv-swatch::after {
+      content: attr(data-hex);
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .sv-swatch:hover::after { opacity: 1; }
+    .sv-figures {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sv-figures li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text);
+      border-bottom: 1px dashed var(--hairline);
+      padding-bottom: 6px;
+    }
+    .sv-figures li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .sv-figures b {
+      font-family: var(--mono);
+      font-weight: 500;
+      color: var(--hobby);
+    }
+    .sv-mood-grid {
+      display: grid;
+      grid-template-columns: auto repeat(6, 1fr);
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-mute);
+      align-items: center;
+    }
+    .sv-mood-grid .sv-mood-head {
+      text-align: center;
+      letter-spacing: 0.08em;
+    }
+    .sv-mood-grid .sv-mood-label {
+      text-align: right;
+      padding-right: 6px;
+      letter-spacing: 0.06em;
+    }
+    .sv-mood-cell {
+      height: 22px;
+      border-radius: 2px;
+      position: relative;
+      color: var(--bg-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    @media (max-width: 540px) {
+      .survey-viz-readout { right: 10px; top: 10px; }
+      .sv-tag { font-size: 9px; padding: 3px 7px; }
+      .sv-mood-grid { font-size: 9px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -38,11 +334,94 @@
     <h1 class="project-title">Colour-preference <em>predictor</em></h1>
 
     <p class="project-lede">
-      A self-directed experiment from upper-secondary school. Built a 20-question colour survey,
-      shipped it to ~160,000 inboxes, trained a model on the 20,000 completed responses, and
-      ended up with a small neural net that could guess a participant's age, gender, and
-      self-reported mood from nothing but their click pattern.
+      A self-directed experiment from the second year of upper-secondary school. I built a
+      twenty-question colour survey, sent it to around 160,000 students through the Oslo
+      school directory, and ended up with 6,731 cleaned sessions and a small neural net that
+      could guess a participant's age, gender and self-reported mood from nothing but their
+      colour clicks.
     </p>
+
+    <section class="project-section">
+      <h2>Explore the data</h2>
+      <p>
+        Before the write-up, the toy. Drag the cube to rotate it, double-click to resume the
+        slow auto-rotate. The buttons swap between boys, girls, the difference between them,
+        and a free pair of sliders. Age filtering is off by default; tap "All ages" to switch
+        the age slider on. Each glowing dot is one cell of an 8&times;8&times;8 RGB grid, sized
+        by how often colours from that cell were picked compared to how often they were shown.
+      </p>
+
+      <div class="survey-viz" id="surveyViz">
+        <div class="survey-viz-canvas-wrap">
+          <canvas id="surveyCanvas" width="1440" height="900" aria-label="3D RGB cloud of colour preferences"></canvas>
+          <div class="survey-viz-legend">
+            <span class="sv-axis sv-axis-r">R</span>
+            <span class="sv-axis sv-axis-g">G</span>
+            <span class="sv-axis sv-axis-b">B</span>
+          </div>
+          <div class="survey-viz-readout" id="surveyReadout">
+            <span class="sv-tag" id="svGenderTag">all</span>
+            <span class="sv-tag" id="svAgeTag">all ages</span>
+            <span class="sv-tag sv-tag-mute" id="svSampleTag">n = 0</span>
+          </div>
+        </div>
+
+        <div class="survey-viz-controls">
+          <div class="survey-preset-row">
+            <button type="button" class="sv-preset" data-preset="boys">Boys</button>
+            <button type="button" class="sv-preset" data-preset="girls">Girls</button>
+            <button type="button" class="sv-preset" data-preset="diff">Difference</button>
+            <button type="button" class="sv-preset is-active" data-preset="free">Sliders</button>
+          </div>
+
+          <label class="sv-slider">
+            <span class="sv-slider-label">
+              <span>Boys</span>
+              <span class="sv-slider-name">gender</span>
+              <span>Girls</span>
+            </span>
+            <input id="svGender" type="range" min="0" max="1000" value="500" step="1" />
+          </label>
+
+          <label class="sv-slider sv-slider-age is-disabled" id="svAgeSlider">
+            <span class="sv-slider-label">
+              <span>6</span>
+              <span class="sv-slider-name">
+                <button type="button" class="sv-age-toggle" id="svAgeToggle" aria-pressed="false">All ages</button>
+                <span class="sv-age-readout" id="svAgeName">age &middot; 17</span>
+              </span>
+              <span>68</span>
+            </span>
+            <input id="svAge" type="range" min="6" max="68" value="17" step="1" disabled />
+          </label>
+        </div>
+
+        <div class="survey-stats-grid">
+          <div class="survey-stats-card">
+            <h3>Most-loved colours</h3>
+            <p class="sv-card-sub">Voxels with the strongest preference score: shown to many people and picked far more often than chance.</p>
+            <div class="sv-swatch-row" id="svFavRow"></div>
+          </div>
+
+          <div class="survey-stats-card">
+            <h3>Most-rejected colours</h3>
+            <p class="sv-card-sub">Voxels people were shown over and over but almost never picked. Muddy yellow-browns lose every popularity contest.</p>
+            <div class="sv-swatch-row" id="svLeastRow"></div>
+          </div>
+
+          <div class="survey-stats-card">
+            <h3>Headline numbers</h3>
+            <ul class="sv-figures" id="svFigures"></ul>
+          </div>
+
+          <div class="survey-stats-card">
+            <h3>Mood by group</h3>
+            <p class="sv-card-sub">Self-reported 0&ndash;60 score, lower is happier. Adolescence visibly bites.</p>
+            <div class="sv-mood-grid" id="svMoodGrid"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="project-section">
       <h2>The question</h2>
@@ -56,9 +435,11 @@
     <section class="project-section">
       <h2>The survey</h2>
       <p>
-        Participants answered three demographic questions (age, gender, and a 1–10 mood
-        rating), then completed twenty trials. Each trial presented four colour swatches and
-        asked them to pick the one they liked best.
+        Participants answered three demographic questions (age, gender and a 1 to 10 mood
+        rating), then completed twenty trials. Each trial showed four colour swatches and
+        asked them to pick the one they liked best. After all twenty, the sixteen surviving
+        favourites were paired off in groups of four, then in a final round of four, until
+        one colour was left standing.
       </p>
       <p>
         Alongside the picks, the survey quietly logged the meta-signal: how long each
@@ -68,16 +449,37 @@
     </section>
 
     <section class="project-section">
-      <h2>Reach &amp; response</h2>
+      <h2>Reach and response</h2>
       <ul>
-        <li>~160,000 mails delivered through the Oslo school directory</li>
-        <li>~20,000 completed surveys (≈12.5% completion)</li>
+        <li>Around 160,000 students opened the mail through the Oslo school directory</li>
+        <li>Around 20,000 finished the full survey (roughly 12.5% completion)</li>
         <li>Every response stored with a timestamp and a session-local salt</li>
       </ul>
       <blockquote>
-        At sixteen, the most surprising part wasn't the model. It was watching a dataset of
+        At sixteen the most surprising part wasn't the model. It was watching a dataset of
         twenty thousand human responses arrive in two days.
       </blockquote>
+    </section>
+
+    <section class="project-section">
+      <h2>Cleaning the data</h2>
+      <p>
+        The dataset arrived dirty. Around 20,000 people finished the survey, but the cube
+        at the top only runs on 6,731 of them. Everything else got filtered out by a chain
+        of sanity checks that I built up as I noticed the failure modes:
+      </p>
+      <ul>
+        <li>Self-reported gender had to match the gender on file in the school directory. People who said the opposite of what was on file were almost always joking.</li>
+        <li>Self-reported age had to be plausibly close to the directory age. A first-grader who claims to be 47 isn't answering seriously.</li>
+        <li>Everyone under 6 was dropped. So was everyone above 68. Roughly half of all "adults" in the raw data claimed to be exactly 69.</li>
+        <li>Sessions where almost every click landed on the same screen coordinate were dropped. Someone tapping one corner twenty times is not picking colours.</li>
+        <li>Sessions where the average answer took less than 0.3 seconds were dropped. You can't read four swatches that fast.</li>
+        <li>Plus a handful of smaller heuristics for duplicate IDs, missing fields, impossible total times, and people who clicked through without ever moving the mouse.</li>
+      </ul>
+      <p>
+        What survives is the 6,731 sessions where I'm reasonably sure a real human was making
+        a real choice. That's the cleaned set the cube at the top is drawing from.
+      </p>
     </section>
 
     <section class="project-section">
@@ -90,24 +492,49 @@
       <h3>Architecture</h3>
       <p>
         A small fully-connected network. Three targets, trained jointly: age (regression),
-        gender (binary classification), mood (1–10 ordinal). I used the meta-features as
-        much as the colour picks themselves; those turned out to carry a lot of the signal.
+        gender (binary classification), mood (1 to 10 ordinal). I leaned on the meta-features
+        as much as the colour picks themselves. They turned out to carry a lot of the signal,
+        especially for age.
       </p>
     </section>
 
     <section class="project-section">
       <h2>What I learned</h2>
       <p>
-        Two things. First, that the way you click is at least as informative as what you
-        click. Second, that running a study at scale is less about the model and more about
-        the boring engineering: surveys, storage, deduplication, abuse-handling, a clean
-        export pipeline. The model was the smallest file in the project.
+        Three things. First, that <em>how</em> you click is at least as informative as
+        <em>what</em> you click. Reaction time and click coordinates carried more weight in
+        the age head than the colour picks themselves. Second, that running a study at scale
+        is less about the model and more about the boring plumbing around it: surveys,
+        storage, deduplication, abuse handling, the cleaning pipeline I just walked through.
+        The model itself was the smallest file in the project.
       </p>
       <p>
-        I'd do this differently now: clearer consent, better aggregation, a published
-        write-up. It was a high-school project and it shows, but it taught me that data
-        beats cleverness, and I've never quite let go of that.
+        Third, that almost two thirds of a "completed" dataset can be noise. The 13,000
+        sessions I threw away weren't all malicious; plenty were kids speed-running for the
+        sake of it, or people typing 69 as their age out of habit. The lesson stuck. Every
+        dataset I've touched since then I treat as guilty until proven clean.
       </p>
+      <p>
+        I'd do this differently today: clearer consent, better aggregation, a published
+        write-up. It was a high-school project and it shows in places, but it taught me that
+        data beats cleverness, and I've never quite let go of that.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Explore the data yourself</h2>
+      <p>
+        Everything that powers the cube above lives in the public repo. The raw export, the
+        Python cleaner that turned 20,000 rows into 6,731, and the aggregator that produced
+        the JSON the viz reads, are all in the project folder. If you want to try a different
+        binning, a different filter, or train your own little net on it, this is where to start.
+      </p>
+      <div class="project-links">
+        <a href="https://github.com/andreasviner/portfolio/tree/main/main/projects_data/2020-survey-ai" target="_blank" rel="noopener">Project folder on GitHub</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-survey-ai/code/save.ligma" target="_blank" rel="noopener">Raw cleaned export (save.ligma, JSON, ~10 MB)</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-survey-ai/new_code/treat_data.py" target="_blank" rel="noopener">Aggregator script (treat_data.py)</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/main/projects_data/2020-survey-ai/preferences.json" target="_blank" rel="noopener">Aggregated voxel data (preferences.json)</a>
+      </div>
     </section>
 
     <a href="../#timeline" class="project-back">Back to timeline</a>
@@ -119,5 +546,417 @@
   </footer>
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+  (function () {
+    const DATA_URL = '../projects_data/2020-survey-ai/preferences.json';
+
+    const canvas   = document.getElementById('surveyCanvas');
+    const ctx      = canvas.getContext('2d');
+    const genderEl = document.getElementById('svGender');
+    const ageEl    = document.getElementById('svAge');
+    const ageName  = document.getElementById('svAgeName');
+    const ageToggle  = document.getElementById('svAgeToggle');
+    const ageWrap    = document.getElementById('svAgeSlider');
+    const genderTag = document.getElementById('svGenderTag');
+    const ageTag    = document.getElementById('svAgeTag');
+    const sampleTag = document.getElementById('svSampleTag');
+    const presetBtns = document.querySelectorAll('.sv-preset');
+    let useAge = false;
+
+    let DATA = null;
+    let GRID = 8;
+    let BUCKETS = null;
+    let mode = 'free';           // 'boys' | 'girls' | 'diff' | 'free'
+    let yaw = 0.6, pitch = -0.45;
+    let dragging = false;
+    let lastX = 0, lastY = 0;
+    let autoRotate = true;
+    let scoreCache = null;
+    let cacheKey = '';
+
+    function ageBucketWeights(age) {
+      const buckets = DATA.age_buckets;
+      const out = new Map();
+      if (!useAge) {
+        let total = 0;
+        for (const b of buckets) {
+          const bg = BUCKETS['g_' + b.name];
+          const jg = BUCKETS['j_' + b.name];
+          total += (bg ? bg.n : 0) + (jg ? jg.n : 0);
+        }
+        if (total > 0) {
+          for (const b of buckets) {
+            const bg = BUCKETS['g_' + b.name];
+            const jg = BUCKETS['j_' + b.name];
+            const n  = (bg ? bg.n : 0) + (jg ? jg.n : 0);
+            if (n > 0) out.set(b.name, n / total);
+          }
+        }
+        return out;
+      }
+      const centers = buckets.map(b => (b.lo + b.hi) / 2);
+      let lo = 0;
+      for (let i = 0; i < centers.length; i++) {
+        if (age <= centers[i]) { lo = Math.max(0, i - 1); break; }
+        lo = i;
+      }
+      const hi = Math.min(buckets.length - 1, lo + 1);
+      if (lo === hi) { out.set(buckets[lo].name, 1); return out; }
+      const span = centers[hi] - centers[lo];
+      const t = span <= 0 ? 0 : Math.min(1, Math.max(0, (age - centers[lo]) / span));
+      out.set(buckets[lo].name, 1 - t);
+      out.set(buckets[hi].name, t);
+      return out;
+    }
+
+    function bucketScores(gKey, ageWeights) {
+      const out = new Map();
+      for (const [name, w] of ageWeights) {
+        const b = BUCKETS[gKey + '_' + name];
+        if (!b) continue;
+        for (const k in b.love) {
+          const cur = out.get(k) || 0;
+          out.set(k, cur + b.love[k] * w);
+        }
+      }
+      return out;
+    }
+
+    function bucketSampleCount(gKey, ageWeights) {
+      let n = 0;
+      for (const [name, w] of ageWeights) {
+        const b = BUCKETS[gKey + '_' + name];
+        if (b) n += b.n * w;
+      }
+      return n;
+    }
+
+    function currentScores() {
+      const age = parseInt(ageEl.value, 10);
+      const gMix = parseInt(genderEl.value, 10) / 1000; // 0=boys, 1=girls
+      const key = mode + '|' + age + '|' + gMix.toFixed(3);
+      if (key === cacheKey && scoreCache) return scoreCache;
+      cacheKey = key;
+
+      const aw = ageBucketWeights(age);
+      let scores = new Map();
+      let n = 0;
+
+      if (mode === 'boys') {
+        scores = bucketScores('g', aw);
+        n = bucketSampleCount('g', aw);
+        genderTag.textContent = 'boys';
+      } else if (mode === 'girls') {
+        scores = bucketScores('j', aw);
+        n = bucketSampleCount('j', aw);
+        genderTag.textContent = 'girls';
+      } else if (mode === 'diff') {
+        const boys  = bucketScores('g', aw);
+        const girls = bucketScores('j', aw);
+        const keys = new Set([...boys.keys(), ...girls.keys()]);
+        for (const k of keys) {
+          scores.set(k, (girls.get(k) || 0) - (boys.get(k) || 0));
+        }
+        n = bucketSampleCount('g', aw) + bucketSampleCount('j', aw);
+        genderTag.textContent = 'girls - boys';
+      } else {
+        const boys  = bucketScores('g', aw);
+        const girls = bucketScores('j', aw);
+        const keys = new Set([...boys.keys(), ...girls.keys()]);
+        for (const k of keys) {
+          scores.set(k, (boys.get(k) || 0) * (1 - gMix) + (girls.get(k) || 0) * gMix);
+        }
+        n = bucketSampleCount('g', aw) * (1 - gMix) + bucketSampleCount('j', aw) * gMix;
+        const pct = Math.round(gMix * 100);
+        genderTag.textContent = pct === 0 ? 'boys' :
+                                pct === 100 ? 'girls' :
+                                `${100 - pct}% boys / ${pct}% girls`;
+      }
+
+      ageTag.textContent = useAge ? ('age ' + age) : 'all ages';
+      sampleTag.textContent = 'n ≈ ' + Math.round(n).toLocaleString();
+      ageName.textContent = 'age · ' + age;
+      ageToggle.textContent = useAge ? ('Age ' + age) : 'All ages';
+
+      scoreCache = { scores, n };
+      return scoreCache;
+    }
+
+    function rotateVec(x, y, z) {
+      const cy = Math.cos(yaw),   sy = Math.sin(yaw);
+      const cp = Math.cos(pitch), sp = Math.sin(pitch);
+      const x1 =  cy * x + sy * z;
+      const z1 = -sy * x + cy * z;
+      const y1 =  cp * y - sp * z1;
+      const z2 =  sp * y + cp * z1;
+      return [x1, y1, z2];
+    }
+
+    function project(x, y, z, cx, cy, scale) {
+      const dist = 4.2;
+      const f = scale / (dist + z);
+      return [cx + x * f, cy - y * f, f];
+    }
+
+    function drawFrame(ts) {
+      if (autoRotate) yaw = (ts || 0) * 0.00018;
+
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const scale = Math.min(w, h) * 0.88;
+
+      const corners = [
+        [-1, -1, -1], [ 1, -1, -1], [ 1,  1, -1], [-1,  1, -1],
+        [-1, -1,  1], [ 1, -1,  1], [ 1,  1,  1], [-1,  1,  1],
+      ];
+      const proj = corners.map(c => {
+        const r = rotateVec(c[0], c[1], c[2]);
+        return project(r[0], r[1], r[2], cx, cy, scale);
+      });
+      const edges = [
+        [0,1],[1,2],[2,3],[3,0],
+        [4,5],[5,6],[6,7],[7,4],
+        [0,4],[1,5],[2,6],[3,7],
+      ];
+      ctx.strokeStyle = 'rgba(235, 230, 218, 0.10)';
+      ctx.lineWidth = 1;
+      for (const [a, b] of edges) {
+        ctx.beginPath();
+        ctx.moveTo(proj[a][0], proj[a][1]);
+        ctx.lineTo(proj[b][0], proj[b][1]);
+        ctx.stroke();
+      }
+
+      const axisEndpoints = [
+        { from: [-1, -1, -1], to: [ 1, -1, -1], color: 'rgba(255, 100, 100, 0.45)' },
+        { from: [-1, -1, -1], to: [-1,  1, -1], color: 'rgba(102, 221, 110, 0.45)' },
+        { from: [-1, -1, -1], to: [-1, -1,  1], color: 'rgba(106, 166, 255, 0.45)' },
+      ];
+      ctx.lineWidth = 1.4;
+      for (const ax of axisEndpoints) {
+        const a = rotateVec(...ax.from);
+        const b = rotateVec(...ax.to);
+        const pa = project(a[0], a[1], a[2], cx, cy, scale);
+        const pb = project(b[0], b[1], b[2], cx, cy, scale);
+        ctx.strokeStyle = ax.color;
+        ctx.beginPath();
+        ctx.moveTo(pa[0], pa[1]);
+        ctx.lineTo(pb[0], pb[1]);
+        ctx.stroke();
+      }
+
+      const { scores } = currentScores();
+      const G = GRID;
+      const step = 2 / G;
+
+      let maxAbs = 0;
+      for (const v of scores.values()) {
+        const a = Math.abs(v);
+        if (a > maxAbs) maxAbs = a;
+      }
+      if (maxAbs === 0) maxAbs = 1;
+
+      const points = [];
+      for (const [k, score] of scores) {
+        const ki = +k;
+        const rr = (ki >>> 6) & 7;
+        const gg = (ki >>> 3) & 7;
+        const bb = ki & 7;
+        const x = -1 + (rr + 0.5) * step;
+        const y = -1 + (gg + 0.5) * step;
+        const z = -1 + (bb + 0.5) * step;
+        const rot = rotateVec(x, y, z);
+        const p = project(rot[0], rot[1], rot[2], cx, cy, scale);
+        const cr = Math.round((rr * 32) + 16);
+        const cg = Math.round((gg * 32) + 16);
+        const cb = Math.round((bb * 32) + 16);
+        points.push({ x: p[0], y: p[1], depth: rot[2], f: p[2], cr, cg, cb, score });
+      }
+      points.sort((a, b) => b.depth - a.depth);
+
+      const baseRadius = Math.min(w, h) * 0.026;
+      const CUTOFF = mode === 'diff' ? 0.12 : 0.32;
+      for (const pt of points) {
+        const norm = pt.score / maxAbs;
+        const mag = Math.abs(norm);
+        if (mag < CUTOFF) continue;
+        const shaped = (mag - CUTOFF) / (1 - CUTOFF);
+        const persp = 1 / (1 + pt.depth * 0.18);
+        const radius = Math.max(1.0, Math.pow(shaped, 1.6) * baseRadius * persp);
+        let r = pt.cr, g = pt.cg, b = pt.cb;
+        if (mode === 'diff') {
+          if (norm > 0) {
+            r = Math.round(220 + (255 - 220) * mag);
+            g = Math.round(80  + (140 - 80) * (1 - mag));
+            b = Math.round(150 + (200 - 150) * mag);
+          } else {
+            r = Math.round(70  + (90 - 70) * (1 - mag));
+            g = Math.round(170 + (210 - 170) * mag);
+            b = Math.round(220 + (255 - 220) * mag);
+          }
+        }
+        const alpha = Math.min(0.98, 0.55 + shaped * 0.45);
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+        ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(drawFrame);
+    }
+
+    function attachInteractions() {
+      canvas.addEventListener('pointerdown', e => {
+        dragging = true; autoRotate = false;
+        lastX = e.clientX; lastY = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener('pointerup', e => {
+        dragging = false;
+        canvas.releasePointerCapture(e.pointerId);
+      });
+      canvas.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        lastX = e.clientX; lastY = e.clientY;
+        yaw   += dx * 0.008;
+        pitch += dy * 0.008;
+        pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch));
+      });
+      canvas.addEventListener('dblclick', () => { autoRotate = true; });
+    }
+
+    function attachControls() {
+      const onChange = () => { cacheKey = ''; };
+      genderEl.addEventListener('input', () => { setMode('free'); onChange(); });
+      ageEl.addEventListener('input', () => { if (useAge) onChange(); });
+      ageToggle.addEventListener('click', () => {
+        useAge = !useAge;
+        ageToggle.setAttribute('aria-pressed', String(useAge));
+        ageWrap.classList.toggle('is-disabled', !useAge);
+        ageEl.disabled = !useAge;
+        cacheKey = '';
+      });
+      presetBtns.forEach(btn => {
+        btn.addEventListener('click', () => setMode(btn.dataset.preset));
+      });
+    }
+
+    function setMode(m) {
+      mode = m;
+      presetBtns.forEach(btn => btn.classList.toggle('is-active', btn.dataset.preset === m));
+      cacheKey = '';
+    }
+
+    function renderFavs() {
+      const favRow = document.getElementById('svFavRow');
+      favRow.innerHTML = '';
+      DATA.favourites.slice(0, 8).forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'sv-swatch';
+        el.style.background = f.hex;
+        el.dataset.hex = f.hex + ' · ' + (f.ratio * 100).toFixed(1) + '%';
+        el.title = `${f.hex} · picked ${(f.ratio * 100).toFixed(1)}% of the time it was shown`;
+        favRow.appendChild(el);
+      });
+
+      const leastRow = document.getElementById('svLeastRow');
+      leastRow.innerHTML = '';
+      DATA.least_favourites.slice(0, 8).forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'sv-swatch';
+        el.style.background = f.hex;
+        el.dataset.hex = f.hex + ' · ' + (f.ratio * 100).toFixed(1) + '%';
+        el.title = `${f.hex} · picked only ${(f.ratio * 100).toFixed(1)}% of the time it was shown`;
+        leastRow.appendChild(el);
+      });
+    }
+
+    function renderFigures() {
+      const ul = document.getElementById('svFigures');
+      const s = DATA.stats;
+      const totalGender = (s.gender.g || 0) + (s.gender.j || 0);
+      const pctGirls = totalGender ? Math.round(100 * (s.gender.j || 0) / totalGender) : 0;
+      const ages = Object.keys(s.age_hist).map(Number);
+      const lo = Math.min(...ages), hi = Math.max(...ages);
+      let total = 0, sum = 0;
+      for (const [a, n] of Object.entries(s.age_hist)) { total += n; sum += a * n; }
+      const meanAge = total ? (sum / total).toFixed(1) : '–';
+      const rows = [
+        ['Valid sessions',   s.total_valid.toLocaleString()],
+        ['Raw responses',    "20,000+"],
+        ['Girls / Boys',     `${pctGirls}% / ${100 - pctGirls}%`],
+        ['Age span',         `${lo}–${hi} (mean ${meanAge})`],
+        ['Mean mood (0=happy, 60=glum)', s.mood_mean],
+      ];
+      ul.innerHTML = rows.map(r => `<li><span>${r[0]}</span><b>${r[1]}</b></li>`).join('');
+    }
+
+    function renderMoodGrid() {
+      const grid = document.getElementById('svMoodGrid');
+      grid.innerHTML = '';
+      const ageNames = DATA.age_buckets.map(b => b.name);
+      const head = document.createElement('div');
+      head.className = 'sv-mood-label';
+      head.textContent = '';
+      grid.appendChild(head);
+      DATA.age_buckets.forEach(b => {
+        const c = document.createElement('div');
+        c.className = 'sv-mood-head';
+        c.textContent = b.lo + '-' + b.hi;
+        grid.appendChild(c);
+      });
+      for (const g of ['j', 'g']) {
+        const lab = document.createElement('div');
+        lab.className = 'sv-mood-label';
+        lab.textContent = g === 'g' ? 'Boys' : 'Girls';
+        grid.appendChild(lab);
+        for (const name of ageNames) {
+          const b = BUCKETS[g + '_' + name];
+          const v = b ? b.mood_mean : null;
+          const cell = document.createElement('div');
+          cell.className = 'sv-mood-cell';
+          if (v === null) {
+            cell.style.background = 'rgba(235,230,218,0.04)';
+            cell.textContent = '–';
+            cell.style.color = 'var(--text-dim)';
+          } else {
+            const t = Math.min(1, Math.max(0, v / 30));
+            const r = Math.round(94  + (245 - 94)  * t);
+            const gg = Math.round(200 + (185 - 200) * t);
+            const bb = Math.round(154 + (92  - 154) * t);
+            cell.style.background = `rgb(${r},${gg},${bb})`;
+            cell.textContent = v.toFixed(1);
+          }
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    fetch(DATA_URL)
+      .then(r => r.json())
+      .then(d => {
+        DATA = d;
+        GRID = d.grid;
+        BUCKETS = d.buckets;
+        renderFavs();
+        renderFigures();
+        renderMoodGrid();
+        attachInteractions();
+        attachControls();
+        requestAnimationFrame(drawFrame);
+      })
+      .catch(err => {
+        const wrap = document.getElementById('surveyViz');
+        if (wrap) wrap.innerHTML = '<p style="color:var(--text-mute);font-family:var(--mono);font-size:12px;">Could not load preferences data: ' + err.message + '</p>';
+      });
+  })();
+  </script>
 </body>
 </html>

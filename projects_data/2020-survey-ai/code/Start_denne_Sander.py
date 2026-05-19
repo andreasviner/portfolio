@@ -16,8 +16,7 @@ except:
 #aa
 
 data = andy.data()
-data.save()
-aaaa
+#data.save()
 data.sort_remove_duplicate_ids = True
 data.config()
 #data.refresh_filter()

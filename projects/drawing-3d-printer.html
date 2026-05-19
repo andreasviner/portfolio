@@ -60,6 +60,30 @@
     </section>
 
     <section class="project-section">
+      <h2>Watching it draw</h2>
+      <p>
+        Twenty-nine renders sampled along the G-code path. Each frame shows
+        what the plotter would have laid down by that point. The portrait
+        surfaces from a tangle of strokes.
+      </p>
+      <figure class="frame-anim"
+        data-frames="29"
+        data-src="../projects_data/2022-drawing-3d-printer/video_frames/test{N}001.jpg">
+        <div class="frame-anim-stage">
+          <img class="frame-anim-img" alt="Plotter drawing in progress" />
+          <div class="frame-anim-loader">loading frames</div>
+        </div>
+        <div class="frame-anim-controls">
+          <button type="button" class="frame-anim-toggle" data-state="playing" aria-label="Pause">
+            <span class="icon" aria-hidden="true"></span>
+          </button>
+          <input type="range" class="frame-anim-scrub" min="0" max="28" value="0" step="1" aria-label="Frame" />
+          <span class="frame-anim-count"><span class="frame-anim-i">1</span> / 29</span>
+        </div>
+      </figure>
+    </section>
+
+    <section class="project-section">
       <h2>What I'd revisit</h2>
       <p>
         The path solver is a greedy heuristic; on portraits it sometimes gives away the
@@ -78,5 +102,107 @@
   </footer>
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+  (function(){
+    var root = document.querySelector('.frame-anim');
+    if(!root) return;
+    var total = parseInt(root.getAttribute('data-frames'), 10) || 0;
+    var pattern = root.getAttribute('data-src') || '';
+    if(!total || !pattern) return;
+
+    var img = root.querySelector('.frame-anim-img');
+    var toggle = root.querySelector('.frame-anim-toggle');
+    var scrub = root.querySelector('.frame-anim-scrub');
+    var counter = root.querySelector('.frame-anim-i');
+
+    var images = new Array(total);
+    var loaded = 0;
+    var current = 0;
+    var timer = null;
+    var playing = false;
+    var ready = false;
+    var stepMs = 220;
+    var holdMs = 1400;
+
+    function show(idx){
+      current = idx;
+      var entry = images[idx];
+      if(entry && entry.src){ img.src = entry.src; }
+      scrub.value = String(idx);
+      counter.textContent = String(idx + 1);
+    }
+
+    function advance(){
+      if(!playing) return;
+      var next = current + 1;
+      if(next >= total){
+        timer = setTimeout(function(){
+          if(!playing) return;
+          show(0);
+          timer = setTimeout(advance, stepMs);
+        }, holdMs);
+        return;
+      }
+      show(next);
+      timer = setTimeout(advance, stepMs);
+    }
+
+    function play(){
+      if(!ready || playing) return;
+      playing = true;
+      toggle.setAttribute('data-state', 'playing');
+      toggle.setAttribute('aria-label', 'Pause');
+      advance();
+    }
+    function pause(){
+      playing = false;
+      toggle.setAttribute('data-state', 'paused');
+      toggle.setAttribute('aria-label', 'Play');
+      if(timer){ clearTimeout(timer); timer = null; }
+    }
+
+    toggle.addEventListener('click', function(){
+      if(playing) pause(); else play();
+    });
+    scrub.addEventListener('input', function(){
+      pause();
+      show(parseInt(scrub.value, 10) || 0);
+    });
+
+    function preload(){
+      for(var i = 0; i < total; i++){
+        (function(idx){
+          var im = new Image();
+          im.onload = function(){
+            loaded++;
+            if(idx === 0 && !ready){ img.src = im.src; }
+            if(loaded === total){
+              ready = true;
+              root.classList.add('is-ready');
+              play();
+            }
+          };
+          im.src = pattern.replace('{N}', String(idx + 1));
+          images[idx] = im;
+        })(i);
+      }
+    }
+
+    if('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){
+            preload();
+            io.disconnect();
+          }
+        });
+      }, { rootMargin: '200px' });
+      io.observe(root);
+    } else {
+      preload();
+    }
+  })();
+  </script>
 </body>
 </html>

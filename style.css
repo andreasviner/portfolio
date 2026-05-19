@@ -2003,11 +2003,11 @@ a:hover { border-color: var(--text); }
 
   /* ---- hero: tighter type and padding ---- */
   .hero {
-    padding: 36px 18px 48px;
+    padding: 56px 18px 88px;
   }
 
   .hero-tag {
-    margin-bottom: 22px;
+    margin-bottom: 36px;
     padding: 5px 10px 5px 9px;
     font-size: 10px;
     letter-spacing: 0.12em;
@@ -2015,27 +2015,39 @@ a:hover { border-color: var(--text); }
   .hero-tag .tag-text { letter-spacing: 0.1em; }
 
   .hero-title {
-    font-size: clamp(48px, 14vw, 80px);
-    margin-bottom: 22px;
+    font-size: clamp(58px, 17vw, 96px);
+    margin-bottom: 40px;
   }
 
   .hero-pitch {
     font-size: 17px;
     line-height: 1.5;
-    margin-bottom: 28px;
+    margin-bottom: 42px;
   }
 
   .hero-sub {
     line-height: 1.4;
-    margin-bottom: 24px;
+    margin-bottom: 38px;
   }
   .hero-sub .sub-lead { font-size: 18px; line-height: 1.4; }
 
+  /* On mobile, the green typewriter phrase can be longer than the available
+     width. Switch the flex row to an inline paragraph so the phrase wraps at
+     word boundaries instead of bumping the whole green block to its own line.
+     Reserve two lines of height up front so the layout doesn't shift when a
+     longer phrase wraps. */
   .hero-build {
     font-size: 20px;
-    line-height: 1.35;
-    margin-bottom: 28px;
-    gap: 0.35em;
+    line-height: 1.4;
+    margin-bottom: 88px;
+    display: block;
+    min-height: 2.8em;
+  }
+  .hero-build .build-type {
+    display: inline;
+  }
+  .hero-build .typewriter-text {
+    white-space: normal;
   }
 
   .status-block {
@@ -2189,7 +2201,7 @@ a:hover { border-color: var(--text); }
 
 /* ≤ 380px: very small phones, pull the screws another quarter-turn */
 @media (max-width: 380px) {
-  .hero-title { font-size: clamp(40px, 13vw, 56px); }
+  .hero-title { font-size: clamp(48px, 16vw, 68px); }
   .hero-pitch { font-size: 16px; }
   .hero-build { font-size: 18px; }
   .section-title { font-size: 32px; }

@@ -446,7 +446,7 @@
             <button type="button" class="sv-preset" data-preset="both">Both</button>
             <button type="button" class="sv-preset is-active" data-preset="free">Sliders</button>
           </div>
-          <p class="sv-preset-help" id="svPresetHelp"><b>Pink ring</b>: girls liked it more. <b>Blue ring</b>: boys liked it more. Thicker = bigger gap. Fill is the real colour.</p>
+          <p class="sv-preset-help" id="svPresetHelp"></p>
 
           <label class="sv-slider">
             <span class="sv-slider-label">
@@ -875,19 +875,16 @@
         const alpha = Math.min(0.98, 0.55 + shaped * 0.45);
         ctx.beginPath();
         ctx.fillStyle = `rgba(${pt.cr},${pt.cg},${pt.cb},${alpha})`;
-        ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
-        ctx.fill();
-        if (mode === 'diff') {
-          const ringWidth = Math.max(1.0, (1.0 + shaped * 2.6) * persp);
-          const ringAlpha = Math.min(0.95, 0.55 + shaped * 0.4);
-          ctx.beginPath();
-          ctx.lineWidth = ringWidth;
-          ctx.strokeStyle = norm > 0
-            ? `rgba(255, 110, 175, ${ringAlpha})`
-            : `rgba(110, 180, 255, ${ringAlpha})`;
-          ctx.arc(pt.x, pt.y, radius + ringWidth * 0.5 + 0.5, 0, Math.PI * 2);
-          ctx.stroke();
+        if (mode === 'diff' && norm > 0) {
+          const r = radius * 1.5551;
+          ctx.moveTo(pt.x, pt.y - r);
+          ctx.lineTo(pt.x + r * 0.866, pt.y + r * 0.5);
+          ctx.lineTo(pt.x - r * 0.866, pt.y + r * 0.5);
+          ctx.closePath();
+        } else {
+          ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
         }
+        ctx.fill();
       }
 
       requestAnimationFrame(drawFrame);
@@ -932,7 +929,7 @@
     }
 
     const HELP_TEXT = {
-      diff: '<b>Pink ring</b>: girls liked it more. <b>Blue ring</b>: boys liked it more. Thicker = bigger gap. Fill is the real colour.',
+      diff: '<b>Triangle</b>: girls liked it more. <b>Circle</b>: boys liked it more. Bigger = bigger gap. Fill is the real colour.',
       both: '<b>Both</b>: dot size is the lower of the boys and girls preferences. Bigger = liked by both groups.'
     };
     function setMode(m) {

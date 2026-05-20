@@ -130,6 +130,9 @@
       color: var(--hobby);
       border-color: rgba(245, 185, 92, 0.32);
     }
+    .sv-preset-invert {
+      margin-left: auto;
+    }
     .sv-slider {
       display: flex;
       flex-direction: column;
@@ -328,7 +331,7 @@
       #svSampleTag { order: 2; }
       .sv-tag { font-size: 9px; padding: 3px 7px; }
       .sv-mood-grid { font-size: 9px; }
-      .survey-preset-row { flex-wrap: nowrap; gap: 6px; }
+      .survey-preset-row { flex-wrap: wrap; gap: 6px; }
       .sv-preset[data-preset="boys"],
       .sv-preset[data-preset="girls"] { display: none; }
       .sv-preset {
@@ -337,6 +340,7 @@
         white-space: nowrap;
         min-width: 0;
       }
+      .sv-preset-invert { margin-left: 0; }
     }
   </style>
 </head>
@@ -417,9 +421,10 @@
       <p>
         Before the write-up, the toy. Drag the cube to rotate it, double-click to resume the
         slow auto-rotate. The buttons swap between boys, girls, the difference between them,
-        the colours both groups love, and a free pair of sliders. Age filtering is off by
-        default; tap "All ages" to switch the age slider on. Each glowing dot is one cell of
-        an 8&times;8&times;8 RGB grid, sized by how often colours from that cell were picked
+        the colours both groups love, and a free pair of sliders. Tap "Invert" to flip the
+        view to what each group rejects instead. Age filtering is off by default; tap "All
+        ages" to switch the age slider on. Each glowing dot is one cell of an
+        8&times;8&times;8 RGB grid, sized by how often colours from that cell were picked
         compared to how often they were shown.
       </p>
 
@@ -445,6 +450,7 @@
             <button type="button" class="sv-preset" data-preset="diff">Difference</button>
             <button type="button" class="sv-preset" data-preset="both">Both</button>
             <button type="button" class="sv-preset is-active" data-preset="free">Sliders</button>
+            <button type="button" class="sv-preset sv-preset-invert" id="svInvert" aria-pressed="false" title="Flip the view to show what each group rejects">Invert</button>
           </div>
           <p class="sv-preset-help" id="svPresetHelp"></p>
 
@@ -635,9 +641,11 @@
     const genderTag = document.getElementById('svGenderTag');
     const ageTag    = document.getElementById('svAgeTag');
     const sampleTag = document.getElementById('svSampleTag');
-    const presetBtns = document.querySelectorAll('.sv-preset');
+    const presetBtns = document.querySelectorAll('.sv-preset[data-preset]');
     const presetHelp = document.getElementById('svPresetHelp');
+    const invertBtn = document.getElementById('svInvert');
     let useAge = false;
+    let inverted = false;
 
     let DATA = null;
     let GRID = 8;
@@ -685,14 +693,27 @@
       return out;
     }
 
-    function bucketScores(gKey, ageWeights) {
+    function bucketScores(gKey, ageWeights, invert) {
       const out = new Map();
       for (const [name, w] of ageWeights) {
         const b = BUCKETS[gKey + '_' + name];
         if (!b) continue;
-        for (const k in b.love) {
-          const cur = out.get(k) || 0;
-          out.set(k, cur + b.love[k] * w);
+        if (invert) {
+          let maxL = 0;
+          for (const k in b.love) {
+            if (b.love[k] > maxL) maxL = b.love[k];
+          }
+          for (const k in b.love) {
+            const inv = maxL - b.love[k];
+            if (inv <= 0) continue;
+            const cur = out.get(k) || 0;
+            out.set(k, cur + inv * w);
+          }
+        } else {
+          for (const k in b.love) {
+            const cur = out.get(k) || 0;
+            out.set(k, cur + b.love[k] * w);
+          }
         }
       }
       return out;
@@ -710,52 +731,54 @@
     function currentScores() {
       const age = parseInt(ageEl.value, 10);
       const gMix = parseInt(genderEl.value, 10) / 1000; // 0=boys, 1=girls
-      const key = mode + '|' + age + '|' + gMix.toFixed(3);
+      const key = mode + '|' + age + '|' + gMix.toFixed(3) + '|' + (inverted ? 'i' : 'l') + '|' + (useAge ? 'a' : '-');
       if (key === cacheKey && scoreCache) return scoreCache;
       cacheKey = key;
 
       const aw = ageBucketWeights(age);
       let scores = new Map();
       let n = 0;
+      const inv = inverted;
 
       if (mode === 'boys') {
-        scores = bucketScores('g', aw);
+        scores = bucketScores('g', aw, inv);
         n = bucketSampleCount('g', aw);
-        genderTag.textContent = 'boys';
+        genderTag.textContent = inv ? 'boys reject' : 'boys';
       } else if (mode === 'girls') {
-        scores = bucketScores('j', aw);
+        scores = bucketScores('j', aw, inv);
         n = bucketSampleCount('j', aw);
-        genderTag.textContent = 'girls';
+        genderTag.textContent = inv ? 'girls reject' : 'girls';
       } else if (mode === 'diff') {
-        const boys  = bucketScores('g', aw);
-        const girls = bucketScores('j', aw);
+        const boys  = bucketScores('g', aw, inv);
+        const girls = bucketScores('j', aw, inv);
         const keys = new Set([...boys.keys(), ...girls.keys()]);
         for (const k of keys) {
           scores.set(k, (girls.get(k) || 0) - (boys.get(k) || 0));
         }
         n = bucketSampleCount('g', aw) + bucketSampleCount('j', aw);
-        genderTag.textContent = 'girls - boys';
+        genderTag.textContent = inv ? 'girls - boys (reject)' : 'girls - boys';
       } else if (mode === 'both') {
-        const boys  = bucketScores('g', aw);
-        const girls = bucketScores('j', aw);
+        const boys  = bucketScores('g', aw, inv);
+        const girls = bucketScores('j', aw, inv);
         const keys = new Set([...boys.keys(), ...girls.keys()]);
         for (const k of keys) {
           scores.set(k, Math.min(boys.get(k) || 0, girls.get(k) || 0));
         }
         n = bucketSampleCount('g', aw) + bucketSampleCount('j', aw);
-        genderTag.textContent = 'both';
+        genderTag.textContent = inv ? 'both reject' : 'both';
       } else {
-        const boys  = bucketScores('g', aw);
-        const girls = bucketScores('j', aw);
+        const boys  = bucketScores('g', aw, inv);
+        const girls = bucketScores('j', aw, inv);
         const keys = new Set([...boys.keys(), ...girls.keys()]);
         for (const k of keys) {
           scores.set(k, (boys.get(k) || 0) * (1 - gMix) + (girls.get(k) || 0) * gMix);
         }
         n = bucketSampleCount('g', aw) * (1 - gMix) + bucketSampleCount('j', aw) * gMix;
         const pct = Math.round(gMix * 100);
-        genderTag.textContent = pct === 0 ? 'boys' :
-                                pct === 100 ? 'girls' :
-                                `${100 - pct}% boys / ${pct}% girls`;
+        const base = pct === 0 ? 'boys' :
+                     pct === 100 ? 'girls' :
+                     `${100 - pct}% boys / ${pct}% girls`;
+        genderTag.textContent = inv ? base + ' reject' : base;
       }
 
       ageTag.textContent = useAge ? ('age ' + age) : 'all ages';
@@ -864,7 +887,7 @@
       points.sort((a, b) => b.depth - a.depth);
 
       const baseRadius = Math.min(w, h) * 0.026;
-      const CUTOFF = mode === 'diff' ? 0.12 : 0.32;
+      const CUTOFF = mode === 'diff' ? 0.12 : (inverted ? 0.72 : 0.32);
       for (const pt of points) {
         const norm = pt.score / maxAbs;
         const mag = Math.abs(norm);
@@ -926,23 +949,38 @@
       presetBtns.forEach(btn => {
         btn.addEventListener('click', () => setMode(btn.dataset.preset));
       });
+      invertBtn.addEventListener('click', () => {
+        inverted = !inverted;
+        invertBtn.setAttribute('aria-pressed', String(inverted));
+        invertBtn.classList.toggle('is-active', inverted);
+        updateHelp();
+        cacheKey = '';
+      });
     }
 
     const HELP_TEXT = {
-      diff: '<b>Triangle</b>: girls liked it more. <b>Circle</b>: boys liked it more. Bigger = bigger gap. Fill is the real colour.',
-      both: '<b>Both</b>: dot size is the lower of the boys and girls preferences. Bigger = liked by both groups.'
+      diff:     '<b>Triangle</b>: girls liked it more. <b>Circle</b>: boys liked it more. Bigger = bigger gap. Fill is the real colour.',
+      diff_inv: '<b>Triangle</b>: girls rejected it more than boys. <b>Circle</b>: boys rejected it more than girls. Bigger = bigger gap.',
+      both:     '<b>Both</b>: dot size is the lower of the boys and girls preferences. Bigger = liked by both groups.',
+      both_inv: '<b>Both</b>: dot size is the lower of how strongly each group rejected the colour. Bigger = rejected by both groups.',
+      boys_inv:  '<b>Inverted</b>: bigger dots are colours boys were shown but rarely picked.',
+      girls_inv: '<b>Inverted</b>: bigger dots are colours girls were shown but rarely picked.',
+      free_inv:  '<b>Inverted</b>: bigger dots are colours this mix rejected (shown often, picked rarely).'
     };
+    function updateHelp() {
+      if (!presetHelp) return;
+      const key = inverted ? mode + '_inv' : mode;
+      if (HELP_TEXT[key]) {
+        presetHelp.innerHTML = HELP_TEXT[key];
+        presetHelp.classList.add('is-visible');
+      } else {
+        presetHelp.classList.remove('is-visible');
+      }
+    }
     function setMode(m) {
       mode = m;
       presetBtns.forEach(btn => btn.classList.toggle('is-active', btn.dataset.preset === m));
-      if (presetHelp) {
-        if (HELP_TEXT[m]) {
-          presetHelp.innerHTML = HELP_TEXT[m];
-          presetHelp.classList.add('is-visible');
-        } else {
-          presetHelp.classList.remove('is-visible');
-        }
-      }
+      updateHelp();
       cacheKey = '';
     }
 

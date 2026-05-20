@@ -8,12 +8,12 @@ in an 8x8x8 RGB grid:
   - round2    : how often it survived round 2 (16 -> 4)
   - final     : how often it was the very last pick
 
-A weighted "love" score is then computed per voxel:
-  love = (round1 + 2 * round2 + 4 * final) / max(1, offered)
-
-The script also extracts overall favourite / least-favourite hex colours
-and a few session-level stats. The output lands in
-main/projects_data/2020-colour-polygraph/preferences.json.
+These four raw counts are emitted per voxel as the array
+  [offered, round1, round2, final]
+so the front-end can experiment with different scoring weights without
+re-running this script. The script also extracts overall favourite /
+least-favourite hex colours and a few session-level stats. Output lands
+in main/projects_data/2020-colour-polygraph/preferences.json.
 """
 
 import json
@@ -27,7 +27,9 @@ OUT = os.path.join(HERE, "..", "preferences.json")
 GRID = 8
 SHIFT = 8 - 3  # quantize 0..255 -> 0..7
 
-AGE_BUCKETS = [
+AGE_BUCKETS = [(str(a), a, a) for a in range(6, 69)]
+
+MOOD_BUCKETS = [
     ("kids",     6,  9),
     ("preteen", 10, 12),
     ("early",   13, 15),
@@ -159,17 +161,21 @@ def main():
     out_buckets = {}
     for (gender, age_name), b in buckets.items():
         n = b["n"]
-        love = {}
+        vox = {}
         for v, off in b["offered"].items():
-            score = b["round1"].get(v, 0) + 2 * b["round2"].get(v, 0) + 4 * b["final"].get(v, 0)
-            ratio = score / off
-            if ratio > 0:
-                love[v] = round(ratio, 4)
+            if off < 3:
+                continue
+            vox[v] = [
+                off,
+                b["round1"].get(v, 0),
+                b["round2"].get(v, 0),
+                b["final"].get(v, 0),
+            ]
         key = f"{gender}_{age_name}"
         out_buckets[key] = {
             "n": n,
             "mood_mean": round((b["mood"] / n) if n else 0, 2),
-            "love": love,
+            "v": vox,
         }
 
     voxel_rows = []
@@ -212,6 +218,22 @@ def main():
             mood_total += int(row[4])
             mood_n += 1
 
+    mood_data = {}
+    for gender in GENDERS:
+        for mname, mlo, mhi in MOOD_BUCKETS:
+            n_sum = 0
+            mood_sum = 0
+            for a in range(mlo, mhi + 1):
+                b = buckets.get((gender, str(a)))
+                if not b:
+                    continue
+                n_sum += b["n"]
+                mood_sum += b["mood"]
+            mood_data[f"{gender}_{mname}"] = {
+                "n": n_sum,
+                "mood_mean": round(mood_sum / n_sum, 2) if n_sum else 0,
+            }
+
     out = {
         "grid": GRID,
         "age_buckets": [
@@ -219,6 +241,11 @@ def main():
             for n, lo, hi in AGE_BUCKETS
         ],
         "buckets": out_buckets,
+        "mood_buckets": [
+            {"name": n, "lo": lo, "hi": hi}
+            for n, lo, hi in MOOD_BUCKETS
+        ],
+        "mood_data": mood_data,
         "favourites": fav_list,
         "least_favourites": least_list,
         "stats": {

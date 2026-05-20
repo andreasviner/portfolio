@@ -211,6 +211,279 @@
       border: 2px solid var(--bg);
       cursor: pointer;
     }
+    .sv-range {
+      position: relative;
+      height: 20px;
+    }
+    .sv-range-track {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 4px;
+      margin-top: -2px;
+      background: var(--hairline-2);
+      border-radius: 2px;
+    }
+    .sv-range-fill {
+      position: absolute;
+      top: 50%;
+      height: 4px;
+      margin-top: -2px;
+      background: rgba(245, 185, 92, 0.5);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .sv-range input[type="range"] {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 20px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .sv-range input[type="range"]::-webkit-slider-runnable-track {
+      background: transparent;
+      height: 4px;
+      border: none;
+    }
+    .sv-range input[type="range"]::-moz-range-track {
+      background: transparent;
+      height: 4px;
+      border: none;
+    }
+    .sv-range input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      pointer-events: auto;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(245, 185, 92, 0.4);
+      cursor: pointer;
+      margin-top: -6px;
+    }
+    .sv-range input[type="range"]::-moz-range-thumb {
+      pointer-events: auto;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+    .sv-slider.is-disabled .sv-range-fill { opacity: 0.4; }
+    .sv-advanced-toggle-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -4px;
+    }
+    .sv-advanced-toggle {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: var(--text-mute);
+      cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .sv-advanced-toggle:hover { color: var(--text); border-color: var(--hairline-2); }
+    .sv-advanced-toggle[aria-expanded="true"] {
+      background: rgba(245, 185, 92, 0.12);
+      color: var(--hobby);
+      border-color: rgba(245, 185, 92, 0.32);
+    }
+    .sv-advanced-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--hairline);
+    }
+    .sv-advanced-panel[hidden] { display: none; }
+    .sv-advanced-panel .sv-advanced-note {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.03em;
+      color: rgba(228, 228, 238, 0.92);
+      margin: 0 0 4px;
+      line-height: 1.6;
+    }
+    .sv-advanced-panel .sv-bracket { font-size: 8.5px; }
+    .sv-advanced-panel .sv-bracket-stage { padding: 3px 7px; }
+    .sv-bracket {
+      list-style: none;
+      padding: 0;
+      margin: 6px 0 2px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.04em;
+      color: var(--text-mute);
+    }
+    .sv-bracket-stage {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border: 1px solid var(--hairline-2);
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .sv-bracket-stage span + span::before {
+      content: '\2192';
+      margin-right: 5px;
+      color: var(--text-dim);
+    }
+    .sv-bracket-arrow {
+      flex: 0 0 auto;
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 0.1 !important;
+    }
+    @media (max-width: 540px) {
+      .sv-bracket {
+        font-size: 8.5px;
+        gap: 0;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.1;
+      }
+      .sv-bracket-stage {
+        padding: 0 7px;
+        gap: 4px;
+        justify-content: center;
+        line-height: 1.2;
+      }
+      .sv-bracket-arrow {
+        transform: rotate(90deg);
+        margin: -4px 0;
+        font-size: 11px;
+        line-height: 1;
+      }
+      .sv-advanced-panel .sv-bracket-stage { padding: 0 6px; }
+    }
+    .sv-bracket-inline {
+      margin: 16px 0 22px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--text-mute);
+      gap: 8px;
+    }
+    .sv-bracket-inline .sv-bracket-stage {
+      padding: 6px 12px;
+      gap: 7px;
+      border-color: var(--hairline-2);
+    }
+    .sv-bracket-inline .sv-bracket-stage span + span::before {
+      color: var(--text-dim);
+      margin-right: 6px;
+    }
+    .sv-bracket-inline .sv-bracket-arrow {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    @media (max-width: 540px) {
+      .sv-bracket-inline { font-size: 10px; gap: 8px; }
+      .sv-bracket-inline .sv-bracket-stage { padding: 6px 12px; gap: 5px; }
+    }
+    .sv-weight {
+      display: grid;
+      grid-template-columns: 1fr 140px 56px;
+      gap: 10px;
+      align-items: center;
+    }
+    .sv-weight-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+    }
+    .sv-weight input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--hairline-2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .sv-weight input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(245, 185, 92, 0.4);
+      cursor: pointer;
+    }
+    .sv-weight input[type="range"]::-moz-range-thumb {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+    .sv-weight-readout {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--hobby);
+      text-align: right;
+    }
+    .sv-balance {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .sv-balance-info {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--text-mute);
+      flex: 1;
+      min-width: 200px;
+    }
+    .sv-balance-info b {
+      color: var(--hobby);
+      font-weight: 500;
+    }
+    .sv-balance-btn {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: var(--text-mute);
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .sv-balance-btn:hover { color: var(--text); border-color: var(--hairline-2); }
+    @media (max-width: 540px) {
+      .sv-weight {
+        grid-template-columns: 1fr 50px;
+        grid-template-areas: 'label readout' 'slider slider';
+        gap: 6px;
+      }
+      .sv-weight-label { grid-area: label; }
+      .sv-weight-readout { grid-area: readout; }
+      .sv-weight input[type="range"] { grid-area: slider; width: 100%; }
+    }
     .survey-stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -318,7 +591,25 @@
       font-size: 10px;
       font-weight: 600;
     }
+    .sv-card-wide { grid-column: 1 / -1; }
+    .sv-age-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 4px;
+    }
+    .sv-age-chart .sv-bar { fill: var(--hobby); }
+    .sv-age-chart .sv-axis-line  { stroke: var(--hairline); stroke-width: 1; }
+    .sv-age-chart .sv-tick-line  { stroke: var(--hairline-2); stroke-width: 1; }
+    .sv-age-chart .sv-median     { stroke: var(--text-mute); stroke-width: 1; stroke-dasharray: 2 3; }
+    .sv-age-chart text {
+      font-family: var(--mono);
+      font-size: 9px;
+      fill: var(--text-dim);
+    }
+    .sv-age-chart .sv-median-label { fill: var(--text-mute); }
     @media (max-width: 540px) {
+      .survey-viz-canvas-wrap { aspect-ratio: 1 / 1; }
       .survey-viz-legend { top: 10px; left: 12px; gap: 10px; font-size: 10px; }
       .survey-viz-readout { right: 10px; top: 10px; left: 70px; gap: 6px; row-gap: 4px; }
       .survey-viz-readout::before {
@@ -446,10 +737,10 @@
         <div class="survey-viz-controls">
           <div class="survey-preset-row">
             <button type="button" class="sv-preset" data-preset="boys">Boys</button>
-            <button type="button" class="sv-preset" data-preset="girls">Girls</button>
+            <button type="button" class="sv-preset is-active" data-preset="girls">Girls</button>
             <button type="button" class="sv-preset" data-preset="diff">Difference</button>
             <button type="button" class="sv-preset" data-preset="both">Both</button>
-            <button type="button" class="sv-preset is-active" data-preset="free">Sliders</button>
+            <button type="button" class="sv-preset" data-preset="free">Sliders</button>
             <button type="button" class="sv-preset sv-preset-invert" id="svInvert" aria-pressed="false" title="Flip the view to show what each group rejects">Invert</button>
           </div>
           <p class="sv-preset-help" id="svPresetHelp"></p>
@@ -463,17 +754,73 @@
             <input id="svGender" type="range" min="0" max="1000" value="500" step="1" />
           </label>
 
-          <label class="sv-slider sv-slider-age is-disabled" id="svAgeSlider">
+          <div class="sv-slider sv-slider-age is-disabled" id="svAgeSlider">
             <span class="sv-slider-label">
               <span>6</span>
               <span class="sv-slider-name">
                 <button type="button" class="sv-age-toggle" id="svAgeToggle" aria-pressed="false">All ages</button>
-                <span class="sv-age-readout" id="svAgeName">age &middot; 17</span>
+                <span class="sv-age-readout" id="svAgeName">age &middot; 13&ndash;18</span>
               </span>
               <span>68</span>
             </span>
-            <input id="svAge" type="range" min="6" max="68" value="17" step="1" disabled />
-          </label>
+            <div class="sv-range">
+              <div class="sv-range-track"></div>
+              <div class="sv-range-fill" id="svAgeFill"></div>
+              <input id="svAgeMin" type="range" min="6" max="68" value="13" step="1" disabled aria-label="Minimum age" />
+              <input id="svAgeMax" type="range" min="6" max="68" value="18" step="1" disabled aria-label="Maximum age" />
+            </div>
+          </div>
+
+          <div class="sv-advanced-toggle-row">
+            <button type="button" class="sv-advanced-toggle" id="svAdvancedToggle" aria-expanded="false" aria-controls="svAdvancedPanel">Advanced</button>
+          </div>
+
+          <div class="sv-advanced-panel" id="svAdvancedPanel" hidden>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Round 1 pick</span>
+              <input type="range" min="0" max="2" step="0.05" value="0.5" id="svW1" aria-label="Round 1 pick weight" />
+              <span class="sv-weight-readout" id="svW1Out">+0.50</span>
+            </div>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Round 2 bonus</span>
+              <input type="range" min="0" max="2" step="0.05" value="0.5" id="svW2" aria-label="Round 2 pick weight" />
+              <span class="sv-weight-readout" id="svW2Out">+0.50</span>
+            </div>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Final bonus</span>
+              <input type="range" min="0" max="2" step="0.05" value="0.5" id="svWF" aria-label="Final pick weight" />
+              <span class="sv-weight-readout" id="svWFOut">+0.50</span>
+            </div>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Round 1 reject</span>
+              <input type="range" min="0" max="1" step="0.01" value="0" id="svWR" aria-label="Round 1 reject penalty" />
+              <span class="sv-weight-readout" id="svWROut">-0.00</span>
+            </div>
+            <div class="sv-balance">
+              <span class="sv-balance-info" id="svBalanceInfo">Net per session: <b>+5.70</b></span>
+              <button type="button" class="sv-balance-btn" id="svBalanceBtn" title="Snap reject penalty so total sums to zero">Balance</button>
+              <button type="button" class="sv-balance-btn" id="svResetBtn" title="Restore defaults">Reset</button>
+            </div>
+            <p class="sv-advanced-note">
+              Each session ran 64 colours through a knockout bracket. Every round
+              showed 4 colours at once and the favourite advanced.
+            </p>
+            <ol class="sv-bracket" aria-label="Survey bracket">
+              <li class="sv-bracket-stage"><span>64 colours</span></li>
+              <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+              <li class="sv-bracket-stage"><span>16 winners</span></li>
+              <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+              <li class="sv-bracket-stage"><span>4 winners</span></li>
+              <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+              <li class="sv-bracket-stage"><span>1 winner</span></li>
+            </ol>
+            <p class="sv-advanced-note">
+              Every time a user picks a colour, it adds to that colour's score and
+              every round-1 loss subtracts. Points are cumulative across every session,
+              and the cube is normalized to the strongest score on display, so pushing
+              one weight high can squeeze weaker colours below the visibility threshold.
+            </p>
+          </div>
         </div>
 
         <div class="survey-stats-grid">
@@ -499,6 +846,12 @@
             <p class="sv-card-sub">Self-reported 0&ndash;60 score, lower is happier. Adolescence visibly bites.</p>
             <div class="sv-mood-grid" id="svMoodGrid"></div>
           </div>
+
+          <div class="survey-stats-card sv-card-wide">
+            <h3>Age distribution</h3>
+            <p class="sv-card-sub">Every valid session, by reported age. The 13&ndash;18 peak is students; the long tail is teachers, substitutes, admins, and other municipal staff who work or have worked in the school system.</p>
+            <svg id="svAgeChart" class="sv-age-chart" viewBox="0 0 640 80" preserveAspectRatio="xMidYMid meet" aria-label="Age histogram from 6 to 68"></svg>
+          </div>
         </div>
       </div>
     </section>
@@ -516,11 +869,18 @@
       <h2>The survey</h2>
       <p>
         Participants answered three demographic questions (age, gender and a 1 to 10 mood
-        rating), then completed twenty trials. Each trial showed four colour swatches and
-        asked them to pick the one they liked best. After all twenty, the sixteen surviving
-        favourites were paired off in groups of four, then in a final round of four, until
-        one colour was left standing.
+        rating), then ran through a single-elimination colour bracket. Each round showed
+        four swatches and the favourite carried into the next round:
       </p>
+      <ol class="sv-bracket sv-bracket-inline" aria-label="Survey bracket">
+        <li class="sv-bracket-stage"><span>64 colours</span></li>
+        <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+        <li class="sv-bracket-stage"><span>16 rounds</span><span>16 winners</span></li>
+        <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+        <li class="sv-bracket-stage"><span>4 rounds</span><span>4 winners</span></li>
+        <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+        <li class="sv-bracket-stage"><span>1 round</span><span>1 winner</span></li>
+      </ol>
       <p>
         Alongside the picks, the survey quietly logged the meta-signal: how long each
         response took, where on the swatch the click landed, whether the cursor wavered, and
@@ -634,7 +994,9 @@
     const canvas   = document.getElementById('surveyCanvas');
     const ctx      = canvas.getContext('2d');
     const genderEl = document.getElementById('svGender');
-    const ageEl    = document.getElementById('svAge');
+    const ageMinEl = document.getElementById('svAgeMin');
+    const ageMaxEl = document.getElementById('svAgeMax');
+    const ageFillEl = document.getElementById('svAgeFill');
     const ageName  = document.getElementById('svAgeName');
     const ageToggle  = document.getElementById('svAgeToggle');
     const ageWrap    = document.getElementById('svAgeSlider');
@@ -644,13 +1006,28 @@
     const presetBtns = document.querySelectorAll('.sv-preset[data-preset]');
     const presetHelp = document.getElementById('svPresetHelp');
     const invertBtn = document.getElementById('svInvert');
+    const advancedToggle = document.getElementById('svAdvancedToggle');
+    const advancedPanel = document.getElementById('svAdvancedPanel');
+    const w1El = document.getElementById('svW1');
+    const w2El = document.getElementById('svW2');
+    const wFEl = document.getElementById('svWF');
+    const wREl = document.getElementById('svWR');
+    const w1Out = document.getElementById('svW1Out');
+    const w2Out = document.getElementById('svW2Out');
+    const wFOut = document.getElementById('svWFOut');
+    const wROut = document.getElementById('svWROut');
+    const balanceInfo = document.getElementById('svBalanceInfo');
+    const balanceBtn = document.getElementById('svBalanceBtn');
+    const resetBtn = document.getElementById('svResetBtn');
+    const DEFAULT_WEIGHTS = { w1: 0.5, w2: 0.5, wF: 0.5, wRej: 0 };
+    const WEIGHTS = { ...DEFAULT_WEIGHTS };
     let useAge = false;
     let inverted = false;
 
     let DATA = null;
     let GRID = 8;
     let BUCKETS = null;
-    let mode = 'free';           // 'boys' | 'girls' | 'diff' | 'free'
+    let mode = 'girls';          // 'boys' | 'girls' | 'diff' | 'free'
     let yaw = 0.6, pitch = -0.45;
     let dragging = false;
     let lastX = 0, lastY = 0;
@@ -658,7 +1035,7 @@
     let scoreCache = null;
     let cacheKey = '';
 
-    function ageBucketWeights(age) {
+    function ageBucketWeights(minAge, maxAge) {
       const buckets = DATA.age_buckets;
       const out = new Map();
       if (!useAge) {
@@ -678,41 +1055,57 @@
         }
         return out;
       }
-      const centers = buckets.map(b => (b.lo + b.hi) / 2);
-      let lo = 0;
-      for (let i = 0; i < centers.length; i++) {
-        if (age <= centers[i]) { lo = Math.max(0, i - 1); break; }
-        lo = i;
+      const tmp = [];
+      let total = 0;
+      for (const b of buckets) {
+        const overlapLo = Math.max(minAge, b.lo);
+        const overlapHi = Math.min(maxAge, b.hi);
+        const overlap = Math.max(0, overlapHi - overlapLo + 1);
+        if (overlap === 0) continue;
+        const bg = BUCKETS['g_' + b.name];
+        const jg = BUCKETS['j_' + b.name];
+        const bn = (bg ? bg.n : 0) + (jg ? jg.n : 0);
+        const span = b.hi - b.lo + 1;
+        const w = (overlap / span) * bn;
+        if (w > 0) {
+          tmp.push([b.name, w]);
+          total += w;
+        }
       }
-      const hi = Math.min(buckets.length - 1, lo + 1);
-      if (lo === hi) { out.set(buckets[lo].name, 1); return out; }
-      const span = centers[hi] - centers[lo];
-      const t = span <= 0 ? 0 : Math.min(1, Math.max(0, (age - centers[lo]) / span));
-      out.set(buckets[lo].name, 1 - t);
-      out.set(buckets[hi].name, t);
+      if (total > 0) {
+        for (const [name, w] of tmp) out.set(name, w / total);
+      }
       return out;
     }
 
     function bucketScores(gKey, ageWeights, invert) {
       const out = new Map();
+      const { w1, w2, wF, wRej } = WEIGHTS;
       for (const [name, w] of ageWeights) {
         const b = BUCKETS[gKey + '_' + name];
-        if (!b) continue;
+        if (!b || !b.v) continue;
+        const v = b.v;
         if (invert) {
-          let maxL = 0;
-          for (const k in b.love) {
-            if (b.love[k] > maxL) maxL = b.love[k];
-          }
-          for (const k in b.love) {
-            const inv = maxL - b.love[k];
-            if (inv <= 0) continue;
+          // Reject signal: round-1 rejection rate only. Disliked = shown often, lost in round 1.
+          for (const k in v) {
+            const arr = v[k];
+            const off = arr[0], r1 = arr[1];
+            if (off <= 0) continue;
+            const reject = (off - r1) / off;
+            if (reject <= 0) continue;
             const cur = out.get(k) || 0;
-            out.set(k, cur + inv * w);
+            out.set(k, cur + reject * w);
           }
         } else {
-          for (const k in b.love) {
+          // Love signal: net points per swatch shown.
+          // Selecting at each round adds; losing round 1 subtracts. Rounds 2 and 3 only add for winners.
+          for (const k in v) {
+            const arr = v[k];
+            const off = arr[0], r1 = arr[1], r2 = arr[2], fn = arr[3];
+            if (off <= 0) continue;
+            const score = (w1 * r1 + w2 * r2 + wF * fn - wRej * (off - r1)) / off;
             const cur = out.get(k) || 0;
-            out.set(k, cur + b.love[k] * w);
+            out.set(k, cur + score * w);
           }
         }
       }
@@ -729,13 +1122,17 @@
     }
 
     function currentScores() {
-      const age = parseInt(ageEl.value, 10);
+      let minAge = parseInt(ageMinEl.value, 10);
+      let maxAge = parseInt(ageMaxEl.value, 10);
+      if (minAge > maxAge) { const t = minAge; minAge = maxAge; maxAge = t; }
+      const ageLabel = (minAge === maxAge) ? String(minAge) : (minAge + '–' + maxAge);
       const gMix = parseInt(genderEl.value, 10) / 1000; // 0=boys, 1=girls
-      const key = mode + '|' + age + '|' + gMix.toFixed(3) + '|' + (inverted ? 'i' : 'l') + '|' + (useAge ? 'a' : '-');
+      const wKey = WEIGHTS.w1.toFixed(2) + ',' + WEIGHTS.w2.toFixed(2) + ',' + WEIGHTS.wF.toFixed(2) + ',' + WEIGHTS.wRej.toFixed(3);
+      const key = mode + '|' + minAge + '-' + maxAge + '|' + gMix.toFixed(3) + '|' + (inverted ? 'i' : 'l') + '|' + (useAge ? 'a' : '-') + '|' + wKey;
       if (key === cacheKey && scoreCache) return scoreCache;
       cacheKey = key;
 
-      const aw = ageBucketWeights(age);
+      const aw = ageBucketWeights(minAge, maxAge);
       let scores = new Map();
       let n = 0;
       const inv = inverted;
@@ -749,12 +1146,11 @@
         n = bucketSampleCount('j', aw);
         genderTag.textContent = inv ? 'girls reject' : 'girls';
       } else if (mode === 'diff') {
-        const boys  = bucketScores('g', aw, false);
-        const girls = bucketScores('j', aw, false);
+        const boys  = bucketScores('g', aw, inv);
+        const girls = bucketScores('j', aw, inv);
         const keys = new Set([...boys.keys(), ...girls.keys()]);
-        const sign = inv ? -1 : 1;
         for (const k of keys) {
-          scores.set(k, sign * ((girls.get(k) || 0) - (boys.get(k) || 0)));
+          scores.set(k, (girls.get(k) || 0) - (boys.get(k) || 0));
         }
         n = bucketSampleCount('g', aw) + bucketSampleCount('j', aw);
         genderTag.textContent = inv ? 'girls - boys (reject)' : 'girls - boys';
@@ -782,10 +1178,10 @@
         genderTag.textContent = inv ? base + ' reject' : base;
       }
 
-      ageTag.textContent = useAge ? ('age ' + age) : 'all ages';
+      ageTag.textContent = useAge ? ('age ' + ageLabel) : 'all ages';
       sampleTag.textContent = 'n ≈ ' + Math.round(n).toLocaleString();
-      ageName.textContent = 'age · ' + age;
-      ageToggle.textContent = useAge ? ('Age ' + age) : 'All ages';
+      ageName.textContent = 'age · ' + ageLabel;
+      ageToggle.textContent = useAge ? ('Age ' + ageLabel) : 'All ages';
 
       scoreCache = { scores, n };
       return scoreCache;
@@ -862,15 +1258,19 @@
       const G = GRID;
       const step = 2 / G;
 
+      const allowSignedNorm = (mode === 'diff');
       let maxAbs = 0;
       for (const v of scores.values()) {
+        if (!allowSignedNorm && v <= 0) continue;
         const a = Math.abs(v);
         if (a > maxAbs) maxAbs = a;
       }
       if (maxAbs === 0) maxAbs = 1;
 
       const points = [];
+      const allowSigned = (mode === 'diff');
       for (const [k, score] of scores) {
+        if (!allowSigned && score <= 0) continue;
         const ki = +k;
         const rr = (ki >>> 6) & 7;
         const gg = (ki >>> 3) & 7;
@@ -936,17 +1336,41 @@
       canvas.addEventListener('dblclick', () => { autoRotate = true; });
     }
 
+    function updateAgeFill() {
+      let lo = parseInt(ageMinEl.value, 10);
+      let hi = parseInt(ageMaxEl.value, 10);
+      if (lo > hi) { const t = lo; lo = hi; hi = t; }
+      const span = 68 - 6;
+      ageFillEl.style.left  = ((lo - 6) / span * 100) + '%';
+      ageFillEl.style.width = ((hi - lo) / span * 100) + '%';
+    }
+
     function attachControls() {
       const onChange = () => { cacheKey = ''; };
       genderEl.addEventListener('input', () => { setMode('free'); onChange(); });
-      ageEl.addEventListener('input', () => { if (useAge) onChange(); });
+      ageMinEl.addEventListener('input', () => {
+        if (parseInt(ageMinEl.value, 10) > parseInt(ageMaxEl.value, 10)) {
+          ageMaxEl.value = ageMinEl.value;
+        }
+        updateAgeFill();
+        if (useAge) onChange();
+      });
+      ageMaxEl.addEventListener('input', () => {
+        if (parseInt(ageMaxEl.value, 10) < parseInt(ageMinEl.value, 10)) {
+          ageMinEl.value = ageMaxEl.value;
+        }
+        updateAgeFill();
+        if (useAge) onChange();
+      });
       ageToggle.addEventListener('click', () => {
         useAge = !useAge;
         ageToggle.setAttribute('aria-pressed', String(useAge));
         ageWrap.classList.toggle('is-disabled', !useAge);
-        ageEl.disabled = !useAge;
+        ageMinEl.disabled = !useAge;
+        ageMaxEl.disabled = !useAge;
         cacheKey = '';
       });
+      updateAgeFill();
       presetBtns.forEach(btn => {
         btn.addEventListener('click', () => setMode(btn.dataset.preset));
       });
@@ -957,6 +1381,61 @@
         updateHelp();
         cacheKey = '';
       });
+      attachAdvanced();
+    }
+
+    function updateBalanceInfo() {
+      // Per-session positive points = w1*16 + w2*4 + wF*1 (cumulative round counts)
+      // Per-session negative magnitude = wRej * 48 (round-1 losers)
+      const pos = WEIGHTS.w1 * 16 + WEIGHTS.w2 * 4 + WEIGHTS.wF * 1;
+      const neg = WEIGHTS.wRej * 48;
+      const net = pos - neg;
+      const sign = net >= 0 ? '+' : '';
+      balanceInfo.innerHTML = 'Net per session: <b>' + sign + net.toFixed(2) + '</b> (+' + pos.toFixed(2) + ' love, -' + neg.toFixed(2) + ' reject)';
+    }
+
+    function syncWeightReadouts() {
+      w1Out.textContent = '+' + WEIGHTS.w1.toFixed(2);
+      w2Out.textContent = '+' + WEIGHTS.w2.toFixed(2);
+      wFOut.textContent = '+' + WEIGHTS.wF.toFixed(2);
+      wROut.textContent = '-' + WEIGHTS.wRej.toFixed(2);
+      updateBalanceInfo();
+    }
+
+    function applyWeightInputs() {
+      WEIGHTS.w1  = parseFloat(w1El.value);
+      WEIGHTS.w2  = parseFloat(w2El.value);
+      WEIGHTS.wF  = parseFloat(wFEl.value);
+      WEIGHTS.wRej = parseFloat(wREl.value);
+      syncWeightReadouts();
+      cacheKey = '';
+    }
+
+    function attachAdvanced() {
+      advancedToggle.addEventListener('click', () => {
+        const open = advancedPanel.hasAttribute('hidden');
+        if (open) advancedPanel.removeAttribute('hidden');
+        else advancedPanel.setAttribute('hidden', '');
+        advancedToggle.setAttribute('aria-expanded', String(open));
+      });
+      [w1El, w2El, wFEl, wREl].forEach(el => {
+        el.addEventListener('input', applyWeightInputs);
+      });
+      balanceBtn.addEventListener('click', () => {
+        const pos = WEIGHTS.w1 * 16 + WEIGHTS.w2 * 4 + WEIGHTS.wF * 1;
+        const target = pos / 48;
+        const clamped = Math.max(0, Math.min(1, target));
+        wREl.value = clamped.toFixed(2);
+        applyWeightInputs();
+      });
+      resetBtn.addEventListener('click', () => {
+        w1El.value = DEFAULT_WEIGHTS.w1;
+        w2El.value = DEFAULT_WEIGHTS.w2;
+        wFEl.value = DEFAULT_WEIGHTS.wF;
+        wREl.value = DEFAULT_WEIGHTS.wRej;
+        applyWeightInputs();
+      });
+      syncWeightReadouts();
     }
 
     const HELP_TEXT = {
@@ -1014,16 +1493,23 @@
       const s = DATA.stats;
       const totalGender = (s.gender.g || 0) + (s.gender.j || 0);
       const pctGirls = totalGender ? Math.round(100 * (s.gender.j || 0) / totalGender) : 0;
-      const ages = Object.keys(s.age_hist).map(Number);
-      const lo = Math.min(...ages), hi = Math.max(...ages);
-      let total = 0, sum = 0;
-      for (const [a, n] of Object.entries(s.age_hist)) { total += n; sum += a * n; }
-      const meanAge = total ? (sum / total).toFixed(1) : '–';
+      const ageEntries = Object.entries(s.age_hist)
+        .map(([a, n]) => [Number(a), n])
+        .sort((p, q) => p[0] - q[0]);
+      const lo = ageEntries.length ? ageEntries[0][0] : 0;
+      const hi = ageEntries.length ? ageEntries[ageEntries.length - 1][0] : 0;
+      const total = ageEntries.reduce((acc, [, n]) => acc + n, 0);
+      let medianAge = '–';
+      let cumulative = 0;
+      for (const [a, n] of ageEntries) {
+        cumulative += n;
+        if (cumulative >= total / 2) { medianAge = a; break; }
+      }
       const rows = [
         ['Valid sessions',   s.total_valid.toLocaleString()],
         ['Raw responses',    "20,000+"],
         ['Girls / Boys',     `${pctGirls}% / ${100 - pctGirls}%`],
-        ['Age span',         `${lo}–${hi} (mean ${meanAge})`],
+        ['Age span',         `${lo}–${hi} (median ${medianAge})`],
         ['Mean mood (0=happy, 60=glum)', s.mood_mean],
       ];
       ul.innerHTML = rows.map(r => `<li><span>${r[0]}</span><b>${r[1]}</b></li>`).join('');
@@ -1032,12 +1518,13 @@
     function renderMoodGrid() {
       const grid = document.getElementById('svMoodGrid');
       grid.innerHTML = '';
-      const ageNames = DATA.age_buckets.map(b => b.name);
+      const moodBuckets = DATA.mood_buckets || DATA.age_buckets;
+      const moodData = DATA.mood_data || BUCKETS;
       const head = document.createElement('div');
       head.className = 'sv-mood-label';
       head.textContent = '';
       grid.appendChild(head);
-      DATA.age_buckets.forEach(b => {
+      moodBuckets.forEach(b => {
         const c = document.createElement('div');
         c.className = 'sv-mood-head';
         c.textContent = b.lo + '-' + b.hi;
@@ -1048,9 +1535,9 @@
         lab.className = 'sv-mood-label';
         lab.textContent = g === 'g' ? 'Boys' : 'Girls';
         grid.appendChild(lab);
-        for (const name of ageNames) {
-          const b = BUCKETS[g + '_' + name];
-          const v = b ? b.mood_mean : null;
+        for (const b of moodBuckets) {
+          const entry = moodData[g + '_' + b.name];
+          const v = entry ? entry.mood_mean : null;
           const cell = document.createElement('div');
           cell.className = 'sv-mood-cell';
           if (v === null) {
@@ -1070,6 +1557,54 @@
       }
     }
 
+    function renderAgeChart() {
+      const svg = document.getElementById('svAgeChart');
+      if (!svg) return;
+      const hist = DATA.stats.age_hist;
+      const ages = [];
+      for (let a = 6; a <= 68; a++) ages.push(a);
+      const counts = ages.map(a => hist[a] || hist[String(a)] || 0);
+      let maxC = 0;
+      for (const c of counts) if (c > maxC) maxC = c;
+      if (maxC === 0) maxC = 1;
+
+      const total = counts.reduce((s, n) => s + n, 0);
+      let cum = 0, medianAge = ages[0];
+      for (let i = 0; i < ages.length; i++) {
+        cum += counts[i];
+        if (cum >= total / 2) { medianAge = ages[i]; break; }
+      }
+
+      const W = 640, H = 80;
+      const PAD_L = 4, PAD_R = 4, PAD_T = 4, PAD_B = 14;
+      const innerW = W - PAD_L - PAD_R;
+      const innerH = H - PAD_T - PAD_B;
+      const slotW = innerW / ages.length;
+      const barW = slotW * 0.82;
+
+      const parts = [];
+      ages.forEach((a, i) => {
+        const h = (counts[i] / maxC) * innerH;
+        const x = PAD_L + i * slotW + (slotW - barW) / 2;
+        const y = PAD_T + innerH - h;
+        parts.push(`<rect class="sv-bar" x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(h, 0.5).toFixed(2)}"><title>age ${a}: ${counts[i]}</title></rect>`);
+      });
+
+      parts.push(`<line class="sv-axis-line" x1="${PAD_L}" y1="${PAD_T + innerH}" x2="${W - PAD_R}" y2="${PAD_T + innerH}"/>`);
+
+      const labelAt = (age, anchor) => {
+        const i = ages.indexOf(age);
+        if (i < 0) return;
+        const x = PAD_L + i * slotW + slotW / 2;
+        parts.push(`<text x="${x.toFixed(2)}" y="${H - 3}" text-anchor="${anchor}">${age}</text>`);
+      };
+      labelAt(6, 'start');
+      [20, 40].forEach(t => labelAt(t, 'middle'));
+      labelAt(68, 'end');
+
+      svg.innerHTML = parts.join('');
+    }
+
     fetch(DATA_URL)
       .then(r => r.json())
       .then(d => {
@@ -1079,6 +1614,7 @@
         renderFavs();
         renderFigures();
         renderMoodGrid();
+        renderAgeChart();
         attachInteractions();
         attachControls();
         requestAnimationFrame(drawFrame);

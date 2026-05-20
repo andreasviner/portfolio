@@ -30,6 +30,7 @@
       width: 100%;
       height: 100%;
       cursor: grab;
+      touch-action: none;
     }
     .survey-viz-canvas-wrap canvas:active { cursor: grabbing; }
     .survey-viz-legend {
@@ -609,7 +610,6 @@
     }
     .sv-age-chart .sv-median-label { fill: var(--text-mute); }
     @media (max-width: 540px) {
-      .survey-viz-canvas-wrap { aspect-ratio: 1 / 1; }
       .survey-viz-legend { top: 10px; left: 12px; gap: 10px; font-size: 10px; }
       .survey-viz-readout { right: 10px; top: 10px; left: 70px; gap: 6px; row-gap: 4px; }
       .survey-viz-readout::before {

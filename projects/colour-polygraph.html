@@ -749,11 +749,12 @@
         n = bucketSampleCount('j', aw);
         genderTag.textContent = inv ? 'girls reject' : 'girls';
       } else if (mode === 'diff') {
-        const boys  = bucketScores('g', aw, inv);
-        const girls = bucketScores('j', aw, inv);
+        const boys  = bucketScores('g', aw, false);
+        const girls = bucketScores('j', aw, false);
         const keys = new Set([...boys.keys(), ...girls.keys()]);
+        const sign = inv ? -1 : 1;
         for (const k of keys) {
-          scores.set(k, (girls.get(k) || 0) - (boys.get(k) || 0));
+          scores.set(k, sign * ((girls.get(k) || 0) - (boys.get(k) || 0)));
         }
         n = bucketSampleCount('g', aw) + bucketSampleCount('j', aw);
         genderTag.textContent = inv ? 'girls - boys (reject)' : 'girls - boys';

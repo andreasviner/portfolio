@@ -2,7 +2,7 @@
    Andreas Lindeman portfolio script
    - Loads timeline entries from projects_data/manifest.json
    - Single-lane swimlane (desktop) with seeded-random vertical
-     placement so categories share a row, distinguished by colour
+     placement so categories share a row, distinguished by color
    - Mobile list view
    - Filters, tooltip, typewriter, navigation
    ============================================================ */

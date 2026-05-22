@@ -1102,7 +1102,7 @@ a:hover { border-color: var(--text); }
 .year-tick:first-child { border-left: none; }
 .year-tick.current { color: var(--hobby); }
 
-/* single unified lane (categories distinguished by colour only) */
+/* single unified lane (categories distinguished by color only) */
 .lane {
   position: relative;
   display: block;

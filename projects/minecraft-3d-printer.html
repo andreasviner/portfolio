@@ -77,7 +77,7 @@
 
     <p class="project-lede">
       A pipeline that takes any 3D model (STL, OBJ, even a raw 3D scan) and generates a
-      sequence of Minecraft commands that build the model in-world, with colour support and
+      sequence of Minecraft commands that build the model in-world, with color support and
       block-palette controls.
     </p>
 
@@ -89,9 +89,9 @@
     <section class="project-section">
       <h2>The pipeline</h2>
       <ul>
-        <li><strong>Load:</strong> Any common 3D format, including meshes, point clouds, or coloured 3D scans.</li>
+        <li><strong>Load:</strong> Any common 3D format, including meshes, point clouds, or colored 3D scans.</li>
         <li><strong>Voxelise:</strong> Resample the model into a voxel grid at the target resolution.</li>
-        <li><strong>Colour-match:</strong> Map each voxel's colour to the closest Minecraft block from a configurable palette (e.g. "stone only" for a statue look).</li>
+        <li><strong>Color-match:</strong> Map each voxel's color to the closest Minecraft block from a configurable palette (e.g. "stone only" for a statue look).</li>
         <li><strong>Emit:</strong> Generate <code>/setblock</code> command sequences, batched so Minecraft doesn't choke when you paste them in.</li>
       </ul>
     </section>
@@ -99,7 +99,7 @@
     <section class="project-section">
       <h2>What was fun about this</h2>
       <p>
-        Minecraft's block palette is small but the colour space is real. Getting good
+        Minecraft's block palette is small but the color space is real. Getting good
         likenesses out of stone-only or wool-only restrictions turned the project into a
         small exercise in palette quantisation, which, as it happens, generalises directly
         to image-processing problems I'd hit later.

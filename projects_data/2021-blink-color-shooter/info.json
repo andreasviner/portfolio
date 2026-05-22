@@ -4,7 +4,7 @@
   "category": "hobby",
   "isProject": true,
   "start": "2022-03",
-  "shortDescription": "Python shooter where webcam-detected blinks flip you between two colour dimensions.",
+  "shortDescription": "Python shooter where webcam-detected blinks flip you between two color dimensions.",
   "tags": [
     "Python",
     "computer vision",

@@ -4,7 +4,7 @@
   "category": "hobby",
   "isProject": true,
   "start": "2021-05",
-  "shortDescription": "Converted any 3D model (including colour and scans) into a generated set of Minecraft commands that build the model in-world.",
+  "shortDescription": "Converted any 3D model (including color and scans) into a generated set of Minecraft commands that build the model in-world.",
   "tags": [
     "Minecraft",
     "Python",

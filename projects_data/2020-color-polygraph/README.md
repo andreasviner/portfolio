@@ -1,23 +1,23 @@
-# Colour Polygraph
+# Color Polygraph
 
-A 2020 hobby project that turned a colour-preference survey into a small
-neural net guessing age, gender, and self-reported mood from the colours
+A 2020 hobby project that turned a color-preference survey into a small
+neural net guessing age, gender, and self-reported mood from the colors
 people picked. This folder holds the raw export, the cleaner, the
 aggregated voxel data the live viz reads, and the original glue scripts.
 
-Live page: https://andreaslindeman.com/projects/colour-polygraph
+Live page: https://andreaslindeman.com/projects/color-polygraph
 
 ## How it worked
 
 Each participant answered three demographic questions (age, gender, and a
 1 to 10 mood rating), then went through sixteen rounds of "pick your
-favourite out of four random colour swatches". The sixteen winners then
+favourite out of four random color swatches". The sixteen winners then
 played a knockout: four groups of four, then one final group of four,
-leaving one colour at the end.
+leaving one color at the end.
 
 Alongside every click the survey logged the meta-signal: time per
 question, click coordinates relative to the swatch centre, total session
-time, and click order. The model leaned on these as much as the colour
+time, and click order. The model leaned on these as much as the color
 picks themselves.
 
 The mail went out through the Oslo school directory. Around 160,000
@@ -34,7 +34,7 @@ survived the cleaning pipeline below.
 - `code/Start_denne_Sander.py` is my classmate Sander's starter script.
 - `new_code/treat_data.py` is the aggregator that turns `save.ligma` into
   the compact `preferences.json` the portfolio page reads. It quantises
-  colours into an 8x8x8 RGB grid, scores each voxel by how often colours
+  colors into an 8x8x8 RGB grid, scores each voxel by how often colors
   from that bin survived the knockout versus how often they were shown,
   and breaks the result down by gender and age bucket.
 - `preferences.json` is the aggregator output, around 75 KB. Already
@@ -54,7 +54,7 @@ survived the cleaning pipeline below.
   valg,     # 21 ASCII digits: 16 first-round picks (0-3) + 4 knockout picks + 1 final
   tider,    # 21 cumulative timestamps in ms (last entry = total session time)
   farger    # [
-            #   [64 colours that were offered],
+            #   [64 colors that were offered],
             #   [16 first-round winners],
             #   [4 knockout winners],
             #   final winner
@@ -62,7 +62,7 @@ survived the cleaning pipeline below.
 ]
 ```
 
-Each colour is `[r, g, b]` with channels in `0..255`.
+Each color is `[r, g, b]` with channels in `0..255`.
 
 ## Cleaning
 
@@ -78,7 +78,7 @@ of `new_code/treat_data.py`):
 - Hard age bounds: under 6 dropped, over 68 dropped. Roughly half of all
   "adults" in the raw data claimed to be exactly 69.
 - One-coordinate spammers dropped: sessions where almost every click landed
-  on the same screen coordinate are not picking colours, they are banging
+  on the same screen coordinate are not picking colors, they are banging
   a corner.
 - Speed runners dropped: anyone averaging under 0.3 seconds per question.
   You cannot read four swatches that fast.
@@ -102,4 +102,4 @@ quick exploratory cube without writing your own aggregator, fetch
 
 Either way: ages were self-reported, the directory match is not perfect,
 and 2020-era Oslo school students are not a representative sample of
-anyone in particular. Do not ship a colour personality test on top of it.
+anyone in particular. Do not ship a color personality test on top of it.

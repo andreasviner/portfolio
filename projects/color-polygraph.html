@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Color Polygraph · Andreas Lindeman</title>
+  <meta name="description" content="A 2020 color polygraph trained on 20,000 survey responses. Guessed age, gender, and mood from nothing but which color swatches people picked." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+  <style>
+    .survey-viz {
+      margin: 24px 0 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .survey-viz-canvas-wrap {
+      position: relative;
+      background: radial-gradient(circle at 50% 45%, #131829 0%, #060810 80%);
+      border: 1px solid var(--hairline);
+      border-radius: 6px;
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+    }
+    .survey-viz-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+    .survey-viz-canvas-wrap canvas:active { cursor: grabbing; }
+    .survey-viz-legend {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      display: flex;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--text-mute);
+      pointer-events: none;
+    }
+    .sv-axis::before {
+      content: '';
+      display: inline-block;
+      width: 8px; height: 8px;
+      margin-right: 6px;
+      vertical-align: 1px;
+      border-radius: 50%;
+    }
+    .sv-axis-r::before { background: #ff6464; }
+    .sv-axis-g::before { background: #66dd6e; }
+    .sv-axis-b::before { background: #6aa6ff; }
+    .survey-viz-readout {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      pointer-events: none;
+    }
+    .sv-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 2px;
+      background: rgba(245, 185, 92, 0.14);
+      color: var(--hobby);
+      border: 1px solid rgba(245, 185, 92, 0.28);
+    }
+    .sv-tag-mute {
+      background: rgba(235, 230, 218, 0.06);
+      color: var(--text-mute);
+      border-color: var(--hairline);
+    }
+    .survey-viz-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 6px;
+      padding: 22px 24px;
+    }
+    .survey-preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .survey-viz-controls .sv-preset-help {
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--hobby);
+      margin: 0;
+      letter-spacing: 0.01em;
+      opacity: 0.78;
+      display: none;
+    }
+    .survey-viz-controls .sv-preset-help.is-visible { display: block; }
+    .survey-viz-controls .sv-preset-help b {
+      color: var(--hobby);
+      font-weight: 500;
+      opacity: 1;
+    }
+    .sv-preset {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: var(--text-mute);
+      cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .sv-preset:hover { color: var(--text); border-color: var(--hairline-2); }
+    .sv-preset.is-active {
+      background: rgba(245, 185, 92, 0.12);
+      color: var(--hobby);
+      border-color: rgba(245, 185, 92, 0.32);
+    }
+    .sv-preset-invert {
+      margin-left: auto;
+    }
+    .sv-slider {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sv-slider-label {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+    }
+    .sv-slider-label > :first-child { text-align: left; }
+    .sv-slider-label > :last-child  { text-align: right; }
+    .sv-slider-name {
+      color: var(--text);
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sv-age-toggle,
+    .sv-mood-toggle {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 2px;
+      background: transparent;
+      color: var(--text-mute);
+      border: 1px solid var(--hairline);
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .sv-age-toggle:hover,
+    .sv-mood-toggle:hover { color: var(--text); border-color: var(--hairline-2); }
+    .sv-age-toggle[aria-pressed="true"],
+    .sv-mood-toggle[aria-pressed="true"] {
+      background: rgba(245, 185, 92, 0.12);
+      color: var(--hobby);
+      border-color: rgba(245, 185, 92, 0.32);
+    }
+    .sv-age-readout,
+    .sv-mood-readout {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .sv-slider.is-disabled input[type="range"] { opacity: 0.35; cursor: not-allowed; }
+    .sv-slider.is-disabled .sv-age-readout,
+    .sv-slider.is-disabled .sv-mood-readout { display: none; }
+    .sv-slider input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--hairline-2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .sv-slider input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(245, 185, 92, 0.4);
+      cursor: pointer;
+    }
+    .sv-slider input[type="range"]::-moz-range-thumb {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+    .sv-range {
+      position: relative;
+      height: 20px;
+    }
+    .sv-range-track {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 4px;
+      margin-top: -2px;
+      background: var(--hairline-2);
+      border-radius: 2px;
+    }
+    .sv-range-fill {
+      position: absolute;
+      top: 50%;
+      height: 4px;
+      margin-top: -2px;
+      background: rgba(245, 185, 92, 0.5);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .sv-range input[type="range"] {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 20px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .sv-range input[type="range"]::-webkit-slider-runnable-track {
+      background: transparent;
+      height: 4px;
+      border: none;
+    }
+    .sv-range input[type="range"]::-moz-range-track {
+      background: transparent;
+      height: 4px;
+      border: none;
+    }
+    .sv-range input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      pointer-events: auto;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(245, 185, 92, 0.4);
+      cursor: pointer;
+      margin-top: -6px;
+    }
+    .sv-range input[type="range"]::-moz-range-thumb {
+      pointer-events: auto;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+    .sv-slider.is-disabled .sv-range-fill { opacity: 0.4; }
+    .sv-range-fill-outer {
+      position: absolute;
+      top: 50%;
+      height: 4px;
+      margin-top: -2px;
+      background: rgba(245, 185, 92, 0.5);
+      border-radius: 2px;
+      pointer-events: none;
+      display: none;
+    }
+    .sv-slider.is-disabled .sv-range-fill-outer { opacity: 0.4; }
+    .sv-slider.is-inverted .sv-range-fill { display: none; }
+    .sv-slider.is-inverted .sv-range-fill-outer { display: block; }
+    .sv-invert-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      cursor: pointer;
+      user-select: none;
+    }
+    .sv-invert-check input {
+      width: 12px;
+      height: 12px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: var(--hobby);
+    }
+    .sv-invert-check input:disabled { cursor: not-allowed; }
+    .sv-slider.is-disabled .sv-invert-check { opacity: 0.45; cursor: not-allowed; }
+    .sv-advanced-toggle-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -4px;
+    }
+    .sv-advanced-toggle {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: var(--text-mute);
+      cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .sv-advanced-toggle:hover { color: var(--text); border-color: var(--hairline-2); }
+    .sv-advanced-toggle[aria-expanded="true"] {
+      background: rgba(245, 185, 92, 0.12);
+      color: var(--hobby);
+      border-color: rgba(245, 185, 92, 0.32);
+    }
+    .sv-advanced-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--hairline);
+    }
+    .sv-advanced-panel[hidden] { display: none; }
+    .sv-advanced-panel .sv-advanced-note {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.03em;
+      color: rgba(228, 228, 238, 0.92);
+      margin: 0 0 4px;
+      line-height: 1.6;
+    }
+    .sv-advanced-panel .sv-bracket { font-size: 8.5px; }
+    .sv-advanced-panel .sv-bracket-stage { padding: 3px 7px; }
+    .sv-bracket {
+      list-style: none;
+      padding: 0;
+      margin: 6px 0 2px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.04em;
+      color: var(--text-mute);
+    }
+    .sv-bracket-stage {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border: 1px solid var(--hairline-2);
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .sv-bracket-stage span + span::before {
+      content: '\2192';
+      margin-right: 5px;
+      color: var(--text-dim);
+    }
+    .sv-bracket-arrow {
+      flex: 0 0 auto;
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 0.1 !important;
+    }
+    @media (max-width: 540px) {
+      .sv-bracket {
+        font-size: 8.5px;
+        gap: 0;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.1;
+      }
+      .sv-bracket-stage {
+        padding: 0 7px;
+        gap: 4px;
+        justify-content: center;
+        line-height: 1.2;
+      }
+      .sv-bracket-arrow {
+        transform: rotate(90deg);
+        margin: -4px 0;
+        font-size: 11px;
+        line-height: 1;
+      }
+      .sv-advanced-panel .sv-bracket-stage { padding: 0 6px; }
+    }
+    .sv-bracket-inline {
+      margin: 16px 0 22px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--text-mute);
+      gap: 8px;
+    }
+    .sv-bracket-inline .sv-bracket-stage {
+      padding: 6px 12px;
+      gap: 7px;
+      border-color: var(--hairline-2);
+    }
+    .sv-bracket-inline .sv-bracket-stage span + span::before {
+      color: var(--text-dim);
+      margin-right: 6px;
+    }
+    .sv-bracket-inline .sv-bracket-arrow {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    @media (max-width: 540px) {
+      .sv-bracket-inline { font-size: 10px; gap: 8px; }
+      .sv-bracket-inline .sv-bracket-stage { padding: 6px 12px; gap: 5px; }
+    }
+    .sv-weight {
+      display: grid;
+      grid-template-columns: 1fr 140px 56px;
+      gap: 10px;
+      align-items: center;
+    }
+    .sv-weight-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+    }
+    .sv-weight input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--hairline-2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .sv-weight input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(245, 185, 92, 0.4);
+      cursor: pointer;
+    }
+    .sv-weight input[type="range"]::-moz-range-thumb {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--hobby);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+    .sv-weight-readout {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--hobby);
+      text-align: right;
+    }
+    .sv-balance {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .sv-balance-info {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--text-mute);
+      flex: 1;
+      min-width: 200px;
+    }
+    .sv-balance-info b {
+      color: var(--hobby);
+      font-weight: 500;
+    }
+    .sv-balance-btn {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      color: var(--text-mute);
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .sv-balance-btn:hover { color: var(--text); border-color: var(--hairline-2); }
+    @media (max-width: 540px) {
+      .sv-weight {
+        grid-template-columns: 1fr 50px;
+        grid-template-areas: 'label readout' 'slider slider';
+        gap: 6px;
+      }
+      .sv-weight-label { grid-area: label; }
+      .sv-weight-readout { grid-area: readout; }
+      .sv-weight input[type="range"] { grid-area: slider; width: 100%; }
+    }
+    .survey-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .survey-stats-card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 6px;
+      padding: 16px 18px;
+    }
+    .survey-stats-card h3 {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      margin: 0 0 6px;
+      font-style: normal;
+      font-weight: 500;
+    }
+    .sv-card-sub {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-mute);
+      margin: 0 0 12px;
+    }
+    .sv-swatch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .sv-swatch {
+      width: 38px;
+      height: 38px;
+      border-radius: 3px;
+      border: 1px solid var(--hairline);
+      position: relative;
+    }
+    .sv-swatch::after {
+      content: attr(data-hex);
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .sv-swatch:hover::after { opacity: 1; }
+    .sv-figures {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sv-figures li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text);
+      border-bottom: 1px dashed var(--hairline);
+      padding-bottom: 6px;
+    }
+    .sv-figures li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .sv-figures b {
+      font-family: var(--mono);
+      font-weight: 500;
+      color: var(--hobby);
+    }
+    .sv-card-wide { grid-column: 1 / -1; }
+    .sv-line-chart {
+      width: 100%;
+      height: 170px;
+      display: block;
+    }
+    .sv-line-chart .sv-grid {
+      stroke: var(--hairline-2);
+      stroke-width: 0.6;
+      stroke-dasharray: 2 3;
+      opacity: 0.6;
+    }
+    .sv-line-chart .sv-axis {
+      stroke: var(--hairline);
+      stroke-width: 1;
+    }
+    .sv-line-chart text {
+      fill: var(--text-mute);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.04em;
+    }
+    .sv-line-chart .sv-ticklabel-end { text-anchor: end; }
+    .sv-line-chart .sv-line {
+      fill: none;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .sv-line-boys  { stroke: #6aa6ff; }
+    .sv-line-girls { stroke: #ff7ab8; }
+    .sv-area-boys  { fill: rgba(106, 166, 255, 0.18); }
+    .sv-area-girls { fill: rgba(255, 122, 184, 0.18); }
+    .sv-legend {
+      display: flex;
+      gap: 18px;
+      margin-top: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+    }
+    .sv-legend-key {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sv-legend-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      border-radius: 1px;
+    }
+    .sv-legend-swatch.boys  { background: #6aa6ff; }
+    .sv-legend-swatch.girls { background: #ff7ab8; }
+    .sv-cohort-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 14px;
+    }
+    .sv-age-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 4px;
+    }
+    .sv-age-chart .sv-bar { fill: var(--hobby); }
+    .sv-age-chart .sv-axis-line  { stroke: var(--hairline); stroke-width: 1; }
+    .sv-age-chart .sv-tick-line  { stroke: var(--hairline-2); stroke-width: 1; }
+    .sv-age-chart .sv-median     { stroke: var(--text-mute); stroke-width: 1; stroke-dasharray: 2 3; }
+    .sv-age-chart text {
+      font-family: var(--mono);
+      font-size: 9px;
+      fill: var(--text-dim);
+    }
+    .sv-age-chart .sv-median-label { fill: var(--text-mute); }
+    @media (max-width: 540px) {
+      .survey-viz-legend { top: 10px; left: 12px; gap: 10px; font-size: 10px; }
+      .survey-viz-readout { right: 10px; top: 10px; left: 70px; gap: 6px; row-gap: 4px; }
+      .survey-viz-readout::before {
+        content: '';
+        flex: 0 0 100%;
+        height: 0;
+        order: 1;
+      }
+      #svGenderTag, #svAgeTag, #svMoodTag, #svTimeTag { order: 0; }
+      #svSampleTag { order: 2; }
+      .sv-tag { font-size: 9px; padding: 3px 7px; }
+      .survey-preset-row { flex-wrap: wrap; gap: 6px; }
+      .sv-preset[data-preset="boys"],
+      .sv-preset[data-preset="girls"] { display: none; }
+      .sv-preset {
+        font-size: clamp(9px, 2.5vw, 11px);
+        padding: 6px clamp(7px, 2vw, 12px);
+        white-space: nowrap;
+        min-width: 0;
+      }
+      .sv-preset-invert { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links-list" aria-label="Open menu">
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+    <ul id="nav-links-list" class="nav-links">
+      <li><a href="../#about">About</a></li>
+      <li><a href="../#timeline">Timeline</a></li>
+      <li><a href="../#stack">Stack</a></li>
+      <li><a href="../#contact">Contact</a></li>
+    </ul>
+    <a class="lang-switch" data-lang-base="https://andreaslindeman.no" href="https://andreaslindeman.no/" hreflang="no" aria-label="Switch to Norwegian">
+      <svg class="lang-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+      <span class="lang-pair"><span class="lang-current">EN</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-target">NO</span></span>
+    </a>
+  </nav>
+  <script>
+    (function(){
+      var s=document.querySelector('.lang-switch');
+      if(s&&s.dataset.langBase)s.href=s.dataset.langBase+location.pathname+location.search+location.hash;
+      var nav=document.querySelector('.site-nav'), btn=document.querySelector('.nav-toggle');
+      if(btn&&nav){
+        function closeMenu(){
+          nav.classList.remove('is-open');
+          btn.setAttribute('aria-expanded','false');
+          btn.setAttribute('aria-label','Open menu');
+        }
+        btn.addEventListener('click',function(e){
+          e.stopPropagation();
+          var open=nav.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded',open?'true':'false');
+          btn.setAttribute('aria-label',open?'Close menu':'Open menu');
+        });
+        nav.querySelectorAll('.nav-links a').forEach(function(a){
+          a.addEventListener('click',closeMenu);
+        });
+        document.addEventListener('click',function(e){
+          if(nav.classList.contains('is-open')&&!nav.contains(e.target))closeMenu();
+        });
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'&&nav.classList.contains('is-open'))closeMenu();
+        });
+      }
+    })();
+  </script>
+
+  <main class="project-page">
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2020</span>
+    </div>
+
+    <h1 class="project-title">Color <em>Polygraph</em></h1>
+
+    <p class="project-lede">
+      A self-directed experiment from the second year of upper-secondary school. I built a
+      twenty-question color survey, sent it to around 160,000 students through the Oslo
+      school directory, and ended up with 6,731 cleaned sessions and a small neural net that
+      could guess a participant's age, gender and self-reported mood from nothing but which
+      color swatches they picked.
+    </p>
+
+    <section class="project-section">
+      <h2>Explore the data</h2>
+      <p>
+        Before the write-up, the toy. Drag the cube to rotate it, double-click to resume the
+        slow auto-rotate. The buttons swap between boys, girls, the difference between them,
+        the colors both groups love, and a free pair of sliders. Tap "Invert" to flip the
+        view to what each group rejects instead. Age filtering is off by default; tap "All
+        ages" to switch the age slider on. Each glowing dot is one cell of an
+        8&times;8&times;8 RGB grid, sized by how often colors from that cell were picked
+        compared to how often they were shown.
+      </p>
+
+      <div class="survey-viz" id="surveyViz">
+        <div class="survey-viz-canvas-wrap">
+          <canvas id="surveyCanvas" width="1440" height="1080" aria-label="3D RGB cloud of color preferences"></canvas>
+          <div class="survey-viz-legend">
+            <span class="sv-axis sv-axis-r">R</span>
+            <span class="sv-axis sv-axis-g">G</span>
+            <span class="sv-axis sv-axis-b">B</span>
+          </div>
+          <div class="survey-viz-readout" id="surveyReadout">
+            <span class="sv-tag" id="svGenderTag">all</span>
+            <span class="sv-tag" id="svAgeTag">all ages</span>
+            <span class="sv-tag" id="svMoodTag" style="display:none"></span>
+            <span class="sv-tag" id="svTimeTag" style="display:none"></span>
+            <span class="sv-tag sv-tag-mute" id="svSampleTag">n = 0</span>
+          </div>
+        </div>
+
+        <div class="survey-viz-controls">
+          <div class="survey-preset-row">
+            <button type="button" class="sv-preset" data-preset="boys">Boys</button>
+            <button type="button" class="sv-preset is-active" data-preset="girls">Girls</button>
+            <button type="button" class="sv-preset" data-preset="diff">Difference</button>
+            <button type="button" class="sv-preset" data-preset="both">Both</button>
+            <button type="button" class="sv-preset" data-preset="free">Sliders</button>
+            <button type="button" class="sv-preset sv-preset-invert" id="svInvert" aria-pressed="false" title="Flip the view to show what each group rejects">Invert</button>
+          </div>
+          <p class="sv-preset-help" id="svPresetHelp"></p>
+
+          <label class="sv-slider">
+            <span class="sv-slider-label">
+              <span>Boys</span>
+              <span class="sv-slider-name">gender</span>
+              <span>Girls</span>
+            </span>
+            <input id="svGender" type="range" min="0" max="1000" value="500" step="1" />
+          </label>
+
+          <div class="sv-slider sv-slider-age is-disabled" id="svAgeSlider">
+            <span class="sv-slider-label">
+              <span>6</span>
+              <span class="sv-slider-name">
+                <button type="button" class="sv-age-toggle" id="svAgeToggle" aria-pressed="false">All ages</button>
+                <span class="sv-age-readout" id="svAgeName">age &middot; 13&ndash;18</span>
+              </span>
+              <span>68</span>
+            </span>
+            <div class="sv-range">
+              <div class="sv-range-track"></div>
+              <div class="sv-range-fill" id="svAgeFill"></div>
+              <input id="svAgeMin" type="range" min="6" max="68" value="13" step="1" disabled aria-label="Minimum age" />
+              <input id="svAgeMax" type="range" min="6" max="68" value="18" step="1" disabled aria-label="Maximum age" />
+            </div>
+          </div>
+
+          <div class="sv-slider sv-slider-mood is-disabled" id="svMoodSlider">
+            <span class="sv-slider-label">
+              <span>0</span>
+              <span class="sv-slider-name">
+                <button type="button" class="sv-mood-toggle" id="svMoodToggle" aria-pressed="false">All moods</button>
+                <span class="sv-mood-readout" id="svMoodName">happiness</span>
+              </span>
+              <span>1</span>
+            </span>
+            <div class="sv-range">
+              <div class="sv-range-track"></div>
+              <div class="sv-range-fill" id="svMoodFill"></div>
+              <input id="svMoodMin" type="range" min="0" max="60" value="30" step="1" disabled aria-label="Minimum happiness" />
+              <input id="svMoodMax" type="range" min="0" max="60" value="50" step="1" disabled aria-label="Maximum happiness" />
+            </div>
+          </div>
+
+          <div class="sv-slider sv-slider-time is-disabled" id="svTimeSlider">
+            <span class="sv-slider-label">
+              <span>0</span>
+              <span class="sv-slider-name">
+                <button type="button" class="sv-mood-toggle" id="svTimeToggle" aria-pressed="false">All hours</button>
+                <span class="sv-mood-readout" id="svTimeName">hours</span>
+                <label class="sv-invert-check" title="Select the hours outside the thumbs instead">
+                  <input type="checkbox" id="svTimeInvert" disabled />
+                  <span>invert</span>
+                </label>
+              </span>
+              <span>23</span>
+            </span>
+            <div class="sv-range">
+              <div class="sv-range-track"></div>
+              <div class="sv-range-fill" id="svTimeFill"></div>
+              <div class="sv-range-fill-outer" id="svTimeFillOuterLo"></div>
+              <div class="sv-range-fill-outer" id="svTimeFillOuterHi"></div>
+              <input id="svTimeMin" type="range" min="0" max="23" value="8" step="1" disabled aria-label="Minimum hour" />
+              <input id="svTimeMax" type="range" min="0" max="23" value="15" step="1" disabled aria-label="Maximum hour" />
+            </div>
+          </div>
+
+          <div class="sv-advanced-toggle-row">
+            <button type="button" class="sv-advanced-toggle" id="svAdvancedToggle" aria-expanded="false" aria-controls="svAdvancedPanel">Advanced</button>
+          </div>
+
+          <div class="sv-advanced-panel" id="svAdvancedPanel" hidden>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Round 1 pick</span>
+              <input type="range" min="0" max="2" step="0.05" value="0.5" id="svW1" aria-label="Round 1 pick weight" />
+              <span class="sv-weight-readout" id="svW1Out">+0.50</span>
+            </div>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Round 2 bonus</span>
+              <input type="range" min="0" max="2" step="0.05" value="0.5" id="svW2" aria-label="Round 2 pick weight" />
+              <span class="sv-weight-readout" id="svW2Out">+0.50</span>
+            </div>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Final bonus</span>
+              <input type="range" min="0" max="2" step="0.05" value="0.5" id="svWF" aria-label="Final pick weight" />
+              <span class="sv-weight-readout" id="svWFOut">+0.50</span>
+            </div>
+            <div class="sv-weight">
+              <span class="sv-weight-label">Round 1 reject</span>
+              <input type="range" min="0" max="1" step="0.01" value="0" id="svWR" aria-label="Round 1 reject penalty" />
+              <span class="sv-weight-readout" id="svWROut">-0.00</span>
+            </div>
+            <div class="sv-balance">
+              <span class="sv-balance-info" id="svBalanceInfo">Net per session: <b>+5.70</b></span>
+              <button type="button" class="sv-balance-btn" id="svBalanceBtn" title="Snap reject penalty so total sums to zero">Balance</button>
+              <button type="button" class="sv-balance-btn" id="svResetBtn" title="Restore defaults">Reset</button>
+            </div>
+            <p class="sv-advanced-note">
+              Each session ran 64 colors through a knockout bracket. Every round
+              showed 4 colors at once and the favourite advanced.
+            </p>
+            <ol class="sv-bracket" aria-label="Survey bracket">
+              <li class="sv-bracket-stage"><span>64 colors</span></li>
+              <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+              <li class="sv-bracket-stage"><span>16 winners</span></li>
+              <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+              <li class="sv-bracket-stage"><span>4 winners</span></li>
+              <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+              <li class="sv-bracket-stage"><span>1 winner</span></li>
+            </ol>
+            <p class="sv-advanced-note">
+              Every time a user picks a color, it adds to that color's score and
+              every round-1 loss subtracts. Points are cumulative across every session,
+              and the cube is normalized to the strongest score on display, so pushing
+              one weight high can squeeze weaker colors below the visibility threshold.
+            </p>
+          </div>
+        </div>
+
+        <div class="survey-stats-grid">
+          <div class="survey-stats-card">
+            <h3>Most-loved colors</h3>
+            <p class="sv-card-sub">Voxels with the strongest preference score: shown to many people and picked far more often than chance.</p>
+            <div class="sv-swatch-row" id="svFavRow"></div>
+          </div>
+
+          <div class="survey-stats-card">
+            <h3>Most-rejected colors</h3>
+            <p class="sv-card-sub">Voxels people were shown over and over but almost never picked. Muddy yellow-browns lose every popularity contest.</p>
+            <div class="sv-swatch-row" id="svLeastRow"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>The question</h2>
+      <p>
+        Does <em>which colors you prefer</em>, and <em>how you click on them</em>, carry
+        enough signal to predict who you are? I had a hunch the answer was yes, and I wanted
+        the dataset to be big enough that the answer wasn't a coincidence.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The survey</h2>
+      <p>
+        Participants answered three demographic questions (age, gender and a 0 to 60 mood
+        rating where 0 is happy and 60 is glum), then ran through a single-elimination
+        color bracket. Each round showed
+        four swatches and the favourite carried into the next round:
+      </p>
+      <ol class="sv-bracket sv-bracket-inline" aria-label="Survey bracket">
+        <li class="sv-bracket-stage"><span>64 colors</span></li>
+        <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+        <li class="sv-bracket-stage"><span>16 rounds</span><span>16 winners</span></li>
+        <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+        <li class="sv-bracket-stage"><span>4 rounds</span><span>4 winners</span></li>
+        <li class="sv-bracket-arrow" aria-hidden="true">&rarr;</li>
+        <li class="sv-bracket-stage"><span>1 round</span><span>1 winner</span></li>
+      </ol>
+      <p>
+        Alongside the picks, the survey quietly logged the meta-signal: how long each
+        response took, where on the swatch the click landed, whether the cursor wavered, and
+        the order participants tended to scan the options.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Reach and response</h2>
+      <ul>
+        <li>Around 160,000 students opened the mail through the Oslo school directory</li>
+        <li>Around 20,000 finished the full survey (roughly 12.5% completion)</li>
+        <li>Every response stored with a timestamp and a session-local salt</li>
+      </ul>
+      <blockquote>
+        At sixteen the most surprising part wasn't the model. It was watching a dataset of
+        twenty thousand human responses arrive in two days.
+      </blockquote>
+    </section>
+
+    <section class="project-section">
+      <h2>Who took it, and how</h2>
+      <p>
+        Once the dataset was cleaned, the cohort itself was almost as interesting as the color
+        picks. Below is what the 6,731 valid sessions look like sliced different ways. Each
+        line plot draws boys and girls separately so the gap, where there is one, is visible.
+      </p>
+
+      <div class="sv-cohort-grid">
+        <div class="survey-stats-card">
+          <h3>Headline numbers</h3>
+          <ul class="sv-figures" id="svFigures"></ul>
+        </div>
+
+        <div class="survey-stats-card">
+          <h3>Responses over the first days</h3>
+          <p class="sv-card-sub">Daily completions from launch. The second wave on day 9 is the second batch of emails I sent.</p>
+          <svg id="svResponsesByDay" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Daily response counts since launch, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>Age distribution</h3>
+          <p class="sv-card-sub">Every valid session, by reported age. The 13&ndash;18 peak is students; the long tail is teachers, substitutes, admins, and other municipal staff who work or have worked in the school system.</p>
+          <svg id="svAgeChart" class="sv-age-chart" viewBox="0 0 640 80" preserveAspectRatio="xMidYMid meet" aria-label="Age histogram from 6 to 68"></svg>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>Boys vs girls by age</h3>
+          <p class="sv-card-sub">Where the gender split lived. The student years are roughly balanced; the adult tail skews female (Norwegian primary-school staff is mostly women).</p>
+          <svg id="svGenderByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Session counts by age, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>Happiness by age</h3>
+          <p class="sv-card-sub">Self-reported mood, mapped to happiness (1 = happy, 0 = glum). The adolescence dip lands almost exactly where you'd expect: a long valley from 13 to 18.</p>
+          <svg id="svHappinessByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean happiness by age, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>Responses through the day</h3>
+          <p class="sv-card-sub">When people actually clicked through the test, by hour they started (Europe/Oslo). The school-day window dominates; the 21:00 evening bump is mostly older respondents at home.</p>
+          <svg id="svResponsesByHour" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Response count by hour of day, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>Happiness through the day</h3>
+          <p class="sv-card-sub">Mean happiness of the people who started the test, by when they started (Europe/Oslo). 15-minute buckets through the active stretch (08&ndash;22), hourly at the shoulders, and 01&ndash;05 skipped since the dataset is too thin to read there.</p>
+          <svg id="svHappinessByHour" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean happiness by hour of day, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>How long the test took, by age</h3>
+          <p class="sv-card-sub">Mean total time to finish the color bracket. Sessions over ten minutes are dropped here as tabs left open.</p>
+          <svg id="svDurationByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean test duration by age, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>Per-question speed by age</h3>
+          <p class="sv-card-sub">Average seconds spent on each swatch decision. Reaction time grows with age; teens click fastest.</p>
+          <svg id="svPerQByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean per-question time by age, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>Time per slide through the bracket</h3>
+          <p class="sv-card-sub">Mean seconds spent on each of the 21 picks. Q1 carries the startup overhead (reading the page, settling in), then the clicks accelerate as the bracket progresses. Round 2 starts at Q17 and the final at Q21.</p>
+          <svg id="svTimePerSlide" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean time spent on each question in the bracket"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+
+        <div class="survey-stats-card sv-card-wide">
+          <h3>How long did people take?</h3>
+          <p class="sv-card-sub">Distribution of total test time in 15-second bins, boys and girls overlaid. Most people finish inside two minutes.</p>
+          <svg id="svDurationHist" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Distribution of total test durations, split by gender"></svg>
+          <div class="sv-legend">
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>Cleaning the data</h2>
+      <p>
+        The dataset arrived dirty. Around 20,000 people finished the survey, but the cube
+        at the top only runs on 6,731 of them. Everything else got filtered out by a chain
+        of sanity checks that I built up as I noticed the failure modes:
+      </p>
+      <ul>
+        <li>Self-reported gender had to match the gender on file in the school directory. People who said the opposite of what was on file were almost always joking.</li>
+        <li>Self-reported age had to be plausibly close to the directory age. A first-grader who claims to be 47 isn't answering seriously.</li>
+        <li>Everyone under 6 was dropped. So was everyone above 68. Roughly half of all "adults" in the raw data claimed to be exactly 69.</li>
+        <li>Sessions where almost every click landed on the same screen coordinate were dropped. Someone tapping one corner twenty times is not picking colors.</li>
+        <li>Sessions where the average answer took less than 0.3 seconds were dropped. You can't read four swatches that fast.</li>
+        <li>Plus a handful of smaller heuristics for duplicate IDs, missing fields, impossible total times, and people who clicked through without ever moving the mouse.</li>
+      </ul>
+      <p>
+        What survives is the 6,731 sessions where I'm reasonably sure a real human was making
+        a real choice. That's the cleaned set the cube at the top is drawing from.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The model</h2>
+      <h3>Features</h3>
+      <ul>
+        <li>Per-trial: chosen color (one-hot), three rejected colors, dwell time, click coordinates relative to swatch centre</li>
+        <li>Per-session: total time, time variance, first-click bias</li>
+      </ul>
+      <h3>Architecture</h3>
+      <p>
+        A small fully-connected network. Three targets, trained jointly: age (regression),
+        gender (binary classification), mood (0 to 60 ordinal, lower is happier). I leaned on the meta-features
+        as much as the color picks themselves. They turned out to carry a lot of the signal,
+        especially for age.
+      </p>
+      <p>
+        Six years later I keep coming back to this dataset to test new architectures on it.
+        Stacked gradient boosting, a small transformer, a BiGRU, an LSTM, plain linear baselines.
+        Current numbers live on the <a href="color-polygraph/ai-leaderboard">architecture leaderboard</a>.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What I learned</h2>
+      <p>
+        Three things. First, that <em>how</em> you click is at least as informative as
+        <em>what</em> you click. Reaction time and click coordinates carried more weight in
+        the age head than the color picks themselves. Second, that running a study at scale
+        is less about the model and more about the boring plumbing around it: surveys,
+        storage, deduplication, abuse handling, the cleaning pipeline I just walked through.
+        The model itself was the smallest file in the project.
+      </p>
+      <p>
+        Third, that almost two thirds of a "completed" dataset can be noise. The 13,000
+        sessions I threw away weren't all malicious; plenty were kids speed-running for the
+        sake of it, or people typing 69 as their age out of habit. The lesson stuck. Every
+        dataset I've touched since then I treat as guilty until proven clean.
+      </p>
+      <p>
+        I'd do this differently today: clearer consent, better aggregation, a published
+        write-up. It was a high-school project and it shows in places, but it taught me that
+        data beats cleverness, and I've never quite let go of that.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Explore the data yourself</h2>
+      <p>
+        Everything that powers the cube above lives in the public repo. The raw export, the
+        Python cleaner that turned 20,000 rows into 6,731, and the aggregator that produced
+        the JSON the viz reads, are all in the project folder. If you want to try a different
+        binning, a different filter, or train your own little net on it, this is where to start.
+      </p>
+      <div class="project-links">
+        <a href="https://github.com/andreasviner/portfolio/tree/main/projects_data/2020-color-polygraph" target="_blank" rel="noopener">Project folder on GitHub</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/projects_data/2020-color-polygraph/code/save.ligma" target="_blank" rel="noopener">Raw cleaned export (save.ligma, JSON, ~10 MB)</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/projects_data/2020-color-polygraph/new_code/treat_data.py" target="_blank" rel="noopener">Aggregator script (treat_data.py)</a>
+        <a href="https://github.com/andreasviner/portfolio/blob/main/projects_data/2020-color-polygraph/preferences.json" target="_blank" rel="noopener">Aggregated voxel data (preferences.json)</a>
+      </div>
+    </section>
+
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+  (function () {
+    const DATA_DIR = '../projects_data/2020-color-polygraph/';
+
+    const canvas   = document.getElementById('surveyCanvas');
+    const ctx      = canvas.getContext('2d');
+    const genderEl = document.getElementById('svGender');
+    const ageMinEl = document.getElementById('svAgeMin');
+    const ageMaxEl = document.getElementById('svAgeMax');
+    const ageFillEl = document.getElementById('svAgeFill');
+    const ageName  = document.getElementById('svAgeName');
+    const ageToggle  = document.getElementById('svAgeToggle');
+    const ageWrap    = document.getElementById('svAgeSlider');
+    const moodMinEl = document.getElementById('svMoodMin');
+    const moodMaxEl = document.getElementById('svMoodMax');
+    const moodFillEl = document.getElementById('svMoodFill');
+    const moodName  = document.getElementById('svMoodName');
+    const moodToggle  = document.getElementById('svMoodToggle');
+    const moodWrap    = document.getElementById('svMoodSlider');
+    const timeMinEl = document.getElementById('svTimeMin');
+    const timeMaxEl = document.getElementById('svTimeMax');
+    const timeFillEl = document.getElementById('svTimeFill');
+    const timeFillOuterLoEl = document.getElementById('svTimeFillOuterLo');
+    const timeFillOuterHiEl = document.getElementById('svTimeFillOuterHi');
+    const timeName  = document.getElementById('svTimeName');
+    const timeToggle  = document.getElementById('svTimeToggle');
+    const timeWrap    = document.getElementById('svTimeSlider');
+    const timeInvertEl = document.getElementById('svTimeInvert');
+    const genderTag = document.getElementById('svGenderTag');
+    const ageTag    = document.getElementById('svAgeTag');
+    const moodTag   = document.getElementById('svMoodTag');
+    const timeTag   = document.getElementById('svTimeTag');
+    const sampleTag = document.getElementById('svSampleTag');
+    const presetBtns = document.querySelectorAll('.sv-preset[data-preset]');
+    const presetHelp = document.getElementById('svPresetHelp');
+    const invertBtn = document.getElementById('svInvert');
+    const advancedToggle = document.getElementById('svAdvancedToggle');
+    const advancedPanel = document.getElementById('svAdvancedPanel');
+    const w1El = document.getElementById('svW1');
+    const w2El = document.getElementById('svW2');
+    const wFEl = document.getElementById('svWF');
+    const wREl = document.getElementById('svWR');
+    const w1Out = document.getElementById('svW1Out');
+    const w2Out = document.getElementById('svW2Out');
+    const wFOut = document.getElementById('svWFOut');
+    const wROut = document.getElementById('svWROut');
+    const balanceInfo = document.getElementById('svBalanceInfo');
+    const balanceBtn = document.getElementById('svBalanceBtn');
+    const resetBtn = document.getElementById('svResetBtn');
+    const DEFAULT_WEIGHTS = { w1: 0.5, w2: 0.5, wF: 0.5, wRej: 0 };
+    const WEIGHTS = { ...DEFAULT_WEIGHTS };
+    let useAge = false;
+    let useMood = false;
+    let useTime = false;
+    let timeInvert = false;
+    let inverted = false;
+
+    let DATA = null;
+    let GRID = 8;
+    let BUCKETS = null;          // summary aggregates: { g_all, j_all }
+    let AGE_DATA = null;         // per-(gender, single-age) buckets, lazy
+    let MOOD_DATA = null;        // per-(gender, mood-range) buckets, lazy
+    let TIME_DATA = null;        // per-(gender, hour-of-day) buckets, lazy
+    let agePromise = null;
+    let moodPromise = null;
+    let timePromise = null;
+    let mode = 'girls';          // 'boys' | 'girls' | 'diff' | 'free'
+    let yaw = 0.6, pitch = -0.45;
+    let dragging = false;
+    let lastX = 0, lastY = 0;
+    let autoRotate = true;
+    let scoreCache = null;
+    let cacheKey = '';
+
+    function happinessOf(moodScore) {
+      // Mood is stored 0..60 (0 = happiest, 60 = glummest).
+      // We display the inverse as happiness on [0, 1].
+      return (60 - moodScore) / 60;
+    }
+
+    function happinessLabel(minMood, maxMood) {
+      const hi = happinessOf(minMood);   // smaller mood score = higher happiness
+      const lo = happinessOf(maxMood);
+      const fmt = (x) => x.toFixed(2);
+      return fmt(lo) === fmt(hi) ? fmt(lo) : (fmt(lo) + '–' + fmt(hi));
+    }
+
+    function fmtHour(h) {
+      return String(h).padStart(2, '0') + ':00';
+    }
+
+    function hourRangeLabel(lo, hi, invert) {
+      if (invert) {
+        if (lo === 0 && hi === 23) return 'none';
+        if (lo === 0)  return fmtHour(hi + 1) + '–' + fmtHour(0);
+        if (hi === 23) return fmtHour(0) + '–' + fmtHour(lo);
+        return 'outside ' + fmtHour(lo) + '–' + fmtHour(hi);
+      }
+      if (lo === hi) return fmtHour(lo);
+      return fmtHour(lo) + '–' + fmtHour(hi);
+    }
+
+    function genderBlendedMean(bg, jg, field) {
+      const bgN = bg ? bg.n : 0;
+      const jgN = jg ? jg.n : 0;
+      const totalN = bgN + jgN;
+      if (totalN === 0) return null;
+      return ((bg && bg[field] != null ? bg[field] * bgN : 0) +
+              (jg && jg[field] != null ? jg[field] * jgN : 0)) / totalN;
+    }
+
+    function pickSource() {
+      // Pick the source from the SINGLE most granular active filter, ignoring
+      // whatever other filters are on. Secondary filters apply as _mean gates
+      // on whichever source we picked. This makes the source stable: toggling
+      // a filter that is currently at its full range is a true no-op, because
+      // the same source serves both states.
+      //
+      // Granularity order: age (per-year, 63 cells) > time (per-hour, 24) > mood (6 ranges).
+      if (useAge && AGE_DATA) {
+        return { buckets: AGE_DATA, list: DATA.age_buckets, kind: 'age' };
+      }
+      if (useTime && TIME_DATA) {
+        return { buckets: TIME_DATA, list: DATA.time_buckets, kind: 'time' };
+      }
+      if (useMood && MOOD_DATA) {
+        return { buckets: MOOD_DATA, list: DATA.mood_levels, kind: 'mood' };
+      }
+      // Any filter active but its preferred detail file is not loaded yet:
+      // fall back to AGE_DATA, which carries mood_mean and time_mean and so
+      // can stand in for any combo until the granular file arrives.
+      if ((useAge || useMood || useTime) && AGE_DATA) {
+        return { buckets: AGE_DATA, list: DATA.age_buckets, kind: 'age' };
+      }
+      return { buckets: BUCKETS, list: null, kind: 'all' };
+    }
+
+    function bucketWeights(src, minAge, maxAge, minMood, maxMood, minHour, maxHour) {
+      const out = new Map();
+      if (src.kind === 'all') {
+        out.set('all', 1);
+        return out;
+      }
+
+      // Primary filter is the axis this source's bucket list is keyed on.
+      let primaryOn, primaryLo, primaryHi, primaryInvert = false;
+      if (src.kind === 'age')  { primaryOn = useAge;  primaryLo = minAge;  primaryHi = maxAge; }
+      if (src.kind === 'mood') { primaryOn = useMood; primaryLo = minMood; primaryHi = maxMood; }
+      if (src.kind === 'time') { primaryOn = useTime; primaryLo = minHour; primaryHi = maxHour; primaryInvert = timeInvert; }
+
+      // Every other active filter applies as a mean-gate on each bucket. The
+      // detail bucket files all carry mood_mean and time_mean, so this works
+      // from any source. (useAge always picks 'age' as the primary, so age is
+      // never a cross-gate.)
+      const moodGateOn = useMood && src.kind !== 'mood';
+      const timeGateOn = useTime && src.kind !== 'time';
+
+      const tmp = [];
+      let total = 0;
+      for (const b of src.list) {
+        let primaryFrac = 1;
+        if (primaryOn) {
+          const overlapLo = Math.max(primaryLo, b.lo);
+          const overlapHi = Math.min(primaryHi, b.hi);
+          const overlap = Math.max(0, overlapHi - overlapLo + 1);
+          const span = b.hi - b.lo + 1;
+          primaryFrac = primaryInvert ? (1 - overlap / span) : (overlap / span);
+        }
+        if (primaryFrac <= 0) continue;
+
+        const bg = src.buckets['g_' + b.name];
+        const jg = src.buckets['j_' + b.name];
+
+        if (moodGateOn) {
+          const m = genderBlendedMean(bg, jg, 'mood_mean');
+          if (m === null || m < minMood || m > maxMood) continue;
+        }
+        if (timeGateOn) {
+          const t = genderBlendedMean(bg, jg, 'time_mean');
+          if (t === null) continue;
+          const inHourRange = t >= minHour && t <= maxHour;
+          if (timeInvert ? inHourRange : !inHourRange) continue;
+        }
+
+        const bn = (bg ? bg.n : 0) + (jg ? jg.n : 0);
+        const w = primaryFrac * bn;
+        if (w > 0) { tmp.push([b.name, w]); total += w; }
+      }
+      if (total > 0) {
+        for (const [name, w] of tmp) out.set(name, w / total);
+      }
+      return out;
+    }
+
+    function bucketScores(gKey, src, weights, invert) {
+      const out = new Map();
+      const { w1, w2, wF, wRej } = WEIGHTS;
+      for (const [name, w] of weights) {
+        const b = src.buckets[gKey + '_' + name];
+        if (!b || !b.v) continue;
+        const v = b.v;
+        if (invert) {
+          // Reject signal: round-1 rejection rate only. Disliked = shown often, lost in round 1.
+          for (const k in v) {
+            const arr = v[k];
+            const off = arr[0], r1 = arr[1];
+            if (off <= 0) continue;
+            const reject = (off - r1) / off;
+            if (reject <= 0) continue;
+            const cur = out.get(k) || 0;
+            out.set(k, cur + reject * w);
+          }
+        } else {
+          // Love signal: net points per swatch shown.
+          // Selecting at each round adds; losing round 1 subtracts. Rounds 2 and 3 only add for winners.
+          for (const k in v) {
+            const arr = v[k];
+            const off = arr[0], r1 = arr[1], r2 = arr[2], fn = arr[3];
+            if (off <= 0) continue;
+            const score = (w1 * r1 + w2 * r2 + wF * fn - wRej * (off - r1)) / off;
+            const cur = out.get(k) || 0;
+            out.set(k, cur + score * w);
+          }
+        }
+      }
+      return out;
+    }
+
+    function bucketSampleCount(gKey, src, weights) {
+      let n = 0;
+      for (const [name, w] of weights) {
+        const b = src.buckets[gKey + '_' + name];
+        if (b) n += b.n * w;
+      }
+      return n;
+    }
+
+    function currentScores() {
+      let minAge = parseInt(ageMinEl.value, 10);
+      let maxAge = parseInt(ageMaxEl.value, 10);
+      if (minAge > maxAge) { const t = minAge; minAge = maxAge; maxAge = t; }
+      const ageLabel = (minAge === maxAge) ? String(minAge) : (minAge + '–' + maxAge);
+      // Mood slider exposes happiness on the input axis: left = sad (0), right = happy (1).
+      // The data is keyed by mood (0 = happy, 60 = glum), so flip the inputs when reading.
+      let happMinIn = parseInt(moodMinEl.value, 10);
+      let happMaxIn = parseInt(moodMaxEl.value, 10);
+      if (happMinIn > happMaxIn) { const t = happMinIn; happMinIn = happMaxIn; happMaxIn = t; }
+      const minMood = 60 - happMaxIn;
+      const maxMood = 60 - happMinIn;
+      const moodLabel = happinessLabel(minMood, maxMood);
+      let minHour = parseInt(timeMinEl.value, 10);
+      let maxHour = parseInt(timeMaxEl.value, 10);
+      if (minHour > maxHour) { const t = minHour; minHour = maxHour; maxHour = t; }
+      const timeLabel = hourRangeLabel(minHour, maxHour, timeInvert);
+      const gMix = parseInt(genderEl.value, 10) / 1000; // 0=boys, 1=girls
+      const wKey = WEIGHTS.w1.toFixed(2) + ',' + WEIGHTS.w2.toFixed(2) + ',' + WEIGHTS.wF.toFixed(2) + ',' + WEIGHTS.wRej.toFixed(3);
+      const key = mode + '|' + minAge + '-' + maxAge + '|' + minMood + '-' + maxMood + '|' + minHour + '-' + maxHour + '|' + gMix.toFixed(3) + '|' + (inverted ? 'i' : 'l') + '|' + (useAge ? 'a' : '-') + '|' + (useMood ? 'm' : '-') + '|' + (useTime ? (timeInvert ? 'T' : 't') : '-') + '|' + wKey;
+      if (key === cacheKey && scoreCache) return scoreCache;
+      cacheKey = key;
+
+      const src = pickSource();
+      const aw = bucketWeights(src, minAge, maxAge, minMood, maxMood, minHour, maxHour);
+      let scores = new Map();
+      let n = 0;
+      const inv = inverted;
+
+      if (mode === 'boys') {
+        scores = bucketScores('g', src, aw, inv);
+        n = bucketSampleCount('g', src, aw);
+        genderTag.textContent = inv ? 'boys reject' : 'boys';
+      } else if (mode === 'girls') {
+        scores = bucketScores('j', src, aw, inv);
+        n = bucketSampleCount('j', src, aw);
+        genderTag.textContent = inv ? 'girls reject' : 'girls';
+      } else if (mode === 'diff') {
+        const boys  = bucketScores('g', src, aw, inv);
+        const girls = bucketScores('j', src, aw, inv);
+        const keys = new Set([...boys.keys(), ...girls.keys()]);
+        for (const k of keys) {
+          scores.set(k, (girls.get(k) || 0) - (boys.get(k) || 0));
+        }
+        n = bucketSampleCount('g', src, aw) + bucketSampleCount('j', src, aw);
+        genderTag.textContent = inv ? 'girls - boys (reject)' : 'girls - boys';
+      } else if (mode === 'both') {
+        const boys  = bucketScores('g', src, aw, inv);
+        const girls = bucketScores('j', src, aw, inv);
+        const keys = new Set([...boys.keys(), ...girls.keys()]);
+        for (const k of keys) {
+          scores.set(k, Math.min(boys.get(k) || 0, girls.get(k) || 0));
+        }
+        n = bucketSampleCount('g', src, aw) + bucketSampleCount('j', src, aw);
+        genderTag.textContent = inv ? 'both reject' : 'both';
+      } else {
+        const boys  = bucketScores('g', src, aw, inv);
+        const girls = bucketScores('j', src, aw, inv);
+        const keys = new Set([...boys.keys(), ...girls.keys()]);
+        for (const k of keys) {
+          scores.set(k, (boys.get(k) || 0) * (1 - gMix) + (girls.get(k) || 0) * gMix);
+        }
+        n = bucketSampleCount('g', src, aw) * (1 - gMix) + bucketSampleCount('j', src, aw) * gMix;
+        const pct = Math.round(gMix * 100);
+        const base = pct === 0 ? 'boys' :
+                     pct === 100 ? 'girls' :
+                     `${100 - pct}% boys / ${pct}% girls`;
+        genderTag.textContent = inv ? base + ' reject' : base;
+      }
+
+      ageTag.textContent = useAge ? ('age ' + ageLabel) : 'all ages';
+      if (useMood) {
+        moodTag.textContent = 'happiness ' + moodLabel;
+        moodTag.style.display = '';
+      } else {
+        moodTag.textContent = '';
+        moodTag.style.display = 'none';
+      }
+      if (useTime) {
+        timeTag.textContent = 'hours ' + timeLabel;
+        timeTag.style.display = '';
+      } else {
+        timeTag.textContent = '';
+        timeTag.style.display = 'none';
+      }
+      sampleTag.textContent = 'n ≈ ' + Math.round(n).toLocaleString();
+      ageName.textContent = 'age · ' + ageLabel;
+      ageToggle.textContent = useAge ? ('Age ' + ageLabel) : 'All ages';
+      moodName.textContent = 'happiness · ' + moodLabel;
+      moodToggle.textContent = useMood ? ('Happiness ' + moodLabel) : 'All moods';
+      timeName.textContent = 'hours · ' + timeLabel;
+      timeToggle.textContent = useTime ? ('Hours ' + timeLabel) : 'All hours';
+
+      scoreCache = { scores, n };
+      return scoreCache;
+    }
+
+    function rotateVec(x, y, z) {
+      const cy = Math.cos(yaw),   sy = Math.sin(yaw);
+      const cp = Math.cos(pitch), sp = Math.sin(pitch);
+      const x1 =  cy * x + sy * z;
+      const z1 = -sy * x + cy * z;
+      const y1 =  cp * y - sp * z1;
+      const z2 =  sp * y + cp * z1;
+      return [x1, y1, z2];
+    }
+
+    function project(x, y, z, cx, cy, scale) {
+      const dist = 4.2;
+      const f = scale / (dist + z);
+      return [cx + x * f, cy - y * f, f];
+    }
+
+    function drawFrame(ts) {
+      if (autoRotate) yaw = (ts || 0) * 0.00018;
+
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w / 2;
+      const cy = h / 2;
+      const scale = Math.min(w, h) * 0.88;
+
+      const corners = [
+        [-1, -1, -1], [ 1, -1, -1], [ 1,  1, -1], [-1,  1, -1],
+        [-1, -1,  1], [ 1, -1,  1], [ 1,  1,  1], [-1,  1,  1],
+      ];
+      const proj = corners.map(c => {
+        const r = rotateVec(c[0], c[1], c[2]);
+        return project(r[0], r[1], r[2], cx, cy, scale);
+      });
+      const edges = [
+        [0,1],[1,2],[2,3],[3,0],
+        [4,5],[5,6],[6,7],[7,4],
+        [0,4],[1,5],[2,6],[3,7],
+      ];
+      ctx.strokeStyle = 'rgba(235, 230, 218, 0.10)';
+      ctx.lineWidth = 1;
+      for (const [a, b] of edges) {
+        ctx.beginPath();
+        ctx.moveTo(proj[a][0], proj[a][1]);
+        ctx.lineTo(proj[b][0], proj[b][1]);
+        ctx.stroke();
+      }
+
+      const axisEndpoints = [
+        { from: [-1, -1, -1], to: [ 1, -1, -1], color: 'rgba(255, 100, 100, 0.45)' },
+        { from: [-1, -1, -1], to: [-1,  1, -1], color: 'rgba(102, 221, 110, 0.45)' },
+        { from: [-1, -1, -1], to: [-1, -1,  1], color: 'rgba(106, 166, 255, 0.45)' },
+      ];
+      ctx.lineWidth = 1.4;
+      for (const ax of axisEndpoints) {
+        const a = rotateVec(...ax.from);
+        const b = rotateVec(...ax.to);
+        const pa = project(a[0], a[1], a[2], cx, cy, scale);
+        const pb = project(b[0], b[1], b[2], cx, cy, scale);
+        ctx.strokeStyle = ax.color;
+        ctx.beginPath();
+        ctx.moveTo(pa[0], pa[1]);
+        ctx.lineTo(pb[0], pb[1]);
+        ctx.stroke();
+      }
+
+      const { scores } = currentScores();
+      const G = GRID;
+      const step = 2 / G;
+
+      const allowSignedNorm = (mode === 'diff');
+      let maxAbs = 0;
+      for (const v of scores.values()) {
+        if (!allowSignedNorm && v <= 0) continue;
+        const a = Math.abs(v);
+        if (a > maxAbs) maxAbs = a;
+      }
+      if (maxAbs === 0) maxAbs = 1;
+
+      const points = [];
+      const allowSigned = (mode === 'diff');
+      for (const [k, score] of scores) {
+        if (!allowSigned && score <= 0) continue;
+        const ki = +k;
+        const rr = (ki >>> 6) & 7;
+        const gg = (ki >>> 3) & 7;
+        const bb = ki & 7;
+        const x = -1 + (rr + 0.5) * step;
+        const y = -1 + (gg + 0.5) * step;
+        const z = -1 + (bb + 0.5) * step;
+        const rot = rotateVec(x, y, z);
+        const p = project(rot[0], rot[1], rot[2], cx, cy, scale);
+        const cr = Math.round((rr * 32) + 16);
+        const cg = Math.round((gg * 32) + 16);
+        const cb = Math.round((bb * 32) + 16);
+        points.push({ x: p[0], y: p[1], depth: rot[2], f: p[2], cr, cg, cb, score });
+      }
+      points.sort((a, b) => b.depth - a.depth);
+
+      const baseRadius = Math.min(w, h) * 0.026;
+      const CUTOFF = mode === 'diff' ? 0.12 : (inverted ? 0.72 : 0.32);
+      for (const pt of points) {
+        const norm = pt.score / maxAbs;
+        const mag = Math.abs(norm);
+        if (mag < CUTOFF) continue;
+        const shaped = (mag - CUTOFF) / (1 - CUTOFF);
+        const persp = 1 / (1 + pt.depth * 0.18);
+        const radius = Math.max(1.0, Math.pow(shaped, 1.6) * baseRadius * persp);
+        const alpha = Math.min(0.98, 0.55 + shaped * 0.45);
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${pt.cr},${pt.cg},${pt.cb},${alpha})`;
+        if (mode === 'diff' && norm > 0) {
+          const r = radius * 1.5551;
+          ctx.moveTo(pt.x, pt.y - r);
+          ctx.lineTo(pt.x + r * 0.866, pt.y + r * 0.5);
+          ctx.lineTo(pt.x - r * 0.866, pt.y + r * 0.5);
+          ctx.closePath();
+        } else {
+          ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
+        }
+        ctx.fill();
+      }
+
+      requestAnimationFrame(drawFrame);
+    }
+
+    function attachInteractions() {
+      canvas.addEventListener('pointerdown', e => {
+        dragging = true; autoRotate = false;
+        lastX = e.clientX; lastY = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener('pointerup', e => {
+        dragging = false;
+        canvas.releasePointerCapture(e.pointerId);
+      });
+      canvas.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        lastX = e.clientX; lastY = e.clientY;
+        yaw   += dx * 0.008;
+        pitch += dy * 0.008;
+        pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch));
+      });
+      canvas.addEventListener('dblclick', () => { autoRotate = true; });
+    }
+
+    function updateAgeFill() {
+      let lo = parseInt(ageMinEl.value, 10);
+      let hi = parseInt(ageMaxEl.value, 10);
+      if (lo > hi) { const t = lo; lo = hi; hi = t; }
+      const span = 68 - 6;
+      ageFillEl.style.left  = ((lo - 6) / span * 100) + '%';
+      ageFillEl.style.width = ((hi - lo) / span * 100) + '%';
+    }
+
+    function updateMoodFill() {
+      let lo = parseInt(moodMinEl.value, 10);
+      let hi = parseInt(moodMaxEl.value, 10);
+      if (lo > hi) { const t = lo; lo = hi; hi = t; }
+      const span = 60 - 0;
+      moodFillEl.style.left  = (lo / span * 100) + '%';
+      moodFillEl.style.width = ((hi - lo) / span * 100) + '%';
+    }
+
+    function updateTimeFill() {
+      let lo = parseInt(timeMinEl.value, 10);
+      let hi = parseInt(timeMaxEl.value, 10);
+      if (lo > hi) { const t = lo; lo = hi; hi = t; }
+      const span = 23 - 0;
+      const loPct = lo / span * 100;
+      const hiPct = hi / span * 100;
+      timeFillEl.style.left  = loPct + '%';
+      timeFillEl.style.width = (hiPct - loPct) + '%';
+      timeFillOuterLoEl.style.left  = '0%';
+      timeFillOuterLoEl.style.width = loPct + '%';
+      timeFillOuterHiEl.style.left  = hiPct + '%';
+      timeFillOuterHiEl.style.width = (100 - hiPct) + '%';
+    }
+
+    function attachControls() {
+      const onChange = () => { cacheKey = ''; };
+      genderEl.addEventListener('input', () => { setMode('free'); onChange(); });
+      ageMinEl.addEventListener('input', () => {
+        if (parseInt(ageMinEl.value, 10) > parseInt(ageMaxEl.value, 10)) {
+          ageMaxEl.value = ageMinEl.value;
+        }
+        updateAgeFill();
+        if (useAge) onChange();
+      });
+      ageMaxEl.addEventListener('input', () => {
+        if (parseInt(ageMaxEl.value, 10) < parseInt(ageMinEl.value, 10)) {
+          ageMinEl.value = ageMaxEl.value;
+        }
+        updateAgeFill();
+        if (useAge) onChange();
+      });
+      ageToggle.addEventListener('click', () => {
+        useAge = !useAge;
+        ageToggle.setAttribute('aria-pressed', String(useAge));
+        ageWrap.classList.toggle('is-disabled', !useAge);
+        ageMinEl.disabled = !useAge;
+        ageMaxEl.disabled = !useAge;
+        cacheKey = '';
+      });
+      moodMinEl.addEventListener('input', () => {
+        if (parseInt(moodMinEl.value, 10) > parseInt(moodMaxEl.value, 10)) {
+          moodMaxEl.value = moodMinEl.value;
+        }
+        updateMoodFill();
+        if (useMood) onChange();
+      });
+      moodMaxEl.addEventListener('input', () => {
+        if (parseInt(moodMaxEl.value, 10) < parseInt(moodMinEl.value, 10)) {
+          moodMinEl.value = moodMaxEl.value;
+        }
+        updateMoodFill();
+        if (useMood) onChange();
+      });
+      moodToggle.addEventListener('click', () => {
+        useMood = !useMood;
+        moodToggle.setAttribute('aria-pressed', String(useMood));
+        moodWrap.classList.toggle('is-disabled', !useMood);
+        moodMinEl.disabled = !useMood;
+        moodMaxEl.disabled = !useMood;
+        cacheKey = '';
+      });
+      timeMinEl.addEventListener('input', () => {
+        if (parseInt(timeMinEl.value, 10) > parseInt(timeMaxEl.value, 10)) {
+          timeMaxEl.value = timeMinEl.value;
+        }
+        updateTimeFill();
+        if (useTime) onChange();
+      });
+      timeMaxEl.addEventListener('input', () => {
+        if (parseInt(timeMaxEl.value, 10) < parseInt(timeMinEl.value, 10)) {
+          timeMinEl.value = timeMaxEl.value;
+        }
+        updateTimeFill();
+        if (useTime) onChange();
+      });
+      timeToggle.addEventListener('click', () => {
+        useTime = !useTime;
+        timeToggle.setAttribute('aria-pressed', String(useTime));
+        timeWrap.classList.toggle('is-disabled', !useTime);
+        timeMinEl.disabled = !useTime;
+        timeMaxEl.disabled = !useTime;
+        timeInvertEl.disabled = !useTime;
+        cacheKey = '';
+      });
+      timeInvertEl.addEventListener('change', () => {
+        timeInvert = timeInvertEl.checked;
+        timeWrap.classList.toggle('is-inverted', timeInvert);
+        if (useTime) onChange();
+      });
+      updateAgeFill();
+      updateMoodFill();
+      updateTimeFill();
+      presetBtns.forEach(btn => {
+        btn.addEventListener('click', () => setMode(btn.dataset.preset));
+      });
+      invertBtn.addEventListener('click', () => {
+        inverted = !inverted;
+        invertBtn.setAttribute('aria-pressed', String(inverted));
+        invertBtn.classList.toggle('is-active', inverted);
+        updateHelp();
+        cacheKey = '';
+      });
+      attachAdvanced();
+    }
+
+    function updateBalanceInfo() {
+      // Per-session positive points = w1*16 + w2*4 + wF*1 (cumulative round counts)
+      // Per-session negative magnitude = wRej * 48 (round-1 losers)
+      const pos = WEIGHTS.w1 * 16 + WEIGHTS.w2 * 4 + WEIGHTS.wF * 1;
+      const neg = WEIGHTS.wRej * 48;
+      const net = pos - neg;
+      const sign = net >= 0 ? '+' : '';
+      balanceInfo.innerHTML = 'Net per session: <b>' + sign + net.toFixed(2) + '</b> (+' + pos.toFixed(2) + ' love, -' + neg.toFixed(2) + ' reject)';
+    }
+
+    function syncWeightReadouts() {
+      w1Out.textContent = '+' + WEIGHTS.w1.toFixed(2);
+      w2Out.textContent = '+' + WEIGHTS.w2.toFixed(2);
+      wFOut.textContent = '+' + WEIGHTS.wF.toFixed(2);
+      wROut.textContent = '-' + WEIGHTS.wRej.toFixed(2);
+      updateBalanceInfo();
+    }
+
+    function applyWeightInputs() {
+      WEIGHTS.w1  = parseFloat(w1El.value);
+      WEIGHTS.w2  = parseFloat(w2El.value);
+      WEIGHTS.wF  = parseFloat(wFEl.value);
+      WEIGHTS.wRej = parseFloat(wREl.value);
+      syncWeightReadouts();
+      cacheKey = '';
+    }
+
+    function attachAdvanced() {
+      advancedToggle.addEventListener('click', () => {
+        const open = advancedPanel.hasAttribute('hidden');
+        if (open) advancedPanel.removeAttribute('hidden');
+        else advancedPanel.setAttribute('hidden', '');
+        advancedToggle.setAttribute('aria-expanded', String(open));
+      });
+      [w1El, w2El, wFEl, wREl].forEach(el => {
+        el.addEventListener('input', applyWeightInputs);
+      });
+      balanceBtn.addEventListener('click', () => {
+        const pos = WEIGHTS.w1 * 16 + WEIGHTS.w2 * 4 + WEIGHTS.wF * 1;
+        const target = pos / 48;
+        const clamped = Math.max(0, Math.min(1, target));
+        wREl.value = clamped.toFixed(2);
+        applyWeightInputs();
+      });
+      resetBtn.addEventListener('click', () => {
+        w1El.value = DEFAULT_WEIGHTS.w1;
+        w2El.value = DEFAULT_WEIGHTS.w2;
+        wFEl.value = DEFAULT_WEIGHTS.wF;
+        wREl.value = DEFAULT_WEIGHTS.wRej;
+        applyWeightInputs();
+      });
+      syncWeightReadouts();
+    }
+
+    const HELP_TEXT = {
+      diff:     '<b>Triangle</b>: girls liked it more. <b>Circle</b>: boys liked it more. Bigger = bigger gap. Fill is the real color.',
+      diff_inv: '<b>Triangle</b>: girls rejected it more than boys. <b>Circle</b>: boys rejected it more than girls. Bigger = bigger gap.',
+      both:     '<b>Both</b>: dot size is the lower of the boys and girls preferences. Bigger = liked by both groups.',
+      both_inv: '<b>Both</b>: dot size is the lower of how strongly each group rejected the color. Bigger = rejected by both groups.',
+      boys_inv:  '<b>Inverted</b>: bigger dots are colors boys were shown but rarely picked.',
+      girls_inv: '<b>Inverted</b>: bigger dots are colors girls were shown but rarely picked.',
+      free_inv:  '<b>Inverted</b>: bigger dots are colors this mix rejected (shown often, picked rarely).'
+    };
+    function updateHelp() {
+      if (!presetHelp) return;
+      const key = inverted ? mode + '_inv' : mode;
+      if (HELP_TEXT[key]) {
+        presetHelp.innerHTML = HELP_TEXT[key];
+        presetHelp.classList.add('is-visible');
+      } else {
+        presetHelp.classList.remove('is-visible');
+      }
+    }
+    function setMode(m) {
+      mode = m;
+      presetBtns.forEach(btn => btn.classList.toggle('is-active', btn.dataset.preset === m));
+      updateHelp();
+      cacheKey = '';
+    }
+
+    function renderFavs() {
+      const favRow = document.getElementById('svFavRow');
+      favRow.innerHTML = '';
+      DATA.favourites.slice(0, 8).forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'sv-swatch';
+        el.style.background = f.hex;
+        el.dataset.hex = f.hex + ' · ' + (f.ratio * 100).toFixed(1) + '%';
+        el.title = `${f.hex} · picked ${(f.ratio * 100).toFixed(1)}% of the time it was shown`;
+        favRow.appendChild(el);
+      });
+
+      const leastRow = document.getElementById('svLeastRow');
+      leastRow.innerHTML = '';
+      DATA.least_favourites.slice(0, 8).forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'sv-swatch';
+        el.style.background = f.hex;
+        el.dataset.hex = f.hex + ' · ' + (f.ratio * 100).toFixed(1) + '%';
+        el.title = `${f.hex} · picked only ${(f.ratio * 100).toFixed(1)}% of the time it was shown`;
+        leastRow.appendChild(el);
+      });
+    }
+
+    function renderFigures() {
+      const ul = document.getElementById('svFigures');
+      const s = DATA.stats;
+      const totalGender = (s.gender.g || 0) + (s.gender.j || 0);
+      const pctGirls = totalGender ? Math.round(100 * (s.gender.j || 0) / totalGender) : 0;
+      const ageEntries = Object.entries(s.age_hist)
+        .map(([a, n]) => [Number(a), n])
+        .sort((p, q) => p[0] - q[0]);
+      const lo = ageEntries.length ? ageEntries[0][0] : 0;
+      const hi = ageEntries.length ? ageEntries[ageEntries.length - 1][0] : 0;
+      const total = ageEntries.reduce((acc, [, n]) => acc + n, 0);
+      let medianAge = '–';
+      let cumulative = 0;
+      for (const [a, n] of ageEntries) {
+        cumulative += n;
+        if (cumulative >= total / 2) { medianAge = a; break; }
+      }
+      const rows = [
+        ['Valid sessions',   s.total_valid.toLocaleString()],
+        ['Raw responses',    "20,000+"],
+        ['Girls / Boys',     `${pctGirls}% / ${100 - pctGirls}%`],
+        ['Age span',         `${lo}–${hi} (median ${medianAge})`],
+        ['Mean mood (0=happy, 60=glum)', s.mood_mean],
+      ];
+      ul.innerHTML = rows.map(r => `<li><span>${r[0]}</span><b>${r[1]}</b></li>`).join('');
+    }
+
+    // Build a two-series line plot inside an SVG element.
+    //   xs       : array of x values
+    //   seriesG  : array of y values for boys (same length as xs; null = gap)
+    //   seriesJ  : same, for girls
+    //   opts     : { xMin, xMax, yMin, yMax, xTicks, yTicks, yLabelFn, smooth, viewBox: [W,H] }
+    function linePlot(svgId, xs, seriesG, seriesJ, opts) {
+      const svg = document.getElementById(svgId);
+      if (!svg) return;
+      const [W, H] = opts.viewBox || [640, 170];
+      const PAD_L = opts.padL != null ? opts.padL : 36;
+      const PAD_R = opts.padR != null ? opts.padR : 12;
+      const PAD_T = opts.padT != null ? opts.padT : 10;
+      const PAD_B = opts.padB != null ? opts.padB : 22;
+      const innerW = W - PAD_L - PAD_R;
+      const innerH = H - PAD_T - PAD_B;
+
+      const xMin = opts.xMin, xMax = opts.xMax;
+      // Auto-pick yMin/yMax from data if not provided.
+      let yMin = opts.yMin, yMax = opts.yMax;
+      if (yMin == null || yMax == null) {
+        let lo = Infinity, hi = -Infinity;
+        for (const y of seriesG.concat(seriesJ)) {
+          if (y == null) continue;
+          if (y < lo) lo = y;
+          if (y > hi) hi = y;
+        }
+        if (!isFinite(lo)) { lo = 0; hi = 1; }
+        if (lo === hi) hi = lo + 1;
+        const pad = (hi - lo) * 0.08;
+        if (yMin == null) yMin = lo - pad;
+        if (yMax == null) yMax = hi + pad;
+      }
+
+      const xPx = x => PAD_L + ((x - xMin) / (xMax - xMin)) * innerW;
+      const yPx = y => PAD_T + (1 - (y - yMin) / (yMax - yMin)) * innerH;
+
+      const parts = [];
+      // Y gridlines + tick labels.
+      const yTicks = opts.yTicks || [];
+      for (const yt of yTicks) {
+        const y = yPx(yt).toFixed(1);
+        parts.push(`<line class="sv-grid" x1="${PAD_L}" x2="${PAD_L + innerW}" y1="${y}" y2="${y}" />`);
+        const label = opts.yLabelFn ? opts.yLabelFn(yt) : String(yt);
+        parts.push(`<text class="sv-ticklabel-end" x="${PAD_L - 5}" y="${(parseFloat(y) + 3).toFixed(1)}">${label}</text>`);
+      }
+      // Bottom axis line.
+      parts.push(`<line class="sv-axis" x1="${PAD_L}" x2="${PAD_L + innerW}" y1="${PAD_T + innerH}" y2="${PAD_T + innerH}" />`);
+      // X tick labels.
+      const xTicks = opts.xTicks || [];
+      for (const xt of xTicks) {
+        const x = xPx(xt.value != null ? xt.value : xt).toFixed(1);
+        const label = xt.label != null ? xt.label : (opts.xLabelFn ? opts.xLabelFn(xt) : String(xt));
+        parts.push(`<text x="${x}" y="${H - 6}" text-anchor="middle">${label}</text>`);
+      }
+
+      function pathFor(values) {
+        let d = '';
+        let prev = null;
+        for (let i = 0; i < xs.length; i++) {
+          const y = values[i];
+          if (y == null || !isFinite(y)) { prev = null; continue; }
+          const px = xPx(xs[i]).toFixed(2);
+          const py = yPx(y).toFixed(2);
+          d += (prev === null ? 'M' : 'L') + px + ',' + py;
+          prev = y;
+        }
+        return d;
+      }
+
+      const dG = pathFor(seriesG);
+      const dJ = pathFor(seriesJ);
+      if (dG) parts.push(`<path class="sv-line sv-line-boys"  d="${dG}" />`);
+      if (dJ) parts.push(`<path class="sv-line sv-line-girls" d="${dJ}" />`);
+
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.innerHTML = parts.join('');
+    }
+
+    function valuesFromSeries(series) {
+      return series.map(p => p && p.v != null ? p.v : null);
+    }
+    function xsFromSeries(series, key) {
+      return series.map(p => p[key]);
+    }
+
+    // Gaussian smoothing across a series whose x positions can be irregular
+    // (e.g. mixed hourly + 15-min buckets, or with gaps across the night).
+    // Each output value is the n-weighted mean of every point, weighted by
+    // a Gaussian on x-distance with the given sigma. Points more than ~3σ
+    // away contribute essentially nothing, so a wide gap is its own break.
+    function gaussianSmoothByX(series, sigmaX, xKey) {
+      xKey = xKey || 'h';
+      const n = series.length;
+      const out = new Array(n);
+      const denom = 2 * sigmaX * sigmaX;
+      for (let i = 0; i < n; i++) {
+        if (series[i] == null || series[i].v == null) { out[i] = null; continue; }
+        const xi = series[i][xKey];
+        let num = 0, den = 0;
+        for (let j = 0; j < n; j++) {
+          const p = series[j];
+          if (!p || p.v == null) continue;
+          const dx = p[xKey] - xi;
+          const w = (p.n || 0) * Math.exp(-(dx * dx) / denom);
+          num += p.v * w;
+          den += w;
+        }
+        out[i] = den > 0 ? num / den : series[i].v;
+      }
+      return out;
+    }
+
+    // Weighted moving average over a series of {v, n} points. Each output
+    // value is the n-weighted mean of itself plus `radius` neighbours on
+    // each side. Points where v is null contribute zero. Returns an array
+    // of values aligned to the input series (nulls preserved at gaps).
+    function weightedMovingAverage(series, radius) {
+      const n = series.length;
+      const out = new Array(n);
+      for (let i = 0; i < n; i++) {
+        if (series[i] == null || series[i].v == null) { out[i] = null; continue; }
+        let num = 0, den = 0;
+        for (let j = Math.max(0, i - radius); j <= Math.min(n - 1, i + radius); j++) {
+          const p = series[j];
+          if (!p || p.v == null) continue;
+          const w = (p.n || 0);
+          num += p.v * w;
+          den += w;
+        }
+        out[i] = den > 0 ? num / den : series[i].v;
+      }
+      return out;
+    }
+
+    function renderHappinessByAge() {
+      const v = DATA.viz && DATA.viz.happiness_by_age;
+      if (!v) return;
+      const xs = xsFromSeries(v.g, 'a');
+      // The adult tail is sparse (often <30 sessions per single age). A
+      // weighted moving average smooths it without flattening the teen
+      // signal, where every age already has hundreds of sessions.
+      linePlot('svHappinessByAge', xs,
+        weightedMovingAverage(v.g, 2),
+        weightedMovingAverage(v.j, 2), {
+        xMin: 6, xMax: 68, yMin: 0.45, yMax: 1.0,
+        yTicks: [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        yLabelFn: y => y.toFixed(1),
+        xTicks: [10, 20, 30, 40, 50, 60].map(a => ({ value: a, label: a })),
+      });
+    }
+
+    function renderHappinessByHour() {
+      const v = DATA.viz && DATA.viz.happiness_by_hour;
+      if (!v) return;
+      // Smooth each 15-min bucket against its neighbours on the time axis.
+      // sigma = 0.5 h means a bucket averages mostly with the ones within
+      // half an hour, with rapidly fading influence beyond that. The night
+      // gap is 5 h wide, so it stays a clean break (weight ~0 across it).
+      const sigma = 0.5;
+      const gSmoothed = gaussianSmoothByX(v.g, sigma, 'h');
+      const jSmoothed = gaussianSmoothByX(v.j, sigma, 'h');
+      // After smoothing, insert null breakpoints between points more than
+      // an hour apart so the rendered line draws a visible gap.
+      const xs = [];
+      const gVals = [];
+      const jVals = [];
+      const GAP_THRESHOLD = 1.0;
+      for (let i = 0; i < v.g.length; i++) {
+        if (i > 0 && (v.g[i].h - v.g[i - 1].h) > GAP_THRESHOLD) {
+          xs.push((v.g[i - 1].h + v.g[i].h) / 2);
+          gVals.push(null);
+          jVals.push(null);
+        }
+        xs.push(v.g[i].h);
+        gVals.push(gSmoothed[i]);
+        jVals.push(jSmoothed[i]);
+      }
+      linePlot('svHappinessByHour', xs, gVals, jVals, {
+        xMin: 0, xMax: 24, yMin: 0.45, yMax: 1.0,
+        yTicks: [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        yLabelFn: y => y.toFixed(1),
+        xTicks: [0, 6, 9, 12, 15, 18, 21, 24].map(h => ({ value: h, label: String(h).padStart(2, '0') })),
+      });
+    }
+
+    function renderDurationByAge() {
+      const v = DATA.viz && DATA.viz.duration_by_age;
+      if (!v) return;
+      const xs = xsFromSeries(v.g, 'a');
+      linePlot('svDurationByAge', xs,
+        weightedMovingAverage(v.g, 2),
+        weightedMovingAverage(v.j, 2), {
+        xMin: 6, xMax: 68, yMin: 30, yMax: 180,
+        yTicks: [30, 60, 90, 120, 150, 180],
+        yLabelFn: y => y + 's',
+        xTicks: [10, 20, 30, 40, 50, 60].map(a => ({ value: a, label: a })),
+      });
+    }
+
+    function renderPerQByAge() {
+      const v = DATA.viz && DATA.viz.perq_by_age;
+      if (!v) return;
+      const xs = xsFromSeries(v.g, 'a');
+      linePlot('svPerQByAge', xs,
+        weightedMovingAverage(v.g, 2),
+        weightedMovingAverage(v.j, 2), {
+        xMin: 6, xMax: 68, yMin: 1.5, yMax: 9,
+        yTicks: [2, 3, 4, 5, 6, 7, 8, 9],
+        yLabelFn: y => y + 's',
+        xTicks: [10, 20, 30, 40, 50, 60].map(a => ({ value: a, label: a })),
+      });
+    }
+
+    function renderGenderByAge() {
+      const v = DATA.viz && DATA.viz.count_by_age;
+      if (!v) return;
+      const xs = xsFromSeries(v.g, 'a');
+      linePlot('svGenderByAge', xs, valuesFromSeries(v.g), valuesFromSeries(v.j), {
+        xMin: 6, xMax: 68, yMin: 0,
+        yTicks: [100, 200, 300, 400, 500, 600, 700, 800],
+        yLabelFn: y => y,
+        xTicks: [10, 20, 30, 40, 50, 60].map(a => ({ value: a, label: a })),
+      });
+    }
+
+    function renderResponsesByHour() {
+      const v = DATA.viz && DATA.viz.responses_by_hour;
+      if (!v) return;
+      const xs = v.g.map(p => p.h);
+      const gVals = v.g.map(p => p.n);
+      const jVals = v.j.map(p => p.n);
+      linePlot('svResponsesByHour', xs, gVals, jVals, {
+        xMin: 0, xMax: 23, yMin: 0,
+        yTicks: [100, 200, 300, 400, 500],
+        yLabelFn: y => y,
+        xTicks: [0, 4, 8, 12, 16, 20, 23].map(h => ({ value: h, label: String(h).padStart(2, '0') })),
+      });
+    }
+
+    function renderResponsesByDay() {
+      const v = DATA.viz && DATA.viz.responses_by_day;
+      if (!v || !v.g) return;
+      const xs = v.g.map((_, i) => i);
+      linePlot('svResponsesByDay', xs, v.g, v.j, {
+        xMin: 0, xMax: xs.length - 1, yMin: 0,
+        yTicks: [200, 500, 800, 1100],
+        yLabelFn: y => y,
+        xTicks: [0, 5, 10, 15, 20, 25, 29].map(d => ({ value: d, label: 'd' + d })),
+      });
+    }
+
+    function renderTimePerSlide() {
+      const v = DATA.viz && DATA.viz.time_per_slide;
+      if (!v) return;
+      const xs = v.g.map(p => p.q);
+      const gVals = v.g.map(p => p.v);
+      const jVals = v.j.map(p => p.v);
+      linePlot('svTimePerSlide', xs, gVals, jVals, {
+        xMin: 1, xMax: 21, yMin: 0,
+        yTicks: [2, 4, 6, 8, 10],
+        yLabelFn: y => y + 's',
+        xTicks: [1, 5, 10, 15, 17, 21].map(q => ({ value: q, label: 'Q' + q })),
+      });
+    }
+
+    function renderDurationHist() {
+      const h = DATA.viz && DATA.viz.duration_hist;
+      if (!h) return;
+      const edges = h.edges;
+      // edges describes 21 cells: bins 0..19 are fixed 15-second windows, bin
+      // 20 is a 300+ overflow tail. Plot only the fixed-width bins.
+      const n = edges.length - 1;
+      const xs = [];
+      for (let i = 0; i < n; i++) xs.push((edges[i] + edges[i + 1]) / 2);
+      linePlot('svDurationHist', xs, h.g.slice(0, n), h.j.slice(0, n), {
+        xMin: 0, xMax: 300, yMin: 0,
+        yTicks: [200, 400, 600, 800],
+        yLabelFn: y => y,
+        xTicks: [0, 60, 120, 180, 240, 300].map(s => ({ value: s, label: s === 0 ? '0s' : (s / 60) + 'm' })),
+      });
+    }
+
+    function renderAgeChart() {
+      const svg = document.getElementById('svAgeChart');
+      if (!svg) return;
+      const hist = DATA.stats.age_hist;
+      const ages = [];
+      for (let a = 6; a <= 68; a++) ages.push(a);
+      const counts = ages.map(a => hist[a] || hist[String(a)] || 0);
+      let maxC = 0;
+      for (const c of counts) if (c > maxC) maxC = c;
+      if (maxC === 0) maxC = 1;
+
+      const total = counts.reduce((s, n) => s + n, 0);
+      let cum = 0, medianAge = ages[0];
+      for (let i = 0; i < ages.length; i++) {
+        cum += counts[i];
+        if (cum >= total / 2) { medianAge = ages[i]; break; }
+      }
+
+      const W = 640, H = 80;
+      const PAD_L = 4, PAD_R = 4, PAD_T = 4, PAD_B = 14;
+      const innerW = W - PAD_L - PAD_R;
+      const innerH = H - PAD_T - PAD_B;
+      const slotW = innerW / ages.length;
+      const barW = slotW * 0.82;
+
+      const parts = [];
+      ages.forEach((a, i) => {
+        const h = (counts[i] / maxC) * innerH;
+        const x = PAD_L + i * slotW + (slotW - barW) / 2;
+        const y = PAD_T + innerH - h;
+        parts.push(`<rect class="sv-bar" x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(h, 0.5).toFixed(2)}"><title>age ${a}: ${counts[i]}</title></rect>`);
+      });
+
+      parts.push(`<line class="sv-axis-line" x1="${PAD_L}" y1="${PAD_T + innerH}" x2="${W - PAD_R}" y2="${PAD_T + innerH}"/>`);
+
+      const labelAt = (age, anchor) => {
+        const i = ages.indexOf(age);
+        if (i < 0) return;
+        const x = PAD_L + i * slotW + slotW / 2;
+        parts.push(`<text x="${x.toFixed(2)}" y="${H - 3}" text-anchor="${anchor}">${age}</text>`);
+      };
+      labelAt(6, 'start');
+      [20, 40].forEach(t => labelAt(t, 'middle'));
+      labelAt(68, 'end');
+
+      svg.innerHTML = parts.join('');
+    }
+
+    function ensureAgeData() {
+      if (AGE_DATA) return Promise.resolve(AGE_DATA);
+      if (!agePromise) {
+        agePromise = fetch(DATA_DIR + 'by_age.json')
+          .then(r => r.json())
+          .then(d => { AGE_DATA = d.buckets; cacheKey = ''; return AGE_DATA; })
+          .catch(err => { agePromise = null; console.warn('by_age.json failed', err); });
+      }
+      return agePromise;
+    }
+
+    function ensureMoodData() {
+      if (MOOD_DATA) return Promise.resolve(MOOD_DATA);
+      if (!moodPromise) {
+        moodPromise = fetch(DATA_DIR + 'by_mood.json')
+          .then(r => r.json())
+          .then(d => { MOOD_DATA = d.buckets; cacheKey = ''; return MOOD_DATA; })
+          .catch(err => { moodPromise = null; console.warn('by_mood.json failed', err); });
+      }
+      return moodPromise;
+    }
+
+    function ensureTimeData() {
+      if (TIME_DATA) return Promise.resolve(TIME_DATA);
+      if (!timePromise) {
+        timePromise = fetch(DATA_DIR + 'by_time.json')
+          .then(r => r.json())
+          .then(d => { TIME_DATA = d.buckets; cacheKey = ''; return TIME_DATA; })
+          .catch(err => { timePromise = null; console.warn('by_time.json failed', err); });
+      }
+      return timePromise;
+    }
+
+    fetch(DATA_DIR + 'summary.json')
+      .then(r => r.json())
+      .then(d => {
+        DATA = d;
+        GRID = d.grid;
+        BUCKETS = d.buckets;
+        renderFavs();
+        renderFigures();
+        renderResponsesByDay();
+        renderAgeChart();
+        renderGenderByAge();
+        renderHappinessByAge();
+        renderResponsesByHour();
+        renderHappinessByHour();
+        renderDurationByAge();
+        renderPerQByAge();
+        renderTimePerSlide();
+        renderDurationHist();
+        attachInteractions();
+        attachControls();
+        requestAnimationFrame(drawFrame);
+        // Prefetch detail files in the background so the first toggle is snappy.
+        ensureAgeData();
+        ensureMoodData();
+        ensureTimeData();
+      })
+      .catch(err => {
+        const wrap = document.getElementById('surveyViz');
+        if (wrap) wrap.innerHTML = '<p style="color:var(--text-mute);font-family:var(--mono);font-size:12px;">Could not load preferences data: ' + err.message + '</p>';
+      });
+  })();
+  </script>
+</body>
+</html>

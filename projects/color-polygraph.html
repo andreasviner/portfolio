@@ -702,6 +702,39 @@
       }
       .sv-preset-invert { margin-left: 0; }
     }
+    html { scroll-behavior: smooth; }
+    .project-cta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 28px 0 56px;
+      flex-wrap: wrap;
+    }
+    .project-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--hobby);
+      border: 1px solid rgba(245, 185, 92, 0.36);
+      background: rgba(245, 185, 92, 0.07);
+      border-radius: 3px;
+      padding: 10px 16px;
+      text-decoration: none;
+      transition: background .15s, border-color .15s;
+    }
+    .project-cta:hover {
+      background: rgba(245, 185, 92, 0.14);
+      border-color: rgba(245, 185, 92, 0.55);
+    }
+    .project-cta-arrow {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -776,7 +809,22 @@
       color swatches they picked.
     </p>
 
-    <section class="project-section">
+    <div class="project-cta-row">
+      <a href="#explore-data" class="project-cta">
+        Explore the data
+        <svg class="project-cta-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4"/></svg>
+      </a>
+      <a href="https://ai.andreaslindeman.com/color-polygraph/" class="project-cta">
+        Model leaderboard
+        <svg class="project-cta-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+      <a href="https://ai.andreaslindeman.com/color-polygraph/survey.html" class="project-cta">
+        Test it yourself
+        <svg class="project-cta-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </div>
+
+    <section class="project-section" id="explore-data">
       <h2>Explore the data</h2>
       <p>
         Before the write-up, the toy. Drag the cube to rotate it, double-click to resume the
@@ -982,6 +1030,12 @@
         response took, where on the swatch the click landed, whether the cursor wavered, and
         the order participants tended to scan the options.
       </p>
+      <div class="project-cta-row" style="margin-top:24px;margin-bottom:0">
+        <a href="https://ai.andreaslindeman.com/color-polygraph/survey.html" class="project-cta">
+          Test it yourself
+          <svg class="project-cta-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
     </section>
 
     <section class="project-section">

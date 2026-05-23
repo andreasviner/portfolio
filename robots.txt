@@ -1,4 +1,5 @@
 User-agent: *
+Allow: /projects_data/*.pdf$
 Disallow: /projects_data/
 Disallow: /tools/
 

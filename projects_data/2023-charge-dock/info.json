@@ -1,0 +1,19 @@
+{
+  "id": "charge-dock-2023",
+  "title": "Under-couch charging dock",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2023-06",
+  "shortDescription": "Four USB-C ports built into the living-room couch of a shared student flat. A 24V DC supply sized for full output on all four, in a Fusion 360-designed, 3D-printed housing with one on/off switch.",
+  "tags": [
+    "3D printing",
+    "Fusion 360",
+    "USB-C power",
+    "quality-of-life"
+  ],
+  "types": [
+    "hardware"
+  ],
+  "importance": 30,
+  "projectPage": "projects/charge-dock"
+}

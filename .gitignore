@@ -4,3 +4,5 @@
 *.preview.png
 
 !robots.txt
+
+.*/

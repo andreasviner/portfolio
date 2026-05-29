@@ -1,0 +1,16 @@
+{
+  "id": "cybersecurity-lecture-2021",
+  "title": "Cybersecurity lecture",
+  "category": "school",
+  "isProject": true,
+  "start": "2021-11",
+  "shortDescription": "A community-week give-back: a lecture at a nearby high school on staying safe online, covering what data you leak, how it's collected, and how not to get caught out.",
+  "tags": [
+    "cybersecurity",
+    "online safety",
+    "teaching",
+    "outreach"
+  ],
+  "importance": 30,
+  "projectPage": "projects/cybersecurity-lecture"
+}

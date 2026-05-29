@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A charging dock built into the couch · Andreas Lindeman</title>
+  <meta name="description" content="Four USB charging ports built into the living-room couch of a shared student flat, in a Fusion 360-designed, 3D-printed housing with a single on/off switch, so charging cables stop crossing the room." />
+  <link rel="alternate" hreflang="en" href="https://andreaslindeman.com/projects/charge-dock" />
+  <link rel="alternate" hreflang="no" href="https://andreaslindeman.no/projects/charge-dock" />
+  <link rel="alternate" hreflang="x-default" href="https://andreaslindeman.com/projects/charge-dock" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+  <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links-list" aria-label="Open menu">
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+    <ul id="nav-links-list" class="nav-links">
+      <li><a href="../#about">About</a></li>
+      <li><a href="../#timeline">Timeline</a></li>
+      <li><a href="../#stack">Stack</a></li>
+      <li><a href="../#contact">Contact</a></li>
+    </ul>
+    <a class="lang-switch" data-lang-base="https://andreaslindeman.no" href="https://andreaslindeman.no/" hreflang="no" aria-label="Switch to Norwegian">
+      <svg class="lang-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+      <span class="lang-pair"><span class="lang-current">EN</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-target">NO</span></span>
+    </a>
+  </nav>
+  <script>
+    (function(){
+      var s=document.querySelector('.lang-switch');
+      if(s&&s.dataset.langBase)s.href=s.dataset.langBase+location.pathname+location.search+location.hash;
+      var nav=document.querySelector('.site-nav'), btn=document.querySelector('.nav-toggle');
+      if(btn&&nav){
+        function closeMenu(){
+          nav.classList.remove('is-open');
+          btn.setAttribute('aria-expanded','false');
+          btn.setAttribute('aria-label','Open menu');
+        }
+        btn.addEventListener('click',function(e){
+          e.stopPropagation();
+          var open=nav.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded',open?'true':'false');
+          btn.setAttribute('aria-label',open?'Close menu':'Open menu');
+        });
+        nav.querySelectorAll('.nav-links a').forEach(function(a){
+          a.addEventListener('click',closeMenu);
+        });
+        document.addEventListener('click',function(e){
+          if(nav.classList.contains('is-open')&&!nav.contains(e.target))closeMenu();
+        });
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'&&nav.classList.contains('is-open'))closeMenu();
+        });
+      }
+    })();
+  </script>
+
+  <main class="project-page">
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>Jun 2023</span>
+    </div>
+
+    <h1 class="project-title">A charging dock built into the <em>couch</em></h1>
+
+    <p class="project-lede">
+      When I started my degree I moved into a flat with six other guys. The
+      living room had one problem everyone felt daily: charging a laptop or a
+      gaming device meant trailing a cable all the way across the room to the
+      nearest socket. The fix was to stop fighting the cables and build the
+      charging into the furniture: four USB-C ports wired straight into the
+      couch in a 3D-printed housing, fed from a 24 V DC supply sized so all four
+      can run at full output at once, with one switch to cut the lot.
+    </p>
+
+    <section class="project-section">
+      <h2>The build</h2>
+      <p>
+        The housing was modelled in Fusion 360 and 3D-printed, sized to hold the
+        four ports and the switch, and to sit cleanly against the couch frame. You
+        can spin the model around below:
+      </p>
+      <model-viewer
+        id="dock-model"
+        src="../projects_data/2023-charge-dock/3d2.glb"
+        alt="3D model of the printed housing that holds the four USB ports and the switch, built into the couch."
+        camera-controls
+        touch-action="pan-y"
+        camera-orbit="0deg 90deg auto"
+        interaction-prompt="none"
+        auto-rotate
+        auto-rotate-delay="0"
+        rotation-per-second="12deg"
+        exposure="0.85"
+        shadow-intensity="2"
+        shadow-softness="0.75"
+        style="width:100%;height:420px;background:var(--surface,#16161a);border-radius:12px;">
+      </model-viewer>
+      <script>
+        (function(){
+          var mv = document.getElementById('dock-model');
+          if (!mv) return;
+          mv.addEventListener('load', function(){
+            try {
+              var pbr = mv.model.materials[0].pbrMetallicRoughness;
+              pbr.setMetallicFactor(0.1);
+              pbr.setRoughnessFactor(0.55);
+              pbr.setBaseColorFactor([0.30, 0.32, 0.36, 1]); // darker slate so the printed detail reads
+            } catch (e) {}
+          });
+        })();
+      </script>
+      <p>
+        Behind the ports sits a 24&nbsp;V DC supply feeding all four USB-C
+        outputs. It's sized with enough power budget that every port can deliver
+        its full output at the same time, with no throttling or sharing a single rail
+        when the couch is full of devices charging at once.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The problem</h2>
+      <p>
+        A shared flat means shared furniture and never enough sockets where you
+        actually sit. Seven people charging phones, controllers and laptops from a
+        couple of wall outlets turned the living room into a trip-hazard of cables
+        running across the floor and over the seats. Rather than add yet another
+        extension lead, I put the ports where the devices already were: in the
+        couch itself.
+      </p>
+
+      <div class="figure-row">
+        <figure class="project-figure">
+          <img src="../projects_data/2023-charge-dock/off.jpg" alt="The charging dock built into the edge of a grey couch, switch off, a charging cable plugged into one port.">
+          <figcaption>Off. The dock sits flush under the edge of the couch, ports facing out.</figcaption>
+        </figure>
+        <figure class="project-figure">
+          <img src="../projects_data/2023-charge-dock/on.jpg" alt="The same dock with its power button lit blue and a port indicator glowing, a cable plugged in.">
+          <figcaption>On. The switch backlights blue and the ports come live.</figcaption>
+        </figure>
+      </div>
+      <p>
+        One switch cuts power to all four ports, handy for leaving the flat or
+        just not trickling power into a controller all night.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>In use</h2>
+      <p>
+        Day to day it just means you grab a cable and plug in without thinking
+        about where the nearest socket is. The photo below is the usual case: a
+        Switch Pro controller topping up on the cushion, powered from the dock
+        built into the couch beneath it.
+      </p>
+      <figure class="project-figure wide">
+        <img src="../projects_data/2023-charge-dock/charging.jpg" alt="A Nintendo Switch Pro controller resting on a couch cushion, charging via a white cable that runs down to the dock built into the couch below.">
+        <figcaption>The everyday case: charge from the seat, no cable across the room.</figcaption>
+      </figure>
+    </section>
+
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

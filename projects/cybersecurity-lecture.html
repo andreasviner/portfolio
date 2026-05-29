@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cybersecurity lecture · Andreas Lindeman</title>
+  <meta name="description" content="A community-week lecture I gave at a nearby high school on staying safe online: what data you leak, how it gets collected, and how not to get caught out." />
+  <link rel="alternate" hreflang="en" href="https://andreaslindeman.com/projects/cybersecurity-lecture" />
+  <link rel="alternate" hreflang="no" href="https://andreaslindeman.no/projects/cybersecurity-lecture" />
+  <link rel="alternate" hreflang="x-default" href="https://andreaslindeman.com/projects/cybersecurity-lecture" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links-list" aria-label="Open menu">
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+    <ul id="nav-links-list" class="nav-links">
+      <li><a href="../#about">About</a></li>
+      <li><a href="../#timeline">Timeline</a></li>
+      <li><a href="../#stack">Stack</a></li>
+      <li><a href="../#contact">Contact</a></li>
+    </ul>
+    <a class="lang-switch" data-lang-base="https://andreaslindeman.no" href="https://andreaslindeman.no/" hreflang="no" aria-label="Switch to Norwegian">
+      <svg class="lang-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+      <span class="lang-pair"><span class="lang-current">EN</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-target">NO</span></span>
+    </a>
+  </nav>
+  <script>
+    (function(){
+      var s=document.querySelector('.lang-switch');
+      if(s&&s.dataset.langBase)s.href=s.dataset.langBase+location.pathname+location.search+location.hash;
+      var nav=document.querySelector('.site-nav'), btn=document.querySelector('.nav-toggle');
+      if(btn&&nav){
+        function closeMenu(){
+          nav.classList.remove('is-open');
+          btn.setAttribute('aria-expanded','false');
+          btn.setAttribute('aria-label','Open menu');
+        }
+        btn.addEventListener('click',function(e){
+          e.stopPropagation();
+          var open=nav.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded',open?'true':'false');
+          btn.setAttribute('aria-label',open?'Close menu':'Open menu');
+        });
+        nav.querySelectorAll('.nav-links a').forEach(function(a){
+          a.addEventListener('click',closeMenu);
+        });
+        document.addEventListener('click',function(e){
+          if(nav.classList.contains('is-open')&&!nav.contains(e.target))closeMenu();
+        });
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'&&nav.classList.contains('is-open'))closeMenu();
+        });
+      }
+    })();
+  </script>
+
+  <main class="project-page">
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch school"></span> school</span>
+      <span class="sep"></span>
+      <span>Nov 2021</span>
+    </div>
+
+    <h1 class="project-title">A cybersecurity <em>lecture</em></h1>
+
+    <p class="project-lede">
+      My high school ran a week where everyone was meant to do something to give
+      back to the local community. Most people picked something hands-on. Given my
+      background poking at security, the most useful thing I could offer was
+      knowledge, so I put together a talk on staying safe online and gave it to
+      students at a nearby high school.
+    </p>
+
+    <section class="project-section">
+      <h2>Why this, of all things</h2>
+      <p>
+        A few years earlier I'd spent a lot of time teaching myself how networks
+        and online systems actually work: the kind of self-taught security
+        research I now frame carefully, because some of it was a teenager learning
+        by prodding things he shouldn't have. The flip side of that curiosity is
+        that I understood, concretely, how ordinary people leak data and get taken
+        advantage of. A community-outreach week was a good excuse to turn that into
+        something genuinely useful: helping younger students not get caught out.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>What the talk covered</h2>
+      <p>
+        I built the deck (in Norwegian, "Datasikkerhet") around a simple arc:
+        start from "what even is data," show how much of it you hand over without
+        noticing, then make it practical.
+      </p>
+      <ul>
+        <li><strong>What data is</strong>, and how much it spans: location, financial, cultural, scientific, behavioural.</li>
+        <li><strong>Data you send</strong>: what leaves your device every time you browse, and what a server on the other end sees.</li>
+        <li><strong>Cookies</strong>: what they actually store, and why "accept all" is rarely in your interest.</li>
+        <li><strong>What data gets used for</strong>: advertising, profiling, and the difference between annoying and harmful.</li>
+        <li><strong>Other ways people get your data</strong>: social engineering, sketchy networks, and the human side of attacks.</li>
+        <li><strong>Local networks</strong>: why the coffee-shop Wi-Fi deserves more suspicion than people give it.</li>
+        <li><strong>Important data</strong>: what's actually worth protecting, and how.</li>
+        <li><strong>How not to be an easy target</strong>: a plain-language checklist for everyday habits.</li>
+      </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>What I took from it</h2>
+      <p>
+        The hard part wasn't the content. It was pitching it so a room of
+        teenagers cared. Concrete examples ("here's exactly what this site knows
+        about you right now") landed; abstract warnings didn't. It was the first
+        time I'd had to translate technical knowledge into something useful for
+        people without a technical background, which is most of what good
+        engineering communication turns out to be.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The slides</h2>
+      <p>
+        The full presentation, in Norwegian:
+      </p>
+      <div class="project-links">
+        <a href="../projects_data/2021-cybersecurity-lecture/Datasikkerhet.pdf" target="_blank" rel="noopener" download>Download: Datasikkerhet.pdf (lecture slides)</a>
+      </div>
+    </section>
+
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -13,6 +13,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="icon" type="image/png" href="../icon.png" />
+  <style>
+    .tb-game{max-width:460px;margin:0 auto;--p0:#e2574e;--p1:#4f8bdc;}
+    .tb-status{text-align:center;font-weight:600;font-size:1.05rem;margin:.2rem 0 .9rem;min-height:1.5em;}
+    .tb-status .who{padding:.05em .55em;border-radius:6px;color:#fff;}
+    .tb-status .who.p0{background:var(--p0);}
+    .tb-status .who.p1{background:var(--p1);}
+    .tb-board{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:7px;border-radius:14px;}
+    .tb-cell{position:relative;aspect-ratio:1;background:rgba(255,255,255,.03);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent;transition:border-color .12s,background .12s;}
+    .tb-cell.valid{border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.09);}
+    .tb-cell.sel{border-color:#fff;}
+    .tb-blob{border-radius:50%;box-shadow:inset 0 -5px 9px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.35);}
+    .tb-blob.s{width:36%;height:36%;}
+    .tb-blob.m{width:60%;height:60%;}
+    .tb-blob.l{width:86%;height:86%;}
+    .tb-blob.p0{background:radial-gradient(circle at 38% 30%, #f08077, var(--p0));}
+    .tb-blob.p1{background:radial-gradient(circle at 38% 30%, #7eb0ee, var(--p1));}
+    .tb-trays{display:flex;gap:12px;margin-top:14px;}
+    .tb-tray{flex:1;border-radius:12px;padding:10px 8px;background:rgba(255,255,255,.035);border:2px solid transparent;text-align:center;transition:border-color .12s;}
+    .tb-tray.active.p0{border-color:var(--p0);}
+    .tb-tray.active.p1{border-color:var(--p1);}
+    .tb-tray h4{margin:0 0 6px;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--text-dim,#9aa6a6);}
+    .tb-pieces{display:flex;align-items:center;justify-content:center;gap:14px;height:54px;}
+    .tb-slot{position:relative;display:flex;align-items:center;justify-content:center;width:48px;height:48px;cursor:pointer;}
+    .tb-slot[data-disabled="1"]{opacity:.28;cursor:default;}
+    .tb-slot.s .tb-blob{width:20px;height:20px;}
+    .tb-slot.m .tb-blob{width:32px;height:32px;}
+    .tb-slot.l .tb-blob{width:46px;height:46px;}
+    .tb-slot.sel::after{content:"";position:absolute;inset:-2px;border:2px solid #fff;border-radius:50%;}
+    .tb-count{position:absolute;bottom:0;right:0;font-size:.72rem;line-height:1;background:#0c0c0c;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:1px 4px;color:#fff;}
+    .tb-controls{display:flex;justify-content:center;margin-top:14px;}
+    .tb-reset{font:inherit;font-size:.9rem;background:rgba(255,255,255,.08);color:var(--text,#eee);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:.5rem 1rem;cursor:pointer;}
+    .tb-reset:hover{background:rgba(255,255,255,.14);}
+    .tb-hint{font-size:.82rem;opacity:.7;text-align:center;margin-top:12px;}
+  </style>
 </head>
 <body>
 
@@ -88,14 +122,36 @@
     <section class="project-section">
       <h2>The rule set</h2>
       <ul>
-        <li>Six blobs per player, in three or four sizes.</li>
-        <li>You can place on an empty cell, or on top of an opponent's blob if yours is
-            bigger.</li>
+        <li>Six blobs per player: two each in three sizes, small, medium and large.</li>
+        <li>You can place on an empty cell, or on top of any smaller blob, yours or the
+            opponent's.</li>
+        <li>You may also move one of your own blobs that is already on the board, which
+            can uncover whatever was sitting underneath it.</li>
         <li>Standard win condition: three in a row of your color, looking only at the
             top blob of each stack.</li>
         <li>What makes it interesting: the "memory" of what is underneath. The board
             looks one way but is secretly another way, and the player has to track both.</li>
       </ul>
+    </section>
+
+    <section class="project-section">
+      <h2>Play it (two players)</h2>
+      <p>
+        Two of you, one screen. Red moves, then Blue. Pick a blob from your tray, or one
+        of your own already on the board, and drop it on an empty square or on top of any
+        smaller blob. Three of your blobs in a row, counting only the top of each stack,
+        wins.
+      </p>
+      <div class="tb-game" id="tb-game">
+        <div class="tb-status"></div>
+        <div class="tb-board"></div>
+        <div class="tb-trays">
+          <div class="tb-tray p0"><h4>Red</h4><div class="tb-pieces"></div></div>
+          <div class="tb-tray p1"><h4>Blue</h4><div class="tb-pieces"></div></div>
+        </div>
+        <div class="tb-controls"><button class="tb-reset" type="button">New game</button></div>
+        <div class="tb-hint">Bigger blobs cover smaller ones, and what is underneath stays hidden, so keep track of it.</div>
+      </div>
     </section>
 
     <section class="project-section">
@@ -117,5 +173,112 @@
   </footer>
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+  (function(){
+    var root = document.getElementById('tb-game');
+    if (!root) return;
+    var boardEl  = root.querySelector('.tb-board');
+    var statusEl = root.querySelector('.tb-status');
+    var trayEls  = [root.querySelector('.tb-tray.p0 .tb-pieces'), root.querySelector('.tb-tray.p1 .tb-pieces')];
+    var trayBox  = [root.querySelector('.tb-tray.p0'), root.querySelector('.tb-tray.p1')];
+    var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    var NAMES = ['Red','Blue'];
+
+    var board, tray, cur, over, sel, winnerP;
+
+    function top(c){ var s = board[c]; return s.length ? s[s.length-1] : null; }
+    function sizeClass(s){ return s===1 ? 's' : s===2 ? 'm' : 'l'; }
+    function hasLine(p){
+      return LINES.some(function(L){ return L.every(function(i){ var t=top(i); return t && t.player===p; }); });
+    }
+    function movingSize(){ return sel.kind==='tray' ? sel.size : top(sel.cell).size; }
+    function validTarget(c){
+      if (!sel) return false;
+      if (sel.kind==='board' && sel.cell===c) return false;
+      var t = top(c);
+      return !t || movingSize() > t.size;
+    }
+
+    function doMove(c){
+      var size = movingSize();
+      if (sel.kind==='tray') tray[cur][size]--;
+      else board[sel.cell].pop();
+      board[c].push({ player: cur, size: size });
+      sel = null;
+      // a move can win for you, or uncover a line for the opponent
+      if (hasLine(cur))      { over = true; winnerP = cur; }
+      else if (hasLine(1-cur)){ over = true; winnerP = 1-cur; }
+      else cur = 1 - cur;
+      render();
+    }
+
+    function clickCell(c){
+      if (over) return;
+      if (sel){
+        if (sel.kind==='board' && sel.cell===c){ sel = null; render(); return; } // deselect
+        if (validTarget(c)) doMove(c);
+        return;
+      }
+      var t = top(c);
+      if (t && t.player===cur){ sel = { kind:'board', cell:c }; render(); } // pick up own blob
+    }
+
+    function clickTray(p, size){
+      if (over || p!==cur || tray[cur][size] <= 0) return;
+      if (sel && sel.kind==='tray' && sel.size===size){ sel = null; render(); return; }
+      sel = { kind:'tray', size: size };
+      render();
+    }
+
+    function render(){
+      statusEl.innerHTML = over
+        ? '<span class="who p'+winnerP+'">'+NAMES[winnerP]+'</span> wins!'
+        : '<span class="who p'+cur+'">'+NAMES[cur]+'</span> to move';
+
+      var html = '';
+      for (var i=0;i<9;i++){
+        var cls = 'tb-cell';
+        if (!over && sel && validTarget(i)) cls += ' valid';
+        if (sel && sel.kind==='board' && sel.cell===i) cls += ' sel';
+        var t = top(i);
+        var inner = t ? '<span class="tb-blob '+sizeClass(t.size)+' p'+t.player+'"></span>' : '';
+        html += '<div class="'+cls+'" data-cell="'+i+'">'+inner+'</div>';
+      }
+      boardEl.innerHTML = html;
+
+      for (var p=0;p<2;p++){
+        var th = '';
+        [3,2,1].forEach(function(size){
+          var cnt = tray[p][size];
+          var dis = (over || p!==cur || cnt<=0) ? '1' : '0';
+          var selcls = (sel && sel.kind==='tray' && sel.size===size && p===cur) ? ' sel' : '';
+          th += '<div class="tb-slot '+sizeClass(size)+selcls+'" data-player="'+p+'" data-size="'+size+'" data-disabled="'+dis+'">'
+              + '<span class="tb-blob p'+p+'"></span>'
+              + '<span class="tb-count">'+cnt+'</span></div>';
+        });
+        trayEls[p].innerHTML = th;
+        trayBox[p].classList.toggle('active', !over && cur===p);
+      }
+    }
+
+    function reset(){
+      board = []; for (var i=0;i<9;i++) board.push([]);
+      tray = [{1:2,2:2,3:2}, {1:2,2:2,3:2}];
+      cur = 0; over = false; sel = null; winnerP = null;
+      render();
+    }
+
+    root.addEventListener('click', function(e){
+      var cell = e.target.closest('[data-cell]');
+      if (cell){ clickCell(+cell.dataset.cell); return; }
+      var slot = e.target.closest('[data-size]');
+      if (slot){ clickTray(+slot.dataset.player, +slot.dataset.size); return; }
+      if (e.target.closest('.tb-reset')){ reset(); }
+    });
+
+    reset();
+  })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,19 @@
+{
+  "id": "data-magic-2023",
+  "title": "A song hidden in a frog",
+  "category": "hobby",
+  "isProject": true,
+  "start": "2023-05",
+  "shortDescription": "A homemade compression algorithm that squeezed the full ASCII version of a certain song into the low bits of a single frog photo. A tiny decompressor reads the hidden bits straight out of the image and plays the result back as a live terminal animation.",
+  "tags": [
+    "steganography",
+    "data compression",
+    "Python",
+    "CTF"
+  ],
+  "types": [
+    "software"
+  ],
+  "importance": 45,
+  "projectPage": "projects/data-magic"
+}

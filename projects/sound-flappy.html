@@ -13,6 +13,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="icon" type="image/png" href="../icon.png" />
+  <style>
+    .sf-game{max-width:420px;margin:0 auto;}
+    .sf-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 36px rgba(0,0,0,.42);touch-action:none;cursor:pointer;}
+    .sf-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:4/5;background:#6db8e8;}
+    .sf-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,22,34,.55);text-align:center;padding:1rem;}
+    .sf-overlay.hidden{display:none;}
+    .sf-card{max-width:300px;}
+    .sf-title{font-family:'Fraunces',serif;font-size:1.5rem;margin:0 0 .4rem;color:#fff;}
+    .sf-msg{color:#eaf2f8;font-size:.95rem;margin:0 0 1rem;line-height:1.4;}
+    .sf-btn{font:inherit;font-weight:600;font-size:1rem;background:#ffd23f;color:#1a1a1a;border:none;border-radius:10px;padding:.6rem 1.5rem;cursor:pointer;box-shadow:0 3px 0 #c9a521;}
+    .sf-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #c9a521;}
+    .sf-sub{color:#bcd3e4;font-size:.78rem;margin:.9rem 0 0;line-height:1.35;}
+  </style>
 </head>
 <body>
 
@@ -86,6 +99,28 @@
     </p>
 
     <section class="project-section">
+      <h2>Play it (use your voice)</h2>
+      <p>
+        Make a sound to fly. The louder you are, the higher the bird climbs; go quiet
+        and it falls. Hum, sing, shout, whatever keeps it off the pipes. The hills drift
+        past slower than the pipes, so the world reads with a bit of depth.
+      </p>
+      <div class="sf-game" id="sf-game">
+        <div class="sf-wrap" id="sf-wrap">
+          <canvas id="sf-canvas"></canvas>
+          <div class="sf-overlay" id="sf-overlay">
+            <div class="sf-card">
+              <p class="sf-title" id="sf-otitle">Sound Flappy</p>
+              <p class="sf-msg" id="sf-omsg">Make noise to fly. The louder you are, the higher the bird climbs.</p>
+              <button class="sf-btn" id="sf-start" type="button">Start</button>
+              <p class="sf-sub" id="sf-osub">Make a sound to fly. You can also press and hold the screen.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-section">
       <h2>How it worked</h2>
       <ul>
         <li>Microphone input sampled and reduced to a smoothed loudness signal.</li>
@@ -114,5 +149,268 @@
   </footer>
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+  (function(){
+    var canvas = document.getElementById('sf-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var wrap    = document.getElementById('sf-wrap');
+    var overlay = document.getElementById('sf-overlay');
+    var oTitle  = document.getElementById('sf-otitle');
+    var oMsg    = document.getElementById('sf-omsg');
+    var oSub    = document.getElementById('sf-osub');
+
+    var W = 0, H = 0;
+    function resize(){
+      var rect = wrap.getBoundingClientRect();
+      if (!rect.width) return;
+      W = rect.width; H = rect.height;
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resize);
+
+    // physics + layout, all as fractions of the canvas so it scales with size
+    function params(){
+      return {
+        r: 0.05 * H, birdX: 0.30 * W,
+        gravity: 2.0 * H, liftAcc: 4.6 * H,
+        maxDown: 1.15 * H, maxUp: 0.95 * H,
+        groundY: 0.85 * H,
+        gap: 0.36 * H, pipeW: 0.14 * W,
+        pipeSpeed: 0.60 * W, spawnGapX: 0.92 * W
+      };
+    }
+
+    var TWO_PI = Math.PI * 2;
+    var state = 'ready';            // ready | playing | dead
+    var bird = { y: 0, vy: 0 };
+    var pipes = [];
+    var score = 0;
+    var hillFar = 0, hillNear = 0;  // parallax scroll phases
+    var loud = 0, liftInput = 0, holding = false;
+    var tBob = 0;
+    // adaptive mic calibration: normalise loudness into this mic's own range,
+    // so a quiet mic still reaches full lift. Persists across rounds and adapts
+    // slowly, so it settles over many rounds instead of jumping each game.
+    var noiseFloor = 0.008, peak = 0.02;
+
+    // microphone
+    var audioCtx = null, analyser = null, timeData = null, micOk = false, micTried = false;
+    function enableMic(){
+      return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:false, noiseSuppression:false, autoGainControl:false } })
+        .then(function(stream){
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          var src = audioCtx.createMediaStreamSource(stream);
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 1024;
+          timeData = new Uint8Array(analyser.fftSize);
+          src.connect(analyser);
+          micOk = true;
+          oSub.textContent = 'Microphone on. The louder you are, the higher the bird flies.';
+        });
+    }
+    function micRms(){
+      if (!analyser) return 0;
+      analyser.getByteTimeDomainData(timeData);
+      var sum = 0;
+      for (var i=0;i<timeData.length;i++){ var v = (timeData[i]-128)/128; sum += v*v; }
+      return Math.sqrt(sum / timeData.length);
+    }
+
+    function spawnPipe(x){
+      var lo = 0.22 * H, hi = 0.64 * H;
+      pipes.push({ x: x, gapY: lo + Math.random()*(hi-lo), passed: false });
+    }
+    function resetGame(){
+      bird.y = H * 0.42; bird.vy = 0;
+      pipes = []; score = 0; loud = 0; liftInput = 0;
+      spawnPipe(W);
+    }
+
+    function showOverlay(title, msg, btn){
+      oTitle.textContent = title;
+      oMsg.textContent = msg;
+      document.getElementById('sf-start').textContent = btn;
+      overlay.classList.remove('hidden');
+    }
+    function hideOverlay(){ overlay.classList.add('hidden'); }
+
+    function start(){
+      if (state === 'playing') return;
+      resetGame();
+      state = 'playing';
+      hideOverlay();
+      if (!micTried){
+        micTried = true;
+        enableMic().catch(function(){
+          micOk = false;
+          oSub.textContent = 'Microphone not available, so press and hold the screen to fly instead.';
+        });
+      } else if (audioCtx && audioCtx.state === 'suspended'){
+        audioCtx.resume();
+      }
+    }
+    function die(){
+      if (state !== 'playing') return;
+      state = 'dead';
+      showOverlay('Game over', 'Score: ' + score, 'Try again');
+    }
+
+    function update(dt){
+      var P = params();
+
+      // control signal: microphone loudness, auto-calibrated, hold as fallback
+      var target = 0;
+      if (micOk){
+        var rms = micRms();
+        // noise floor: settle down to quiet moderately, drift up extremely slowly
+        noiseFloor += (rms - noiseFloor) * (rms < noiseFloor ? 0.05 : 0.0002);
+        // peak: rise toward your loud level over a second or two, then forget it
+        // very slowly (half-life of minutes) so the scale stays stiff across rounds
+        peak += (rms - peak) * (rms > peak ? 0.03 : 0.00004);
+        var span = Math.max(peak - noiseFloor, 0.012);
+        // where this instant sits in your own range, with a small dead zone
+        var norm = (rms - noiseFloor - span * 0.12) / span;
+        target = Math.max(0, norm) * 1.5;
+      }
+      if (holding) target = Math.max(target, 1.25);
+      loud += (target - loud) * Math.min(1, dt * 14);
+      liftInput = Math.max(0, Math.min(1.6, loud));
+
+      // hills always drift (even on the menu), slower than the pipes -> depth
+      hillFar  += P.pipeSpeed * 0.18 * dt;
+      hillNear += P.pipeSpeed * 0.36 * dt;
+
+      if (state !== 'playing'){
+        tBob += dt;
+        bird.y = H * 0.42 + Math.sin(tBob * 2) * H * 0.03;
+        bird.vy = Math.cos(tBob * 2) * 0.2 * H;
+        return;
+      }
+
+      bird.vy += (P.gravity - P.liftAcc * liftInput) * dt;
+      if (bird.vy > P.maxDown) bird.vy = P.maxDown;
+      if (bird.vy < -P.maxUp) bird.vy = -P.maxUp;
+      bird.y += bird.vy * dt;
+      if (bird.y < P.r){ bird.y = P.r; if (bird.vy < 0) bird.vy = 0; } // no ceiling
+
+      for (var i=0;i<pipes.length;i++) pipes[i].x -= P.pipeSpeed * dt;
+      if (!pipes.length || pipes[pipes.length-1].x <= W - P.spawnGapX) spawnPipe(W);
+      while (pipes.length && pipes[0].x + P.pipeW < 0) pipes.shift();
+
+      var bx = P.birdX, r = P.r;
+      for (var j=0;j<pipes.length;j++){
+        var p = pipes[j];
+        if (!p.passed && p.x + P.pipeW < bx - r){ p.passed = true; score++; }
+        if (bx + r > p.x && bx - r < p.x + P.pipeW){
+          var gt = p.gapY - P.gap/2, gb = p.gapY + P.gap/2;
+          if (bird.y - r < gt || bird.y + r > gb) die();
+        }
+      }
+      if (bird.y + r >= P.groundY){ bird.y = P.groundY - r; if (bird.vy > 0) bird.vy = 0; } // floor clamps, only pipes kill
+    }
+
+    function hills(baseY, amp, wavelen, phase, color){
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      for (var x=0; x<=W; x+=4){
+        ctx.lineTo(x, baseY - amp * Math.sin((x + phase) / wavelen * TWO_PI));
+      }
+      ctx.lineTo(W, H);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    function drawPipe(p, P){
+      var gt = p.gapY - P.gap/2, gb = p.gapY + P.gap/2, lip = P.pipeW * 0.18;
+      ctx.fillStyle = '#2f8f3e';
+      ctx.fillRect(p.x, 0, P.pipeW, gt);
+      ctx.fillRect(p.x, gb, P.pipeW, H - gb);
+      ctx.fillStyle = '#256f30';
+      ctx.fillRect(p.x - lip, gt - lip*2.2, P.pipeW + lip*2, lip*2.2);
+      ctx.fillRect(p.x - lip, gb, P.pipeW + lip*2, lip*2.2);
+      ctx.fillStyle = 'rgba(255,255,255,.12)';
+      ctx.fillRect(p.x + P.pipeW*0.18, 0, P.pipeW*0.16, gt);
+      ctx.fillRect(p.x + P.pipeW*0.18, gb, P.pipeW*0.16, H - gb);
+    }
+    function drawBird(P){
+      ctx.save();
+      ctx.translate(P.birdX, bird.y);
+      var ang = Math.max(-0.5, Math.min(0.9, bird.vy / P.maxDown * 0.9));
+      ctx.rotate(ang);
+      var r = P.r;
+      ctx.fillStyle = '#ffd23f';
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, TWO_PI); ctx.fill();
+      ctx.fillStyle = '#f4b400';
+      ctx.beginPath(); ctx.ellipse(-r*0.1, r*0.15, r*0.55, r*0.35, 0, 0, TWO_PI); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(r*0.38, -r*0.32, r*0.30, 0, TWO_PI); ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath(); ctx.arc(r*0.46, -r*0.32, r*0.15, 0, TWO_PI); ctx.fill();
+      ctx.fillStyle = '#ff8c2b';
+      ctx.beginPath();
+      ctx.moveTo(r*0.78, -r*0.1); ctx.lineTo(r*1.35, r*0.05); ctx.lineTo(r*0.78, r*0.2);
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+
+    function render(){
+      var P = params();
+      ctx.clearRect(0, 0, W, H);
+      // sky
+      var sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#3aa0e8');
+      sky.addColorStop(1, '#aee2ff');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
+      // hills, far layer slower than near layer, both slower than the pipes
+      hills(0.80*H, 0.055*H, 0.65*W, hillFar, '#8fce86');
+      hills(0.84*H, 0.040*H, 0.45*W, hillNear, '#4ea84f');
+      // pipes
+      for (var i=0;i<pipes.length;i++) drawPipe(pipes[i], P);
+      drawBird(P);
+      // loudness meter
+      var mh = (0.34*H) * Math.min(1, liftInput);
+      ctx.fillStyle = 'rgba(0,0,0,.15)';
+      ctx.fillRect(10, 0.10*H, 8, 0.34*H);
+      ctx.fillStyle = '#ffd23f';
+      ctx.fillRect(10, 0.10*H + (0.34*H - mh), 8, mh);
+      // score
+      if (state !== 'ready'){
+        ctx.fillStyle = 'rgba(0,0,0,.35)';
+        ctx.font = '700 ' + Math.round(0.10*H) + 'px Geist, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(score, W/2 + 2, 0.16*H + 2);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(score, W/2, 0.16*H);
+      }
+    }
+
+    var lastT;
+    function loop(t){
+      if (lastT === undefined) lastT = t;
+      var dt = Math.min(0.033, (t - lastT) / 1000);
+      lastT = t;
+      if (W) { update(dt); render(); }
+      requestAnimationFrame(loop);
+    }
+
+    // input: pointer starts/restarts the game and doubles as the hold fallback
+    wrap.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      if (state === 'playing'){ holding = true; }
+      else { start(); holding = true; }
+    });
+    window.addEventListener('pointerup', function(){ holding = false; });
+    wrap.addEventListener('pointercancel', function(){ holding = false; });
+
+    resize();
+    requestAnimationFrame(loop);
+  })();
+  </script>
 </body>
 </html>

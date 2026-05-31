@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A whole song hidden inside one image · Andreas Lindeman</title>
+  <meta name="description" content="A homemade compression scheme that hid the full ASCII version of a song in the low bits of a single frog photo, with a one-line decompressor that reads the bits back out and replays it as a live terminal animation." />
+  <link rel="alternate" hreflang="en" href="https://andreaslindeman.com/projects/data-magic" />
+  <link rel="alternate" hreflang="no" href="https://andreaslindeman.no/projects/data-magic" />
+  <link rel="alternate" hreflang="x-default" href="https://andreaslindeman.com/projects/data-magic" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../icon.png" />
+  <style>
+    .dm-terminal{background:#0c0c0c;border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden;box-shadow:0 14px 44px rgba(0,0,0,.45);width:min(1180px,94vw);margin-left:50%;transform:translateX(-50%);margin-bottom:1.4rem;}
+    .dm-term-bar{display:flex;align-items:center;gap:.5rem;padding:.55rem .8rem;background:#1c1c1c;border-bottom:1px solid rgba(255,255,255,.08);}
+    .dm-dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+    .dm-dot.r{background:#ff5f56}.dm-dot.y{background:#ffbd2e}.dm-dot.g{background:#27c93f}
+    .dm-term-title{margin-left:.45rem;font-family:Consolas,'Lucida Console',monospace;font-size:.78rem;color:#9aa6a6;}
+    .dm-term-body{padding:.85rem .95rem 1rem;font-family:Consolas,'Lucida Console','DejaVu Sans Mono',monospace;background:#0c0c0c;}
+    .dm-cmdline{font-family:Consolas,'Lucida Console','DejaVu Sans Mono',monospace;font-size:1.05rem;white-space:pre-wrap;word-break:break-word;color:#d3dbd0;}
+    .dm-prompt{color:#27c93f;}
+    .dm-caret{display:inline-block;width:.55em;background:#e8e8e8;color:transparent;animation:dm-blink 1s steps(2,start) infinite;}
+    .dm-caret.done{animation:none;opacity:0;}
+    @keyframes dm-blink{50%{opacity:0;}}
+    .dm-status{color:#ffbd2e;font-size:.86rem;margin-top:.45rem;font-family:Consolas,'Lucida Console',monospace;}
+    .dm-screen-wrap{margin-top:.55rem;overflow:hidden;}
+    .dm-screen{margin:0;font-family:Consolas,'Lucida Console','DejaVu Sans Mono',monospace;font-size:11px;line-height:1.02;white-space:pre;color:#d3dbd0;transform-origin:top left;width:max-content;}
+    @media (prefers-reduced-motion: reduce){.dm-caret{animation:none;}}
+    .dm-download{display:inline-block;font-family:Consolas,'Lucida Console',monospace;font-size:.92rem;color:#0c0c0c;background:#27c93f;padding:.6rem 1rem;border-radius:7px;text-decoration:none;font-weight:600;transition:background .15s ease;}
+    .dm-download:hover{background:#34d94c;}
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../" class="brand">
+      <span class="brand-mark">AL</span>
+      <span class="brand-name">Andreas Lindeman</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links-list" aria-label="Open menu">
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+    <ul id="nav-links-list" class="nav-links">
+      <li><a href="../#about">About</a></li>
+      <li><a href="../#timeline">Timeline</a></li>
+      <li><a href="../#stack">Stack</a></li>
+      <li><a href="../#contact">Contact</a></li>
+    </ul>
+    <a class="lang-switch" data-lang-base="https://andreaslindeman.no" href="https://andreaslindeman.no/" hreflang="no" aria-label="Switch to Norwegian">
+      <svg class="lang-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></svg>
+      <span class="lang-pair"><span class="lang-current">EN</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-target">NO</span></span>
+    </a>
+  </nav>
+  <script>
+    (function(){
+      var s=document.querySelector('.lang-switch');
+      if(s&&s.dataset.langBase)s.href=s.dataset.langBase+location.pathname+location.search+location.hash;
+      var nav=document.querySelector('.site-nav'), btn=document.querySelector('.nav-toggle');
+      if(btn&&nav){
+        function closeMenu(){
+          nav.classList.remove('is-open');
+          btn.setAttribute('aria-expanded','false');
+          btn.setAttribute('aria-label','Open menu');
+        }
+        btn.addEventListener('click',function(e){
+          e.stopPropagation();
+          var open=nav.classList.toggle('is-open');
+          btn.setAttribute('aria-expanded',open?'true':'false');
+          btn.setAttribute('aria-label',open?'Close menu':'Open menu');
+        });
+        nav.querySelectorAll('.nav-links a').forEach(function(a){
+          a.addEventListener('click',closeMenu);
+        });
+        document.addEventListener('click',function(e){
+          if(nav.classList.contains('is-open')&&!nav.contains(e.target))closeMenu();
+        });
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'&&nav.classList.contains('is-open'))closeMenu();
+        });
+      }
+    })();
+  </script>
+
+  <main class="project-page">
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+
+    <div class="project-meta-row">
+      <span class="cat-tag"><span class="cat-swatch hobby"></span> hobby</span>
+      <span class="sep"></span>
+      <span>2023</span>
+    </div>
+
+    <h1 class="project-title">A whole song hidden inside one <em>image</em></h1>
+
+    <p class="project-lede">
+      I had built custom encryption before, but never my own compression, and I
+      had spent years hooked on hiding data inside images through Norway's PST
+      advent-calendar CTF. So I put the two together: I took the full ASCII version
+      of a certain song from an earlier project, compressed it with a scheme of my
+      own, and tucked the whole thing into the low bits of a single frog photo. The
+      decompressor below is the real one, ported to run in your browser. It reads
+      the hidden bits straight out of the image and plays the song back as ASCII.
+    </p>
+
+    <section class="project-section">
+      <div class="dm-terminal" aria-label="Live demo of the decompressor reading the song out of the image">
+        <div class="dm-term-bar">
+          <span class="dm-dot r"></span><span class="dm-dot y"></span><span class="dm-dot g"></span>
+          <span class="dm-term-title">cmd.exe</span>
+        </div>
+        <div class="dm-term-body">
+          <div class="dm-cmdline"><span class="dm-prompt">&gt;</span> <span id="dm-typed"></span><span class="dm-caret" id="dm-caret">&nbsp;</span></div>
+          <div class="dm-status" id="dm-status"></div>
+          <div class="dm-screen-wrap" id="dm-screen-wrap">
+            <pre class="dm-screen" id="dm-screen" aria-hidden="true"></pre>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:.85rem;opacity:.7;margin-top:-.4rem;">
+        Nothing is downloaded except the frog photo itself. Every character above is
+        decoded live from the low four bits of that one image, in real time.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The idea</h2>
+      <p>
+        At that point I had written my own encryption for data, but I had never
+        built a compression algorithm, even though it always looked like a fun
+        problem. I was also fascinated by hiding data in plain sight. I had spent
+        about three years doing the PST advent-calendar CTF (NTPS), and that is
+        where I first got into hiding data inside images, where a payload can live
+        in the parts of a picture your eye never notices.
+      </p>
+      <p>
+        I even had the perfect thing to compress: the ASCII version of an entire
+        song, lifted from an earlier project. The goal was to squeeze the whole
+        thing into one image and to make the decompressor as short as I possibly
+        could.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>Hiding the data</h2>
+      <p>
+        Every pixel of the carrier image has four channels: red, green, blue and
+        alpha. Each channel is a byte, and the top four bits carry almost all of
+        the colour your eye sees. The bottom four bits barely change the picture at
+        all, so that is where the payload goes. Four channels times four spare bits
+        gives sixteen bits of hidden storage per pixel, and across a multi-megapixel
+        image that is enough room for the whole song.
+      </p>
+      <p>
+        The carrier is deliberately a busy photo: a frog, with a lot going on in
+        the texture and lighting. A noisy, detailed image hides the small wobble in
+        the low bits far better than a flat one would, so the data stays invisible.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The compression</h2>
+      <p>
+        The song is mostly the same handful of glyphs repeated in long runs, so the
+        scheme is built around a small dictionary of symbols plus run-length coding,
+        packed into a tight bitstream. Reading it back, each token is:
+      </p>
+      <ul>
+        <li>one flag bit, saying whether this token repeats,</li>
+        <li>five bits for the symbol index into the dictionary,</li>
+        <li>and, only if the flag is set, five more bits for a repeat count.</li>
+      </ul>
+      <p>
+        So a single character costs six bits, and a run of up to thirty-two of the
+        same character costs eleven. Decoding walks the image pixel by pixel,
+        peels the sixteen hidden bits out of each one, refills a bit buffer, and
+        emits symbols until it has a full screen: forty-eight rows of one hundred
+        and thirty-one characters, printed at twenty-five frames per second. The
+        result is the song playing as ASCII video, straight out of the frog.
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The decompressor</h2>
+      <p>
+        The part I am most happy with is how short the reader and player ended up.
+        The whole thing, opening the image, pulling the bits, expanding the
+        dictionary tokens and animating the frames, is four lines of Python:
+      </p>
+      <pre class="code-block" id="dm-code" style="overflow:auto;font-family:Consolas,'Lucida Console',monospace;font-size:.8rem;background:#0c0c0c;color:#d3dbd0;padding:1rem;border-radius:8px;border:1px solid rgba(255,255,255,.1);white-space:pre;"></pre>
+      <p>
+        The list <code>A</code> does triple duty: slot zero is the image, the next
+        slots hold the dictionary of glyphs, and the last two are reused as the bit
+        buffer and the output buffer. The terminal at the top of this page runs that
+        exact algorithm, decoded faithfully in JavaScript. Because the data lives in
+        the low bits, the image has to be read losslessly, so the page decodes the
+        PNG itself rather than going through a canvas, which would round the bits off
+        and scramble the stream.
+      </p>
+      <p>
+        Want to poke at it yourself? Here are both files, the carrier image and the
+        four-line player, zipped together:
+      </p>
+      <p>
+        <a class="dm-download" href="../projects_data/2023-data-magic/compressed.zip" download>
+          Download the image and decompressor (ZIP, 13&nbsp;MB)
+        </a>
+      </p>
+    </section>
+
+    <section class="project-section">
+      <h2>The carrier</h2>
+      <p>
+        And here is the image itself, the one holding the entire song. It looks like
+        an ordinary photo, because that is the whole point.
+      </p>
+      <figure class="project-figure wide">
+        <img src="../projects_data/2023-data-magic/img1.png" alt="A busy, detailed photo of a frog, used as the carrier image that secretly holds the compressed song in its low bits." loading="lazy">
+        <figcaption>The frog blesses you with luck in these trying times.</figcaption>
+      </figure>
+    </section>
+
+    <a href="../#timeline" class="project-back">Back to timeline</a>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span id="year"></span> Andreas Lindeman</span>
+    <span class="footer-meta">Built by hand · No frameworks · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <!-- The original run.py, verbatim, shown in the writeup -->
+  <script type="text/plain" id="dm-src">import PIL.Image,time
+A = [PIL.Image.open("img1.png").load(),*[l for l in '_)]⌐«·k",‼M/z[≡aWα^@*L\'~.π(!ª x1ª'],time.time()]
+for i in range(5068444):
+    A[32]+=("0"*16+bin(((A[0][(i//1905)%2663,i%1905][0]&0x0f)<<12)+((A[0][(i//1905)%2663,i%1905][1]&0x0f)<<8)+((A[0][(i//1905)%2663,i%1905][2]&0x0f)<<4)+(A[0][(i//1905)%2663,i%1905][3]&0x0f))[2:])[-16:]
+    while len(A[32])>11:A[32:34]=[A[32][6+5*int(A[32][0]):],A[33]+A[int(A[32][1:6],2)]+(int(A[32][6:11],2)*int(A[32][0]))*A[int(A[32][1:6],2)]]
+    if len(A[33])>6288:print("\033[F"*49);[print(A[33][ii*131:(ii+1)*131]) for ii in range(48)];time.sleep(max(A[34]+1/25-time.time(),0));A[33:]=[A[33][6288:],time.time()]</script>
+
+  <script>
+  (function(){
+    // Show the original source in the writeup (textContent avoids any HTML escaping issues).
+    var src = document.getElementById('dm-src');
+    var codeEl = document.getElementById('dm-code');
+    if (src && codeEl) codeEl.textContent = src.textContent.trim();
+
+    var typed  = document.getElementById('dm-typed');
+    var caret  = document.getElementById('dm-caret');
+    var status = document.getElementById('dm-status');
+    var screen = document.getElementById('dm-screen');
+    var wrap   = document.getElementById('dm-screen-wrap');
+    var cmdline = typed.parentNode; // the "> python run.py" line
+    if (!typed) return;
+
+    var BASE = 11; // matches the .dm-screen base font-size (px); one glyph cell
+
+    // ---- the symbol dictionary (same string the Python uses) ----
+    var SYMS = `_)]⌐«·k",‼M/z[≡aWα^@*L'~.π(!ª x1ª`;
+    var DICT = [''].concat(SYMS.split('')); // DICT[1] = SYMS[0]; index 0 is the image (unused)
+    var INIT_BUF = SYMS[31]; // '1', the original A[32]
+    var INIT_OUT = SYMS[32]; // the original A[33]
+
+    var W = 2663, H = 1905, TOTAL = 5068444;
+    var COLS = 131, ROWS = 48, FRAME = COLS * ROWS; // 6288
+    // Playback speed. The original ran at 25 fps but only because cmd.exe could
+    // not keep up; in the browser that feels too fast, so it is slowed here.
+    var FPS = 25;
+
+    // ---- lossless PNG -> raw RGBA (canvas would round off the low bits) ----
+    async function loadRawRGBA(url){
+      var resp = await fetch(url);
+      if (!resp.ok) throw new Error('fetch ' + resp.status);
+      var buf = new Uint8Array(await resp.arrayBuffer());
+      var o = 8, idat = [], iw = 0, ih = 0;
+      while (o < buf.length){
+        var len = ((buf[o]<<24)|(buf[o+1]<<16)|(buf[o+2]<<8)|buf[o+3]) >>> 0;
+        var t = String.fromCharCode(buf[o+4],buf[o+5],buf[o+6],buf[o+7]);
+        if (t === 'IHDR'){
+          iw = ((buf[o+8]<<24)|(buf[o+9]<<16)|(buf[o+10]<<8)|buf[o+11]) >>> 0;
+          ih = ((buf[o+12]<<24)|(buf[o+13]<<16)|(buf[o+14]<<8)|buf[o+15]) >>> 0;
+        } else if (t === 'IDAT'){
+          idat.push(buf.subarray(o+8, o+8+len));
+        } else if (t === 'IEND'){ break; }
+        o += 12 + len;
+      }
+      var tot = 0, k; for (k=0;k<idat.length;k++) tot += idat[k].length;
+      var comp = new Uint8Array(tot), p = 0;
+      for (k=0;k<idat.length;k++){ comp.set(idat[k], p); p += idat[k].length; }
+      // PNG IDAT is zlib-wrapped deflate -> DecompressionStream('deflate')
+      var ds = new DecompressionStream('deflate');
+      var inflStream = new Response(comp).body.pipeThrough(ds);
+      var infl = new Uint8Array(await new Response(inflStream).arrayBuffer());
+      // un-filter scanlines (8-bit RGBA, bpp = 4)
+      var bpp = 4, stride = iw * bpp;
+      var raw = new Uint8Array(ih * stride), si = 0;
+      for (var y=0; y<ih; y++){
+        var ft = infl[si++], ro = y*stride, po = (y-1)*stride;
+        for (var x=0; x<stride; x++){
+          var v = infl[si++];
+          var a = x>=bpp ? raw[ro+x-bpp] : 0;
+          var b = y>0    ? raw[po+x]     : 0;
+          var c = (x>=bpp && y>0) ? raw[po+x-bpp] : 0;
+          var val;
+          switch (ft){
+            case 1: val = v + a; break;
+            case 2: val = v + b; break;
+            case 3: val = v + ((a + b) >> 1); break;
+            case 4:
+              var pp = a + b - c, pa = Math.abs(pp-a), pb = Math.abs(pp-b), pc = Math.abs(pp-c);
+              val = v + (pa<=pb && pa<=pc ? a : (pb<=pc ? b : c)); break;
+            default: val = v;
+          }
+          raw[ro+x] = val & 0xff;
+        }
+      }
+      return { raw: raw, W: iw, H: ih };
+    }
+
+    // ---- scale the 131-col grid so it always fills the terminal width,
+    //      and size the command line to the same glyph size ----
+    function fitScreen(){
+      if (!screen.textContent) return;
+      screen.style.transform = 'scale(1)';
+      var natW = screen.scrollWidth, natH = screen.scrollHeight;
+      if (!natW) return;
+      var s = wrap.clientWidth / natW; // exact horizontal fill, no cap
+      screen.style.transform = 'scale(' + s + ')';
+      wrap.style.height = Math.ceil(natH * s) + 'px';
+      // the typed command shares the animation's font and glyph size
+      cmdline.style.fontSize = (BASE * s) + 'px';
+    }
+    window.addEventListener('resize', fitScreen);
+
+    // ---- the decompressor + player (faithful port of run.py) ----
+    function startPlayer(raw){
+      var buf = INIT_BUF, out = INIT_OUT, i = 0;
+      var lines = new Array(ROWS);
+
+      function renderFrame(){
+        for (var r=0; r<ROWS; r++) lines[r] = out.substr(r*COLS, COLS);
+        screen.textContent = lines.join('\n');
+        out = out.slice(FRAME);
+      }
+
+      function step(){
+        // advance until one full screen is ready (or pixels run out)
+        var guard = 0;
+        while (out.length <= FRAME){
+          if (i >= TOTAL){ // loop the song
+            i = 0; buf = INIT_BUF; out = INIT_OUT;
+          }
+          var x = ((i / 1905) | 0) % W, y = i % 1905, off = (y * W + x) * 4;
+          var val = ((raw[off] & 0x0f) << 12) | ((raw[off+1] & 0x0f) << 8) |
+                    ((raw[off+2] & 0x0f) << 4) | (raw[off+3] & 0x0f);
+          buf += ('0000000000000000' + val.toString(2)).slice(-16);
+          i++;
+          while (buf.length > 11){
+            var f = buf.charCodeAt(0) - 48;          // flag bit
+            var idx = parseInt(buf.substr(1,5), 2);  // 5-bit symbol index
+            var cnt = parseInt(buf.substr(6,5), 2);  // 5-bit repeat count
+            buf = buf.slice(6 + 5*f);
+            var ch = DICT[idx] || '';
+            out += ch.repeat(1 + cnt*f);
+          }
+          if (++guard > 200000) break; // safety valve, never hit in practice
+        }
+        renderFrame();
+      }
+
+      // first frame, then settle the scale, then run at the chosen rate
+      step();
+      fitScreen();
+      status.textContent = '';
+      var first = true;
+      setInterval(function(){ step(); if (first){ fitScreen(); first = false; } }, Math.round(1000 / FPS));
+    }
+
+    // ---- start pulling the image apart right away, so the ASCII video can
+    //      spawn the instant the "> python run.py" loading line finishes ----
+    var imgPromise;
+    if (typeof DecompressionStream === 'undefined'){
+      imgPromise = Promise.reject(new Error('no DecompressionStream'));
+    } else {
+      imgPromise = loadRawRGBA('../projects_data/2023-data-magic/img1.png');
+    }
+    imgPromise.catch(function(){}); // keep an early rejection from going unhandled
+
+    var cmd = 'python run.py';
+    var ci = 0;
+    function typeCmd(){
+      if (ci <= cmd.length){
+        typed.textContent = cmd.slice(0, ci);
+        ci++;
+        setTimeout(typeCmd, 70 + (ci % 3) * 25);
+      } else {
+        caret.classList.add('done');
+        status.textContent = 'reading hidden data out of the image...';
+        imgPromise
+          .then(function(img){ startPlayer(img.raw); })
+          .catch(function(e){
+            status.textContent = (e && e.message === 'no DecompressionStream')
+              ? 'This browser cannot decode the image losslessly here. The source is shown below.'
+              : 'Could not load the image (' + (e && e.message) + ').';
+          });
+      }
+    }
+
+    // Hold the typed command and the animation until at least the top half of
+    // the terminal is actually on screen. The image keeps decoding in the
+    // background meanwhile, so playback can start the moment typing finishes.
+    var started = false;
+    function beginSequence(){
+      if (started) return; started = true;
+      // measure with a full grid first, so the typed command is already at the
+      // animation's glyph size and the screen area reserves its height up front
+      screen.textContent = (('M'.repeat(COLS) + '\n').repeat(ROWS)).slice(0, -1);
+      fitScreen();
+      screen.textContent = '';
+      typeCmd();
+    }
+
+    var terminal = document.querySelector('.dm-terminal');
+    if ('IntersectionObserver' in window && terminal){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          var need = Math.min(en.boundingClientRect.height * 0.5, window.innerHeight * 0.6);
+          if (en.isIntersecting && en.intersectionRect.height >= need){
+            io.disconnect();
+            beginSequence();
+          }
+        });
+      }, { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] });
+      io.observe(terminal);
+    } else {
+      beginSequence();
+    }
+  })();
+  </script>
+</body>
+</html>

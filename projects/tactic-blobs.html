@@ -113,11 +113,32 @@
     <h1 class="project-title">Tactic <em>blobs</em></h1>
 
     <p class="project-lede">
-      A game-jam mobile game, inspired by the Russian variant of tic-tac-toe where bigger
-      pieces eat smaller ones. Each player gets six blobs of varying sizes; place them on
-      a board, and a bigger blob can overtake a smaller one underneath it. Quick rounds,
-      easy rule, surprisingly deep play.
+      A two-player game of three-in-a-row where bigger blobs gobble smaller ones. Place a
+      blob, cover a smaller one to hide it, and line up three of your color to win.
     </p>
+
+    <section class="project-section">
+      <div class="tb-game" id="tb-game">
+        <div class="tb-status"></div>
+        <div class="tb-board"></div>
+        <div class="tb-trays">
+          <div class="tb-tray p0"><h4>Red</h4><div class="tb-pieces"></div></div>
+          <div class="tb-tray p1"><h4>Blue</h4><div class="tb-pieces"></div></div>
+        </div>
+        <div class="tb-controls"><button class="tb-reset" type="button">New game</button></div>
+        <div class="tb-hint">Bigger blobs cover smaller ones, and what is underneath stays hidden, so keep track of it.</div>
+      </div>
+    </section>
+
+    <section class="project-section">
+      <h2>How to play</h2>
+      <p>
+        Two of you, one screen. Red moves, then Blue. Pick a blob from your tray, or one
+        of your own already on the board, and drop it on an empty square or on top of any
+        smaller blob. Three of your blobs in a row, counting only the top of each stack,
+        wins.
+      </p>
+    </section>
 
     <section class="project-section">
       <h2>The rule set</h2>
@@ -135,23 +156,12 @@
     </section>
 
     <section class="project-section">
-      <h2>Play it (two players)</h2>
+      <h2>Where it came from</h2>
       <p>
-        Two of you, one screen. Red moves, then Blue. Pick a blob from your tray, or one
-        of your own already on the board, and drop it on an empty square or on top of any
-        smaller blob. Three of your blobs in a row, counting only the top of each stack,
-        wins.
+        A game-jam mobile game made at Torshus folkehøyskole, inspired by the Russian
+        variant of tic-tac-toe where bigger pieces eat smaller ones. Quick rounds, one
+        easy rule, surprisingly deep play.
       </p>
-      <div class="tb-game" id="tb-game">
-        <div class="tb-status"></div>
-        <div class="tb-board"></div>
-        <div class="tb-trays">
-          <div class="tb-tray p0"><h4>Red</h4><div class="tb-pieces"></div></div>
-          <div class="tb-tray p1"><h4>Blue</h4><div class="tb-pieces"></div></div>
-        </div>
-        <div class="tb-controls"><button class="tb-reset" type="button">New game</button></div>
-        <div class="tb-hint">Bigger blobs cover smaller ones, and what is underneath stays hidden, so keep track of it.</div>
-      </div>
     </section>
 
     <section class="project-section">

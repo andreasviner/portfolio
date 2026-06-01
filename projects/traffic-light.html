@@ -13,6 +13,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="icon" type="image/png" href="../icon.png" />
+  <style>
+    /* splitscreen: the real remote on the left, the live photo on the right, equal size */
+    .tl-demo{display:flex;gap:14px;align-items:stretch;height:clamp(420px,74vh,660px);margin:.5rem 0;}
+    .tl-pane{flex:1 1 0;min-width:0;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 32px rgba(0,0,0,.45);}
+    .tl-remote-frame{display:block;background:#696969;}
+    .tl-stack{position:relative;background:#0c0c0c;}
+    .tl-frame{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;transition:opacity .075s linear;-webkit-user-drag:none;user-select:none;}
+    #tl-b{opacity:0;}
+    @media (max-width:640px){ .tl-demo{flex-direction:column;height:auto;} .tl-pane{height:64vh;} }
+  </style>
 </head>
 <body>
 
@@ -86,6 +96,23 @@
     </p>
 
     <section class="project-section">
+      <h2>Try the remote</h2>
+      <p>
+        This is the same control we used from our phones. Tap a lamp to switch it; the
+        photo on the right is the real light in that exact state. Because each lamp is
+        just its own mains relay, you can light up combinations a real crossing never
+        would.
+      </p>
+      <div class="tl-demo">
+        <iframe class="tl-pane tl-remote-frame" src="../projects_data/2024-traff-light/code/remote/remote_embed.html" title="Traffic light remote" loading="lazy"></iframe>
+        <div class="tl-pane tl-stack">
+          <img class="tl-frame" id="tl-a" draggable="false" alt="The real traffic light in the state set by the remote." />
+          <img class="tl-frame" id="tl-b" draggable="false" alt="" aria-hidden="true" />
+        </div>
+      </div>
+    </section>
+
+    <section class="project-section">
       <h2>Step 1: getting it open</h2>
       <p>
         I 3D-printed an opening tool, took the front off, and figured out the wiring.
@@ -93,11 +120,6 @@
         one per lamp, each switched by whether or not it saw 240V AC. So control meant
         switching three independent mains connections.
       </p>
-
-      <figure class="project-figure narrow">
-        <img src="../projects_data/2024-traff-light/trafikklys_figures/figure1.png" alt="The pedestrian traffic light standing in the kitchen, unlit. Three stacked lamp housings on a concrete base.">
-        <figcaption>As received. Three independent 240 V lamps, no controller, ready for retrofit.</figcaption>
-      </figure>
     </section>
 
     <section class="project-section">
@@ -118,17 +140,10 @@
         <code>trafikklys.local</code> via mDNS. From any phone in the house: pick a
         mode, run a sequence, trigger one-off effects.
       </p>
-
-      <div class="figure-row">
-        <figure class="project-figure">
-          <img src="../projects_data/2024-traff-light/trafikklys_figures/figure2.png" alt="iPhone screenshot of the trafikklys.local web UI: three rendered lamp circles, top red and bottom green active.">
-          <figcaption>Web UI on <code>trafikklys.local</code>. Direct lamp control from any phone on the LAN.</figcaption>
-        </figure>
-        <figure class="project-figure">
-          <img src="../projects_data/2024-traff-light/trafikklys_figures/figure3.png" alt="The physical traffic light with the top red lamp and the bottom green lamp lit at the same time.">
-          <figcaption>And the same state on the actual hardware: red and green simultaneously, which a real crossing would never do.</figcaption>
-        </figure>
-      </div>
+      <p>
+        That is the same control embedded at the top of this page: tap a lamp and the
+        photo shows the real light in that state.
+      </p>
     </section>
 
     <section class="project-section">
@@ -140,11 +155,6 @@
         used feature by a wide margin, beating both the original lamp function and the
         music-reactive mode.
       </p>
-
-      <figure class="project-figure narrow">
-        <img src="../projects_data/2024-traff-light/trafikklys_figures/figure5.png" alt="The physical traffic light with two red lamps lit and the green lamp dark. A state that exists only because we can now do whatever we want with the three lamps.">
-        <figcaption>Two reds at once. A state the original controller would never have produced.</figcaption>
-      </figure>
     </section>
 
     <section class="project-section">
@@ -181,5 +191,47 @@
   </footer>
 
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <script>
+  (function(){
+    var BASE = '../projects_data/2024-traff-light/light_status/';
+    var a = document.getElementById('tl-a'), b = document.getElementById('tl-b');
+    if (!a) return;
+    var front = a, back = b, cur = '110'; // remote starts on red + amber
+
+    // preload all eight states so the 0.1s crossfade is instant, never a flash
+    for (var r=0;r<2;r++) for (var y=0;y<2;y++) for (var g=0;g<2;g++){
+      var im = new Image(); im.src = BASE + r + '' + y + '' + g + '.jpg';
+    }
+    front.src = BASE + cur + '.jpg';
+    front.style.opacity = '1'; front.style.zIndex = '1';
+    back.style.opacity = '0';
+
+    function setState(s){
+      if (s === cur) return;
+      cur = s;
+      // keep the current photo fully opaque underneath and fade the new one in
+      // on top, so the picture never dips through the dark background mid-switch
+      back.src = BASE + s + '.jpg';
+      back.style.transition = 'none';
+      back.style.opacity = '0';
+      back.style.zIndex = '2';
+      front.style.zIndex = '1';
+      void back.offsetWidth; // reflow so the fade starts cleanly from 0
+      back.style.transition = 'opacity .075s linear';
+      back.style.opacity = '1';
+      var t = front; front = back; back = t;
+    }
+
+    // the embedded remote posts its lamp state ("tl:RYG") whenever it changes
+    window.addEventListener('message', function(e){
+      var d = e.data;
+      if (typeof d === 'string' && d.slice(0,3) === 'tl:'){
+        var s = d.slice(3);
+        if (/^[01]{3}$/.test(s)) setState(s);
+      }
+    });
+  })();
+  </script>
 </body>
 </html>

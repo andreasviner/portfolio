@@ -1,0 +1,170 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>    
+<style>
+
+html, body {
+    margin: 0; 
+    height: 100%;
+    overflow:hidden;
+    position:relative;
+	overflow-x:hidden;
+    }
+
+
+table {
+    background-color:#222222;
+    border: 1vh solid black;
+    border-radius: 5vh;
+    padding-top: 2vh;
+    padding-right: 5vh;
+    padding-bottom: 3vh;
+    padding-left: 5vh;
+}
+
+td {
+    background-color:#cccccc;
+    border: 0.5vh solid black;
+    border-radius: 50%;
+    padding: 0.5vh;
+}
+
+.pole{
+    
+    position:absolute;
+    height:100vh;
+    width:10vh;
+    background-color: #ee9b1e;
+    right:calc(50vw - 5vh);
+    top:80vh;
+    z-index: -2;
+    border: 0.5vh solid rgb(59, 59, 59);
+    overflow: auto;
+}
+
+
+.Gray{
+    
+    position:absolute;
+    height:20vh;
+    width:20vh;
+    background-color: #727272;
+    right:calc(50vw - 10vh);
+    top:73vh;
+    z-index: -1;
+    border: 0.5vh solid rgb(59, 59, 59);
+    overflow: auto;
+    border-radius: 10%;
+}
+
+.button {
+  background-color: #04AA6D; /* Green */
+  border: none;
+  height: 24vh;
+  width: 24vh;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 50%;
+  right:calc(50vw - 12vh);
+}
+
+</style>
+</head>
+<body style = "background-color: #696969;">
+
+<table style="margin:auto;">
+  <tr>
+<td id = "t1"  ><img src="r1.png" class="button" ></img>
+    <img src="g0.png" class="button" id = "l1" style="position:absolute;" ></img>
+</td>
+  </tr>
+  <tr style="height:1vh"></tr>
+  <tr>
+    <td id = "t2"><img src="r1.png" class="button"  ></img>
+        <img src="g0.png" class="button" id = "l2" style="position:absolute;" ></td>
+  </tr>
+  <tr style="height:1vh"></tr>
+  <tr>
+    <td id = "t3"><img  src="g1.png" class="button" ></img>
+        <img src="r0.png" class="button" id = "l3" style="position:absolute;" ></td>
+  </tr>
+</table>
+<div class ="gray"></div>
+<div class ="pole"></div>
+</body>
+<script>
+
+
+function send() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/Nicoerkul?a=1" + data[0] + data[1] + data[2]);
+  xhttp.send();
+  xhttp.onreadystatechange = (e) => {
+    eval(xhttp.responseText);
+  }
+}
+
+function refresh() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/Nicoerkul?a=0" + data[0] + data[1] + data[2]);
+  xhttp.send();
+  xhttp.onreadystatechange = (e) => {
+    eval(xhttp.responseText);
+  }
+}
+
+var intervalId = window.setInterval(function(){
+refresh();
+}, 10000);
+
+
+let data = [1,1,1];
+let lights = [document.getElementById("l1"), document.getElementById("l2"), document.getElementById("l3")];
+let pics = [["r1.png","g0.png"],["r1.png","g0.png"],["g1.png","r0.png"]];
+let ids = ["l1","l2","l3"];
+let bords = [document.getElementById("t1"), document.getElementById("t2"), document.getElementById("t3")];
+let colors = [["#333333", "#ffcccc"],["#333333", "#ffcccc"],["#333333", "#ccffcc"]];
+
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+for (let i = 0; i < 3; i++){
+
+    $(document ).on("touchstart", "#" + ids[i], function (){
+        //alert("HI");
+    //lights[i].addEventListener("click", function () {
+click(i);
+}); 
+}
+}else {
+
+    for (let i = 0; i < 3; i++){
+
+    $(document ).on("click", "#" + ids[i], function (){
+        //alert("HI");
+    //lights[i].addEventListener("click", function () {
+click(i);
+}); 
+    }
+}
+
+function update(){
+    for (let i = 0; i < 3; i++){
+        //lights[i].src = pics[i][data[i]];
+        lights[i].style.opacity = data[i];
+        bords[i].style.backgroundColor = colors[i][data[i]];
+    }
+}
+
+function click(i){
+    data[i] = (data[i] + 1)%2;
+    update();
+    send();
+}
+
+
+update();
+
+</script>
+</html>

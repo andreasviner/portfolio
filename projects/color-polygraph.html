@@ -831,7 +831,7 @@
       <h2>Explore the data</h2>
       <p>
         Before the write-up, the toy. Drag the cube to rotate it, double-click to resume the
-        slow auto-rotate. The buttons swap between boys, girls, the difference between them,
+        slow auto-rotate. The buttons swap between men, women, the difference between them,
         the colors both groups love, and a free pair of sliders. Tap "Invert" to flip the
         view to what each group rejects instead. Age filtering is off by default; tap "All
         ages" to switch the age slider on. Each glowing dot is one cell of an
@@ -858,8 +858,8 @@
 
         <div class="survey-viz-controls">
           <div class="survey-preset-row">
-            <button type="button" class="sv-preset" data-preset="boys">Boys</button>
-            <button type="button" class="sv-preset is-active" data-preset="girls">Girls</button>
+            <button type="button" class="sv-preset" data-preset="boys">Men</button>
+            <button type="button" class="sv-preset is-active" data-preset="girls">Women</button>
             <button type="button" class="sv-preset" data-preset="diff">Difference</button>
             <button type="button" class="sv-preset" data-preset="both">Both</button>
             <button type="button" class="sv-preset" data-preset="free">Sliders</button>
@@ -869,9 +869,9 @@
 
           <label class="sv-slider">
             <span class="sv-slider-label">
-              <span>Boys</span>
+              <span>Men</span>
               <span class="sv-slider-name">gender</span>
-              <span>Girls</span>
+              <span>Women</span>
             </span>
             <input id="svGender" type="range" min="0" max="1000" value="500" step="1" />
           </label>
@@ -1059,7 +1059,7 @@
       <p>
         Once the dataset was cleaned, the cohort itself was almost as interesting as the color
         picks. Below is what the 6,731 valid sessions look like sliced different ways. Each
-        line plot draws boys and girls separately so the gap, where there is one, is visible.
+        line plot draws men and women separately so the gap, where there is one, is visible.
       </p>
 
       <div class="sv-cohort-grid">
@@ -1073,8 +1073,8 @@
           <p class="sv-card-sub">Daily completions from launch. The second wave on day 9 is the second batch of emails I sent.</p>
           <svg id="svResponsesByDay" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Daily response counts since launch, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
@@ -1085,12 +1085,12 @@
         </div>
 
         <div class="survey-stats-card sv-card-wide">
-          <h3>Boys vs girls by age</h3>
+          <h3>Men vs women by age</h3>
           <p class="sv-card-sub">Where the gender split lived. The student years are roughly balanced; the adult tail skews female (Norwegian primary-school staff is mostly women).</p>
           <svg id="svGenderByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Session counts by age, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
@@ -1099,8 +1099,8 @@
           <p class="sv-card-sub">Self-reported mood, mapped to happiness (1 = happy, 0 = glum). The adolescence dip lands almost exactly where you'd expect: a long valley from 13 to 18.</p>
           <svg id="svHappinessByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean happiness by age, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
@@ -1109,8 +1109,8 @@
           <p class="sv-card-sub">When people actually clicked through the test, by hour they started (Europe/Oslo). The school-day window dominates; the 21:00 evening bump is mostly older respondents at home.</p>
           <svg id="svResponsesByHour" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Response count by hour of day, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
@@ -1119,8 +1119,8 @@
           <p class="sv-card-sub">Mean happiness of the people who started the test, by when they started (Europe/Oslo). 15-minute buckets through the active stretch (08&ndash;22), hourly at the shoulders, and 01&ndash;05 skipped since the dataset is too thin to read there.</p>
           <svg id="svHappinessByHour" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean happiness by hour of day, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
@@ -1129,8 +1129,8 @@
           <p class="sv-card-sub">Mean total time to finish the color bracket. Sessions over ten minutes are dropped here as tabs left open.</p>
           <svg id="svDurationByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean test duration by age, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
@@ -1139,8 +1139,8 @@
           <p class="sv-card-sub">Average seconds spent on each swatch decision. Reaction time grows with age; teens click fastest.</p>
           <svg id="svPerQByAge" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean per-question time by age, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
@@ -1149,18 +1149,18 @@
           <p class="sv-card-sub">Mean seconds spent on each of the 21 picks. Q1 carries the startup overhead (reading the page, settling in), then the clicks accelerate as the bracket progresses. Round 2 starts at Q17 and the final at Q21.</p>
           <svg id="svTimePerSlide" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Mean time spent on each question in the bracket"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
 
         <div class="survey-stats-card sv-card-wide">
           <h3>How long did people take?</h3>
-          <p class="sv-card-sub">Distribution of total test time in 15-second bins, boys and girls overlaid. Most people finish inside two minutes.</p>
+          <p class="sv-card-sub">Distribution of total test time in 15-second bins, men and women overlaid. Most people finish inside two minutes.</p>
           <svg id="svDurationHist" class="sv-line-chart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid meet" aria-label="Distribution of total test durations, split by gender"></svg>
           <div class="sv-legend">
-            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>boys</span>
-            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>girls</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch boys"></span>men</span>
+            <span class="sv-legend-key"><span class="sv-legend-swatch girls"></span>women</span>
           </div>
         </div>
       </div>
@@ -1526,11 +1526,11 @@
       if (mode === 'boys') {
         scores = bucketScores('g', src, aw, inv);
         n = bucketSampleCount('g', src, aw);
-        genderTag.textContent = inv ? 'boys reject' : 'boys';
+        genderTag.textContent = inv ? 'men reject' : 'men';
       } else if (mode === 'girls') {
         scores = bucketScores('j', src, aw, inv);
         n = bucketSampleCount('j', src, aw);
-        genderTag.textContent = inv ? 'girls reject' : 'girls';
+        genderTag.textContent = inv ? 'women reject' : 'women';
       } else if (mode === 'diff') {
         const boys  = bucketScores('g', src, aw, inv);
         const girls = bucketScores('j', src, aw, inv);
@@ -1539,7 +1539,7 @@
           scores.set(k, (girls.get(k) || 0) - (boys.get(k) || 0));
         }
         n = bucketSampleCount('g', src, aw) + bucketSampleCount('j', src, aw);
-        genderTag.textContent = inv ? 'girls - boys (reject)' : 'girls - boys';
+        genderTag.textContent = inv ? 'women - men (reject)' : 'women - men';
       } else if (mode === 'both') {
         const boys  = bucketScores('g', src, aw, inv);
         const girls = bucketScores('j', src, aw, inv);
@@ -1558,9 +1558,9 @@
         }
         n = bucketSampleCount('g', src, aw) * (1 - gMix) + bucketSampleCount('j', src, aw) * gMix;
         const pct = Math.round(gMix * 100);
-        const base = pct === 0 ? 'boys' :
-                     pct === 100 ? 'girls' :
-                     `${100 - pct}% boys / ${pct}% girls`;
+        const base = pct === 0 ? 'men' :
+                     pct === 100 ? 'women' :
+                     `${100 - pct}% men / ${pct}% women`;
         genderTag.textContent = inv ? base + ' reject' : base;
       }
 
@@ -1919,12 +1919,12 @@
     }
 
     const HELP_TEXT = {
-      diff:     '<b>Triangle</b>: girls liked it more. <b>Circle</b>: boys liked it more. Bigger = bigger gap. Fill is the real color.',
-      diff_inv: '<b>Triangle</b>: girls rejected it more than boys. <b>Circle</b>: boys rejected it more than girls. Bigger = bigger gap.',
-      both:     '<b>Both</b>: dot size is the lower of the boys and girls preferences. Bigger = liked by both groups.',
+      diff:     '<b>Triangle</b>: women liked it more. <b>Circle</b>: men liked it more. Bigger = bigger gap. Fill is the real color.',
+      diff_inv: '<b>Triangle</b>: women rejected it more than men. <b>Circle</b>: men rejected it more than women. Bigger = bigger gap.',
+      both:     '<b>Both</b>: dot size is the lower of the men and women preferences. Bigger = liked by both groups.',
       both_inv: '<b>Both</b>: dot size is the lower of how strongly each group rejected the color. Bigger = rejected by both groups.',
-      boys_inv:  '<b>Inverted</b>: bigger dots are colors boys were shown but rarely picked.',
-      girls_inv: '<b>Inverted</b>: bigger dots are colors girls were shown but rarely picked.',
+      boys_inv:  '<b>Inverted</b>: bigger dots are colors men were shown but rarely picked.',
+      girls_inv: '<b>Inverted</b>: bigger dots are colors women were shown but rarely picked.',
       free_inv:  '<b>Inverted</b>: bigger dots are colors this mix rejected (shown often, picked rarely).'
     };
     function updateHelp() {
@@ -1988,7 +1988,7 @@
       const rows = [
         ['Valid sessions',   s.total_valid.toLocaleString()],
         ['Raw responses',    "20,000+"],
-        ['Girls / Boys',     `${pctGirls}% / ${100 - pctGirls}%`],
+        ['Women / Men',      `${pctGirls}% / ${100 - pctGirls}%`],
         ['Age span',         `${lo}–${hi} (median ${medianAge})`],
         ['Mean mood (0=happy, 60=glum)', s.mood_mean],
       ];

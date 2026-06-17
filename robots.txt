@@ -1,6 +1,7 @@
 User-agent: *
-Allow: /projects_data/*.pdf$
-Disallow: /projects_data/
+Allow: /projects_data/
+Disallow: /projects_data/*/info.data$
+Disallow: /projects_data/*/info.json$
 Disallow: /tools/
 
 Sitemap: https://andreaslindeman.com/sitemap.xml

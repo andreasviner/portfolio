@@ -20,10 +20,13 @@
   const LANE_ROWS    = 12;        // discrete vertical slots in the single lane
   const ROW_HEIGHT   = 42;        // px per slot; larger to fit importance-scaled bars
   const TOP_PAD      = 24;        // px from axis to first slot
-  const LIST_QUIET_THRESHOLD = 50; // mobile list: dim+shrink entries below this
-  const DENSE_YEAR_MIN_ENTRIES = 3; // mobile list: years before the first
-                                    // year with ≥ this many entries collapse
-                                    // into a single "earlier timeline" toggle.
+  // mobile vertical swimlane: time runs down the Y axis, projects packed into a
+  // few horizontal lanes (see assignSlots + renderVerticalSwimlane).
+  const PX_PER_YEAR_V = 150;      // mobile: vertical pixels per year
+  const V_TOP_PAD     = 18;       // mobile: px above the newest year
+  const V_AXIS_W      = 30;       // mobile: left gutter reserved for year labels
+  const V_SLOT_PAD    = 0.5;      // mobile: scale on the lane-packing time pad
+                                  //         (desktop uses 1; compact nodes < 1)
   const CATEGORY_FILTERS = new Set(['work', 'school', 'hobby']);
   let firstRender = true;
 
@@ -47,6 +50,17 @@
   const $filters  = document.querySelectorAll('.filter-chip');
   const $year     = document.getElementById('year');
   const $yearsCoding = document.getElementById('years-coding');
+
+  // Backdrop behind the mobile detail sheet (tap to dismiss). closeSheet is a
+  // hoisted function declaration, so referencing it here is fine.
+  const $backdrop = document.createElement('div');
+  $backdrop.className = 'sheet-backdrop';
+  $backdrop.setAttribute('aria-hidden', 'true');
+  document.body.appendChild($backdrop);
+  $backdrop.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $tooltip.classList.contains('is-sheet')) closeSheet();
+  });
 
   if ($year) $year.textContent = currentYear;
   if ($yearsCoding) $yearsCoding.textContent = currentYear - 2012;
@@ -159,6 +173,10 @@
     } catch (err) {
       console.error('Failed to load timeline', err);
       $loading.innerHTML = '<p style="color:var(--nda)">Couldn\'t load timeline data. Check the console.</p>';
+      // Degrade to the real, semantic project list (normally hidden for JS
+      // users by CSS). Inline style beats the stylesheet's display:none.
+      const fb = document.querySelector('.seo-fallback');
+      if (fb) fb.style.display = 'block';
     }
   }
 
@@ -192,10 +210,10 @@
       importance,
       importanceNorm: importance / 100, // 0..1
       isClickable: !!e.projectPage,
-      // hideOnMobile: opt-in flag for biographical / life-stage entries that
-      // give useful context on the desktop swimlane but just take up scroll
-      // space in the vertical list. Hidden in the mobile list view only;
-      // still rendered on the desktop swimlane.
+      // hideOnMobile: legacy flag from the old mobile list (which hid
+      // biographical entries to save scroll space). The vertical swimlane packs
+      // them into lanes instead, so every entry now renders in both views; the
+      // flag is preserved on the object but no longer suppresses anything.
       hideOnMobile: !!e.hideOnMobile,
     };
   }
@@ -230,6 +248,84 @@
   }
 
   // ----------------------------------------------------------
+  // Importance-aware, collision-free slot assignment.
+  //
+  // Shared by the desktop swimlane (slots = vertical rows, time on the X axis)
+  // and the mobile vertical swimlane (slots = horizontal lanes, time on the Y
+  // axis). Heaviest entries are placed first and biased toward the centre band
+  // so the eye lands on them; lighter ones drift toward the edges, with
+  // deterministic hash jitter so the layout looks organic rather than striped.
+  // Within a slot, two entries never overlap in time — a per-entry pad reserves
+  // room for the label/bar. If every slot collides at a given time, the
+  // least-bad slot is chosen. Sets entry._slot ∈ [0, slotCount).
+  //
+  // padScale scales the time-pad: 1 on desktop (wide horizontal labels reserve
+  // a lot of time-width); < 1 on mobile, where compact nodes need less
+  // time-separation to read cleanly, which packs more projects per band.
+  // ----------------------------------------------------------
+  function assignSlots(list, slotCount, padScale) {
+    const usage = []; // usage[i] = array of {start, end} intervals already taken
+    for (let i = 0; i < slotCount; i++) usage.push([]);
+
+    const center = (slotCount - 1) / 2;
+    const ordered = list.slice().sort((a, b) => b.importance - a.importance);
+
+    ordered.forEach(entry => {
+      const start = entry.startVal;
+      const end   = entry.isRange ? entry.endVal : start;
+      const basePad = entry.isRange ? 0.04 : 0.18;
+      const labelPad = (basePad + entry.importanceNorm * 0.5) * padScale;
+      const reqStart = start - labelPad;
+      const reqEnd   = end + labelPad;
+
+      // Hash-driven jitter for the preferred slot within the band.
+      const seed = hash01(entry.id || entry.title);
+      // Heavier → narrower band around centre; lighter → wider band to the edges.
+      const bandHalf = (slotCount / 2) * (1.05 - entry.importanceNorm * 0.55);
+      const direction = seed < 0.5 ? -1 : 1;
+      const intoBand  = ((seed * 2) % 1);              // 0..1
+      let preferred = Math.round(center + direction * intoBand * bandHalf);
+      preferred = Math.max(0, Math.min(slotCount - 1, preferred));
+
+      // Walk outward from the preferred slot, alternating sides, until free.
+      let chosen = -1;
+      outer: for (let offset = 0; offset < slotCount; offset++) {
+        const candidates = offset === 0 ? [0] : [offset, -offset];
+        for (const d of candidates) {
+          const r = preferred + d;
+          if (r < 0 || r >= slotCount) continue;
+          const overlaps = usage[r].some(u => !(reqEnd < u.start || reqStart > u.end));
+          if (!overlaps) { chosen = r; break outer; }
+        }
+      }
+      if (chosen === -1) {
+        // Every slot collides here. Pick the one with the smallest overlap.
+        let best = preferred, bestOverlap = Infinity;
+        for (let r = 0; r < slotCount; r++) {
+          const ov = usage[r].reduce((acc, u) => {
+            const o = Math.max(0, Math.min(reqEnd, u.end) - Math.max(reqStart, u.start));
+            return acc + o;
+          }, 0);
+          if (ov < bestOverlap) { bestOverlap = ov; best = r; }
+        }
+        chosen = best;
+      }
+
+      usage[chosen].push({ start: reqStart, end: reqEnd });
+      entry._slot = chosen;
+    });
+  }
+
+  // Mobile lane count scales with viewport width so narrow phones aren't
+  // crammed; busy years still pack ~5 projects across the same time-band.
+  function mobileLaneCount() {
+    const w = window.innerWidth;
+    if (w < 400) return 4;
+    if (w < 600) return 5;
+    return 6;
+  }
+
+  // ----------------------------------------------------------
   // Render: decide swimlane vs list
   // ----------------------------------------------------------
   function render() {
@@ -239,8 +335,9 @@
       $list.classList.add('is-active');
       $swim.setAttribute('aria-hidden', 'true');
       $list.setAttribute('aria-hidden', 'false');
-      // renderList filters internally; no separate applyFilter pass needed.
-      renderList();
+      // Rendered with every entry; applyFilter fades the non-matching ones.
+      renderVerticalSwimlane();
+      applyFilter();
     } else {
       $swim.classList.remove('hidden');
       $list.classList.remove('is-active');
@@ -307,73 +404,10 @@
     for (let i = 0; i < numYears; i++) guides.appendChild(el('div', 'year-guide'));
     lane.appendChild(guides);
 
-    // Row assignment: importance-aware, collision-free.
-    //
-    // - Process heaviest first so they get their preferred slot.
-    // - Each entry has a "preferred band" of rows. Heavier entries are biased
-    //   toward the centre rows so the eye lands on them; lighter entries
-    //   drift toward the edges. The hash provides deterministic jitter so the
-    //   layout looks organic, not striped by importance.
-    // - For each row, we track the time-intervals already taken (with label
-    //   padding) and never place two entries on the same row in overlapping
-    //   time. If we can't find a free row, we widen the search and finally
-    //   accept the least-bad slot.
-    const rowUsage = []; // rowUsage[i] = array of {start, end}
-    for (let i = 0; i < LANE_ROWS; i++) rowUsage.push([]);
-
-    const center = (LANE_ROWS - 1) / 2;
-    const placement = entries.slice().sort((a, b) => b.importance - a.importance);
-
-    placement.forEach(entry => {
-      const start = entry.startVal;
-      const end   = entry.isRange ? entry.endVal : start;
-      // padding around the entry; accounts for the label/bar visually
-      // extending past the marker. Heavier entries reserve more horizontal
-      // space because their labels are larger.
-      const basePad = entry.isRange ? 0.04 : 0.18;
-      const labelPad = basePad + entry.importanceNorm * 0.5;
-      const reqStart = start - labelPad;
-      const reqEnd   = end + labelPad;
-
-      // Hash-driven jitter for the preferred row within the band.
-      const seed = hash01(entry.id || entry.title);
-      // Heavier → narrower band around centre (offset ∈ [-1, 1] × bandHalf).
-      // Lighter → wider band that reaches the edges.
-      const bandHalf = (LANE_ROWS / 2) * (1.05 - entry.importanceNorm * 0.55);
-      const direction = seed < 0.5 ? -1 : 1;
-      const intoBand  = ((seed * 2) % 1);              // 0..1
-      let preferred = Math.round(center + direction * intoBand * bandHalf);
-      preferred = Math.max(0, Math.min(LANE_ROWS - 1, preferred));
-
-      // Walk outward from preferred row, alternating sides, until a free row
-      // is found.
-      let chosen = -1;
-      outer: for (let offset = 0; offset < LANE_ROWS; offset++) {
-        const candidates = offset === 0 ? [0] : [offset, -offset];
-        for (const d of candidates) {
-          const r = preferred + d;
-          if (r < 0 || r >= LANE_ROWS) continue;
-          const overlaps = rowUsage[r].some(u => !(reqEnd < u.start || reqStart > u.end));
-          if (!overlaps) { chosen = r; break outer; }
-        }
-      }
-      if (chosen === -1) {
-        // Every row collides at this time-range. Pick the row with the
-        // smallest overlap so the visual damage is minimal.
-        let best = preferred, bestOverlap = Infinity;
-        for (let r = 0; r < LANE_ROWS; r++) {
-          const ov = rowUsage[r].reduce((acc, u) => {
-            const o = Math.max(0, Math.min(reqEnd, u.end) - Math.max(reqStart, u.start));
-            return acc + o;
-          }, 0);
-          if (ov < bestOverlap) { bestOverlap = ov; best = r; }
-        }
-        chosen = best;
-      }
-
-      rowUsage[chosen].push({ start: reqStart, end: reqEnd });
-      entry._row = chosen;
-    });
+    // Importance-aware, collision-free row assignment (shared with the mobile
+    // vertical swimlane). Sets entry._slot ∈ [0, LANE_ROWS); heaviest first,
+    // biased toward the centre rows. padScale = 1: desktop labels are wide.
+    assignSlots(entries, LANE_ROWS, 1);
 
     lane.style.minHeight = (TOP_PAD + LANE_ROWS * ROW_HEIGHT + 16) + 'px';
 
@@ -402,7 +436,7 @@
   function buildSwimlaneEntry(entry, totalWidth, totalSpan) {
     const pxPerYear = totalWidth / totalSpan;
     const startPx = (entry.startVal - minYear) * pxPerYear;
-    const top = TOP_PAD + entry._row * ROW_HEIGHT;
+    const top = TOP_PAD + entry._slot * ROW_HEIGHT;
 
     const node = document.createElement('button');
     node.className = 'entry';
@@ -447,191 +481,96 @@
   }
 
   // ----------------------------------------------------------
-  // Mobile: list view
+  // Mobile: vertical swimlane (the desktop swimlane, rotated 90°)
+  //
+  // Time runs down the Y axis (newest at the top, like a reverse-chron feed);
+  // projects pack into a few horizontal lanes via assignSlots() so busy years
+  // show several side-by-side. Importance scales node size/prominence through
+  // the shared --importance custom property, exactly like the desktop entries.
+  // Every entry is rendered (including biographical context) — nothing is
+  // hidden behind a collapse — and filters fade non-matching nodes in place.
   // ----------------------------------------------------------
-  function renderList() {
+  function renderVerticalSwimlane() {
     $list.innerHTML = '';
+    if (!entries.length) return;
 
-    // Mobile filter behaviour: re-render the list from the filtered subset so
-    // years that drop out (no matching entries) physically disappear, and the
-    // backward-merge + earlier-timeline logic re-runs to collapse what's left
-    // into a clean grouping. Beats fading individual entries in place; the
-    // resulting list has no empty year headers or stranded "+0 more" toggles.
-    // Also drop entries explicitly flagged hideOnMobile, since those exist for
-    // biographical context on the desktop timeline only.
-    const visible = entries.filter(e => !e.hideOnMobile && entryMatchesActiveFilter(e));
+    const laneCount = mobileLaneCount();
+    assignSlots(entries, laneCount, V_SLOT_PAD);
 
-    if (!visible.length) {
-      const empty = el('p', 'list-empty');
-      empty.textContent = 'Nothing matches this filter.';
-      $list.appendChild(empty);
-      return;
+    const containerW = $list.clientWidth || window.innerWidth;
+    const usableW = Math.max(containerW - V_AXIS_W - 4, 200);
+    const laneW = usableW / laneCount;
+    const totalSpan = Math.max(rawMaxYear - minYear, 1);
+
+    const inner = el('div', 'vswim-inner');
+    inner.style.height = (V_TOP_PAD + totalSpan * PX_PER_YEAR_V + 40) + 'px';
+
+    // y position for a fractional year value — newest year sits at the top.
+    const yFor = val => V_TOP_PAD + (rawMaxYear - val) * PX_PER_YEAR_V;
+
+    // year guide lines + labels down the left gutter
+    const guides = el('div', 'vswim-guides');
+    for (let y = minYear; y <= maxYear; y++) {
+      const yTop = yFor(y);
+      const line = el('div', 'vyear-line');
+      line.style.top = yTop + 'px';
+      line.style.left = V_AXIS_W + 'px';
+      const lab = el('div', 'vyear-label');
+      lab.style.top = yTop + 'px';
+      lab.textContent = y;
+      if (y === currentYear) { line.classList.add('current'); lab.classList.add('current'); }
+      guides.appendChild(line);
+      guides.appendChild(lab);
     }
+    inner.appendChild(guides);
 
-    const byYear = {};
-    visible.forEach(e => {
-      const y = Math.floor(e.startVal);
-      (byYear[y] = byYear[y] || []).push(e);
-    });
-    const years = Object.keys(byYear).map(Number).sort((a, b) => a - b);
+    const geom = { laneW, yFor };
+    entries.forEach(entry => inner.appendChild(buildVerticalEntry(entry, geom)));
 
-    // Build groups, folding minor-only years into the nearest year-with-major
-    // so a lone "+1 more" never sits under an empty year header.
-    //
-    // Direction:
-    //   - prefer backward: fold into the most recent emitted group, so the
-    //     anchor major reads first (e.g. 2016's minor-only entry merges into
-    //     the 2015 group → header becomes "2015–2016").
-    //   - if there is no emitted group yet (start of timeline, before the
-    //     first major), accumulate forward into "pending" and merge those
-    //     into the first major year we hit (e.g. 2002 / 2009 / 2011 all roll
-    //     into the 2014 group → header becomes "2002–2014").
-    const groups = [];
-    let pendingMinors = [];
-    let pendingStartYear = null;
-
-    years.forEach((y, idx) => {
-      const yearEntries = byYear[y];
-      // Heavier entries float to the top within their year-bucket
-      yearEntries.sort((a, b) => b.importance - a.importance);
-      const major = yearEntries.filter(e => e.importance >= LIST_QUIET_THRESHOLD);
-      const minor = yearEntries.filter(e => e.importance <  LIST_QUIET_THRESHOLD);
-
-      if (major.length === 0) {
-        if (groups.length) {
-          // Fold backward: extend the previous group's end-year and append.
-          const tail = groups[groups.length - 1];
-          tail.endYear = y;
-          tail.minors.push(...minor);
-        } else {
-          // No prior anchor yet, so accumulate until the first major lands.
-          if (pendingStartYear === null) pendingStartYear = y;
-          pendingMinors.push(...minor);
-        }
-        return;
-      }
-
-      groups.push({
-        startYear: pendingStartYear !== null ? pendingStartYear : y,
-        endYear: y,
-        majors: major,
-        minors: [...pendingMinors, ...minor],
-      });
-      pendingMinors = [];
-      pendingStartYear = null;
-    });
-
-    // Edge: the entire timeline is minor-only (no anchor was ever found).
-    // Render the orphan accumulator as its own group so the entries don't
-    // silently vanish.
-    if (pendingMinors.length) {
-      groups.push({
-        startYear: pendingStartYear,
-        endYear: years[years.length - 1],
-        majors: [],
-        minors: pendingMinors,
-      });
-    }
-
-    // Find when the timeline becomes "dense": the first year that has
-    // ≥ DENSE_YEAR_MIN_ENTRIES on its own. Everything before that collapses
-    // into a single "earlier timeline" toggle at the top of the list.
-    //
-    // Only applied to the *unfiltered* view. With a filter active, the user
-    // has already narrowed the timeline themselves, so hiding more entries
-    // behind another toggle would mean a filter like "school" buries the
-    // entries that match it just because the matches sit in early years.
-    // Falls back to no collapsing if the entire timeline is sparse.
-    const firstDenseYear = activeFilter === 'all'
-      ? (years.find(y => byYear[y].length >= DENSE_YEAR_MIN_ENTRIES) ?? null)
-      : null;
-    const earlyGroups = firstDenseYear === null
-      ? []
-      : groups.filter(g => g.endYear < firstDenseYear);
-    const mainGroups  = firstDenseYear === null
-      ? groups
-      : groups.filter(g => g.endYear >= firstDenseYear);
-
-    if (earlyGroups.length) {
-      const wrap = document.createElement('details');
-      wrap.className = 'earlier-timeline';
-      const summary = document.createElement('summary');
-      const startYear = earlyGroups[0].startYear;
-      const endYear   = earlyGroups[earlyGroups.length - 1].endYear;
-      const total = earlyGroups.reduce((n, g) => n + g.majors.length + g.minors.length, 0);
-      summary.innerHTML =
-        `<span class="et-label">Earlier projects</span>` +
-        `<span class="et-meta">${startYear}–${endYear} · ${total}</span>`;
-      wrap.appendChild(summary);
-      const inner = el('div', 'earlier-timeline-content');
-      earlyGroups.forEach(g => inner.appendChild(buildYearGroup(g)));
-      wrap.appendChild(inner);
-      $list.appendChild(wrap);
-    }
-
-    mainGroups.forEach(g => $list.appendChild(buildYearGroup(g)));
+    $list.appendChild(inner);
   }
 
-  function buildYearGroup(g) {
-    const group = el('div', 'year-group');
-    const header = el('div', 'year-header');
-    header.textContent = g.startYear === g.endYear
-      ? String(g.startYear)
-      : `${g.startYear}–${g.endYear}`;
-    group.appendChild(header);
+  function buildVerticalEntry(entry, geom) {
+    const left = V_AXIS_W + entry._slot * geom.laneW;
 
-    const wrap = el('div', 'year-entries');
-    g.majors.forEach(entry => wrap.appendChild(buildListEntry(entry)));
-
-    if (g.minors.length) {
-      const details = document.createElement('details');
-      details.className = 'year-more';
-      const summary = document.createElement('summary');
-      summary.textContent = `${g.minors.length} more`;
-      details.appendChild(summary);
-      const minorWrap = el('div', 'year-minor-entries');
-      g.minors.forEach(entry => minorWrap.appendChild(buildListEntry(entry)));
-      details.appendChild(minorWrap);
-      wrap.appendChild(details);
-    }
-
-    group.appendChild(wrap);
-    return group;
-  }
-
-  function buildListEntry(entry) {
-    const node = el('button', 'list-entry');
+    const node = document.createElement('button');
+    node.className = 'ventry';
+    node.classList.add(entry.isRange ? 'range' : 'point');
+    if (entry.isProject)   node.classList.add('is-project');
+    if (entry.isClickable) node.classList.add('is-clickable');
+    node.style.left  = left + 'px';
+    node.style.width = (geom.laneW - 6) + 'px';
     node.style.setProperty('--cat-color', `var(--${entry.category})`);
     node.style.setProperty('--importance', entry.importanceNorm.toFixed(3));
     node.dataset.id  = entry.id;
     node.dataset.cat = entry.category;
     node.dataset.isProject = String(entry.isProject);
     node.dataset.types = (entry.types || []).join('|');
-    if (entry.isClickable) node.classList.add('is-clickable');
-    if (entry.importance < LIST_QUIET_THRESHOLD) node.classList.add('is-quiet');
+    node.dataset.importance = entry.importance;
 
-    const meta = el('div', 'le-meta');
-    const sw = el('span', 'le-cat-swatch');
-    meta.appendChild(sw);
-    meta.appendChild(textSpan(entry.category));
-    meta.appendChild(textSpan('·'));
-    meta.appendChild(textSpan(formatDateRange(entry)));
-    node.appendChild(meta);
-
-    const title = el('h3', 'le-title');
-    title.textContent = entry.title;
-    node.appendChild(title);
-
-    if (entry.shortDescription) {
-      const desc = el('p', 'le-desc');
-      desc.textContent = entry.shortDescription;
-      node.appendChild(desc);
-    }
-
-    if (entry.status) {
-      const status = el('span', 'le-status ' + entry.status);
-      status.textContent = statusLabel(entry.status);
-      node.appendChild(status);
+    if (entry.isRange) {
+      // vertical bar spanning the entry's time range in its lane
+      node.style.top = geom.yFor(entry.endVal) + 'px';
+      node.style.height =
+        Math.max((entry.endVal - entry.startVal) * PX_PER_YEAR_V, 30) + 'px';
+      const bar = el('div', 'vbar');
+      const t = el('span', 'vbar-title');
+      t.textContent = entry.title;
+      bar.appendChild(t);
+      if (entry.status === 'ongoing' || entry.end === 'present') {
+        bar.appendChild(el('div', 'vongoing-arrow'));
+      }
+      node.appendChild(bar);
+    } else {
+      // point: marker + label, vertically centred on its year position (the
+      // translateY(-50%) lives in CSS so the marker sits on the time line)
+      node.style.top = geom.yFor(entry.startVal) + 'px';
+      const marker = el('div', 'vmarker');
+      const lbl = el('div', 'vlabel');
+      if (entry.status) lbl.appendChild(el('span', 'vstatus-dot ' + entry.status));
+      lbl.appendChild(textSpan(entry.title));
+      node.appendChild(marker);
+      node.appendChild(lbl);
     }
 
     attachEntryHandlers(node, entry);
@@ -652,7 +591,10 @@
     node.addEventListener('blur', hideTooltip);
     node.addEventListener('click', e => {
       e.preventDefault();
-      handleEntryClick(entry);
+      // No hover on touch: a tap opens the detail sheet (with the deep-dive
+      // link inside it) rather than navigating straight away.
+      if (window.innerWidth < MOBILE_BREAK) openSheet(entry);
+      else handleEntryClick(entry);
     });
   }
 
@@ -665,43 +607,40 @@
   }
 
   // ----------------------------------------------------------
-  // Tooltip
+  // Entry detail (shared by the desktop hover tooltip and the mobile sheet)
   // ----------------------------------------------------------
-  function showTooltip(entry, e) {
-    if (window.innerWidth < MOBILE_BREAK) return;
-    $tooltip.innerHTML = '';
+  function buildEntryDetail(entry, interactive) {
+    const frag = document.createDocumentFragment();
 
     const cat = el('div', 'tt-cat');
     const sw = el('span', 'tt-cat-swatch');
     sw.style.background = `var(--${entry.category})`;
     cat.appendChild(sw);
     cat.appendChild(textSpan(entry.category + (entry.isProject ? ' · project' : '')));
-    $tooltip.appendChild(cat);
+    frag.appendChild(cat);
 
     const title = el('h4', 'tt-title');
     title.textContent = entry.title;
-    $tooltip.appendChild(title);
+    frag.appendChild(title);
 
     const date = el('div', 'tt-date');
     date.textContent = formatDateRange(entry);
-    $tooltip.appendChild(date);
+    frag.appendChild(date);
 
     if (entry.shortDescription) {
       const d = el('p', 'tt-desc');
       d.textContent = entry.shortDescription;
-      $tooltip.appendChild(d);
+      frag.appendChild(d);
     }
 
     if (entry.status) {
       const st = el('span', 'tt-status ' + entry.status);
       st.textContent = statusLabel(entry.status);
-      $tooltip.appendChild(st);
+      frag.appendChild(st);
       if (entry.statusNote) {
         const n = el('span', 'tt-status-note');
-        n.style.fontSize = '11px';
-        n.style.color = 'var(--text-mute)';
         n.textContent = entry.statusNote;
-        $tooltip.appendChild(n);
+        frag.appendChild(n);
       }
     }
 
@@ -712,21 +651,42 @@
         tag.textContent = t;
         tags.appendChild(tag);
       });
-      $tooltip.appendChild(tags);
+      frag.appendChild(tags);
     }
 
     if (entry.projectPage) {
-      const c = el('div', 'tt-cta');
-      c.textContent = '↗  Click for project deep-dive';
-      $tooltip.appendChild(c);
+      // Desktop tooltip is non-interactive (pointer-events:none), so a plain
+      // line reads as the cue. The mobile sheet needs a real, tappable link.
+      if (interactive) {
+        const a = document.createElement('a');
+        a.className = 'tt-cta';
+        a.href = entry.projectPage;
+        a.textContent = '↗  Open project deep-dive';
+        frag.appendChild(a);
+      } else {
+        const c = el('div', 'tt-cta');
+        c.textContent = '↗  Click for project deep-dive';
+        frag.appendChild(c);
+      }
     }
+    return frag;
+  }
 
+  // ----------------------------------------------------------
+  // Tooltip (desktop hover)
+  // ----------------------------------------------------------
+  function showTooltip(entry, e) {
+    if (window.innerWidth < MOBILE_BREAK) return;
+    $tooltip.classList.remove('is-sheet');
+    $tooltip.innerHTML = '';
+    $tooltip.appendChild(buildEntryDetail(entry, false));
     positionTooltip(e);
     $tooltip.classList.add('is-visible');
     $tooltip.setAttribute('aria-hidden', 'false');
   }
 
   function positionTooltip(e) {
+    if ($tooltip.classList.contains('is-sheet')) return; // sheet is CSS-positioned
     const pad = 16;
     const w = $tooltip.offsetWidth || 320;
     const h = $tooltip.offsetHeight || 200;
@@ -741,8 +701,28 @@
   }
 
   function hideTooltip() {
+    if ($tooltip.classList.contains('is-sheet')) return; // don't fight the sheet
     $tooltip.classList.remove('is-visible');
     $tooltip.setAttribute('aria-hidden', 'true');
+  }
+
+  // ----------------------------------------------------------
+  // Detail sheet (mobile tap) — reuses #tooltip, restyled as a bottom sheet
+  // ----------------------------------------------------------
+  function openSheet(entry) {
+    $tooltip.innerHTML = '';
+    $tooltip.appendChild(buildEntryDetail(entry, true));
+    $tooltip.style.left = '';
+    $tooltip.style.top  = '';
+    $tooltip.classList.add('is-sheet', 'is-visible');
+    $tooltip.setAttribute('aria-hidden', 'false');
+    $backdrop.classList.add('is-visible');
+  }
+
+  function closeSheet() {
+    $tooltip.classList.remove('is-sheet', 'is-visible');
+    $tooltip.setAttribute('aria-hidden', 'true');
+    $backdrop.classList.remove('is-visible');
   }
 
   // ----------------------------------------------------------
@@ -757,33 +737,32 @@
     });
   });
 
-  function entryMatchesActiveFilter(entry) {
+  // Does a rendered entry node (either view) match the active filter? Reads the
+  // data-* attributes that buildSwimlaneEntry and buildVerticalEntry both stamp.
+  function nodeMatches(node) {
+    const cat = node.dataset.cat;
+    const isProject = node.dataset.isProject === 'true';
+    const types = (node.dataset.types || '').split('|').filter(Boolean);
     if (activeFilter === 'all')             return true;
-    if (activeFilter === 'project')         return entry.isProject;
-    if (CATEGORY_FILTERS.has(activeFilter)) return entry.category === activeFilter;
-    return (entry.types || []).includes(activeFilter); // type/tag filter
+    if (activeFilter === 'project')         return isProject;
+    if (CATEGORY_FILTERS.has(activeFilter)) return cat === activeFilter;
+    return types.includes(activeFilter); // type filter
   }
 
   function applyFilter() {
-    // Mobile list view: rebuild from the filtered subset so empty years
-    // physically drop out and adjacent visible years re-group via the same
-    // backward-merge + earlier-timeline logic used on first render.
+    // Mobile vertical swimlane: fade non-matching nodes in place; positions
+    // stay anchored to the time axis so the user sees what's filtered out
+    // (mirrors the desktop behaviour rather than rebuilding the layout).
     if (window.innerWidth < MOBILE_BREAK) {
-      renderList();
+      $list.querySelectorAll('.ventry').forEach(node => {
+        node.classList.toggle('is-faded', !nodeMatches(node));
+      });
       return;
     }
     // Desktop swimlane: fade non-matching entries in place; positions stay
     // anchored to the year axis so the user can see what's filtered out.
     $swim.querySelectorAll('.entry').forEach(node => {
-      const cat = node.dataset.cat;
-      const isProject = node.dataset.isProject === 'true';
-      const types = (node.dataset.types || '').split('|').filter(Boolean);
-      let show = true;
-      if (activeFilter === 'all') show = true;
-      else if (activeFilter === 'project') show = isProject;
-      else if (CATEGORY_FILTERS.has(activeFilter)) show = cat === activeFilter;
-      else show = types.includes(activeFilter);
-      node.classList.toggle('is-faded', !show);
+      node.classList.toggle('is-faded', !nodeMatches(node));
     });
     // Labels in the swimlane are layout-sensitive: recompute which ones can
     // be shown without colliding with another node's marker / another visible

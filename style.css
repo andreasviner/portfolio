@@ -1374,107 +1374,254 @@ a:hover { border-color: var(--text); }
 }
 
 /* ============================================================
-   Mobile / vertical list view
+   Mobile: vertical swimlane (the desktop swimlane, rotated 90°)
+   Time runs top→bottom (newest first); projects pack into a few
+   horizontal lanes. --importance (0..1) scales prominence just
+   like the desktop entries.
    ============================================================ */
 .timeline-list { display: none; }
 .timeline-list.is-active { display: block; }
 
-.year-group {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: 16px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--hairline);
+.vswim-inner {
+  position: relative;
+  width: 100%;
 }
-.year-group:last-child { border-bottom: none; }
-.year-header {
-  font-family: var(--mono);
-  font-size: 16px;
-  color: var(--text);
-  letter-spacing: 0.04em;
-  position: sticky;
-  top: 80px;
-  align-self: start;
+
+/* year guide lines + labels down the left gutter */
+.vswim-guides { position: absolute; inset: 0; pointer-events: none; }
+.vyear-line {
+  position: absolute;
+  right: 0;                 /* left edge set inline (= V_AXIS_W) */
+  border-top: 1px solid var(--hairline);
 }
-.year-entries {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.list-entry {
-  display: block;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-left: 3px solid var(--cat-color);
-  border-radius: 4px;
-  text-decoration: none;
-  color: var(--text);
-  transition: background .2s, border-color .2s;
-  cursor: pointer;
-}
-.list-entry:hover {
-  background: var(--surface-2);
-  border-color: var(--hairline-2);
-}
-.list-entry .le-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+.vyear-line.current { border-top-color: color-mix(in srgb, var(--hobby) 45%, transparent); }
+.vyear-label {
+  position: absolute;
+  left: 0;
+  transform: translateY(-50%);
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  color: var(--text-mute);
 }
-.list-entry .le-cat-swatch {
-  width: 8px; height: 8px;
-  border-radius: 2px;
-  background: var(--cat-color);
+.vyear-label.current { color: var(--hobby); }
+
+/* entries */
+.ventry {
+  position: absolute;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font-family: var(--mono);
+  color: var(--text);
+  cursor: pointer;
+  opacity: calc(0.6 + var(--importance, 0.4) * 0.4);
+  transition: opacity .2s, filter .2s;
+  /* heavier entries paint on top of lighter neighbours */
+  z-index: calc(1 + var(--importance, 0.4) * 10);
 }
-.list-entry .le-title {
+.ventry:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 4px; }
+.ventry.point:not(.is-clickable),
+.ventry.range:not(.is-clickable) { cursor: default; }
+
+/* point: marker + label chip, vertically centred on its year position */
+.ventry.point {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateY(-50%);
+}
+.ventry.point .vmarker {
+  flex-shrink: 0;
+  width:  calc(6px + var(--importance, 0.4) * 9px);
+  height: calc(6px + var(--importance, 0.4) * 9px);
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--cat-color);
+}
+.ventry.point.is-clickable .vmarker { background: var(--cat-color); }
+.ventry.point .vlabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;                 /* let the title ellipsis inside the flex row */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: calc(9.5px + var(--importance, 0.4) * 3px);
+  line-height: 1.2;
+  padding: 2px 5px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-2);
+  border-radius: 3px;
+}
+.ventry.point .vlabel span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* range: a vertical bar spanning the time range in its lane */
+.ventry.range { display: flex; }
+.ventry.range .vbar {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  border-radius: 3px;
+  padding: 4px 6px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--cat-color), color-mix(in srgb, var(--cat-color) 55%, transparent));
+  color: var(--bg);
+  font-size: calc(9.5px + var(--importance, 0.4) * 2.5px);
+  font-weight: 500;
+}
+.ventry.range:not(.is-clickable) .vbar {
+  background: transparent;
+  border: 1px dashed var(--cat-color);
+  color: var(--cat-color);
+}
+.ventry.range .vbar-title {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ventry.range .vongoing-arrow {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid var(--cat-color);
+}
+
+.ventry .vstatus-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ventry .vstatus-dot.nda     { background: var(--nda); }
+.ventry .vstatus-dot.lost    { background: var(--lost); }
+.ventry .vstatus-dot.ongoing { background: var(--ongoing); }
+
+.ventry:hover { filter: brightness(1.12); }
+.ventry.is-faded {
+  opacity: 0.12;
+  filter: saturate(0.3);
+  pointer-events: none;
+}
+
+/* ============================================================
+   Mobile detail sheet (tap a node) — reuses #tooltip
+   ============================================================ */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 8, 16, 0.6);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+  z-index: 110;
+}
+.sheet-backdrop.is-visible { opacity: 1; pointer-events: auto; }
+
+.tooltip.is-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  top: auto;
+  width: auto;
+  max-width: 560px;
+  margin: 0 auto;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px 22px calc(22px + env(safe-area-inset-bottom, 0px));
+  border-radius: 16px 16px 0 0;
+  pointer-events: auto;
+  transform: translateY(100%);
+  transition: transform .25s ease, opacity .2s;
+  z-index: 120;
+}
+.tooltip.is-sheet.is-visible { transform: translateY(0); opacity: 1; }
+.tooltip.is-sheet::before {        /* grab handle */
+  content: '';
+  position: absolute;
+  top: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 38px; height: 4px;
+  border-radius: 100px;
+  background: var(--hairline-2);
+}
+.tooltip.is-sheet .tt-title { font-size: 22px; }
+.tooltip.is-sheet a.tt-cta {
+  display: block;
+  margin-top: 18px;
+  padding: 13px 16px;
+  border: 1px solid var(--hairline-2);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.tooltip.is-sheet a.tt-cta:active { background: var(--surface); }
+
+/* status note (was inline-styled in showTooltip; now shared) */
+.tt-status-note {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-mute);
+}
+
+/* ============================================================
+   Progressive-enhancement fallback (.seo-fallback)
+   The real, semantic project list. JS users get the interactive
+   timeline, so it's hidden for them; no-JS clients and scrapers
+   never run the inline class swap, keep .no-js, and see it.
+   ============================================================ */
+.seo-fallback {
+  display: none;
+  margin: 8px 0 0;
+}
+.no-js .seo-fallback { display: block; }
+/* no-JS clients can't run the timeline; hide the whole interactive section
+   (its empty containers + dead filter chips) and let the semantic fallback,
+   which carries its own heading, stand in as the project list. */
+.no-js #timeline { display: none; }
+
+.seo-fallback h2 {
   font-family: var(--serif);
   font-style: italic;
-  font-size: 19px;
-  line-height: 1.25;
-  margin: 0 0 6px;
-  font-variation-settings: "opsz" 36;
+  font-size: clamp(22px, 4vw, 30px);
+  font-variation-settings: "opsz" 40;
+  margin: 0 0 20px;
 }
-.list-entry .le-desc {
-  font-size: 13px;
+.seo-fallback ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.seo-fallback li {
+  line-height: 1.55;
   color: var(--text-mute);
-  margin: 0 0 8px;
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 14px;
 }
-.list-entry .le-status {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 2px;
-  margin-right: 4px;
-}
-.list-entry .le-status.nda     { background: rgba(255,138,138,0.12); color: var(--nda); }
-.list-entry .le-status.lost    { background: rgba(138,143,163,0.12); color: var(--lost); }
-.list-entry .le-status.ongoing { background: rgba(245,185,92,0.12); color: var(--ongoing); }
-
-.list-entry.is-faded { display: none; }
-/* low-importance list entries get a smaller footprint and dimmer text */
-.list-entry.is-quiet {
-  padding: 8px 12px;
-  opacity: 0.7;
-}
-.list-entry.is-quiet .le-title {
-  font-size: 15px;
-}
-.list-entry.is-quiet .le-desc { display: none; }
-
-@media (max-width: 480px) {
-  .year-group { grid-template-columns: 60px 1fr; gap: 12px; }
-  .year-header { font-size: 14px; }
-}
+.seo-fallback li:last-child { border-bottom: none; }
+.seo-fallback li a,
+.seo-fallback li strong { color: var(--text); font-weight: 600; }
+.seo-fallback time { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+.seo-fallback small { display: block; margin-top: 4px; font-size: 12px; color: var(--text-dim); }
 
 /* ============================================================
    Bench: signal-chain stack (Sense → Model → Build → Ship)
@@ -1947,136 +2094,9 @@ a:hover { border-color: var(--text); }
 
 /* ============================================================
    Mobile / vertical device overrides
-   A focused rework for screens ≤ 760px: drops the decorative
-   "scope" panel and trace pattern, tightens type and spacing,
-   collapses low-importance timeline entries behind a toggle.
+   A focused rework for small screens: drops the decorative
+   "scope" panel and trace pattern, tightens type and spacing.
    ============================================================ */
-
-/* "Earlier timeline": gates the sparse early years (childhood-era
-   single-entry years) behind one large toggle at the top of the mobile
-   list view. Visually distinct from the per-year "+N more" pills so it
-   reads as a section divider, not just another minor toggle. */
-.earlier-timeline {
-  margin: 0 0 8px;
-  border-bottom: 1px solid var(--hairline);
-}
-.earlier-timeline > summary {
-  list-style: none;
-  cursor: pointer;
-  user-select: none;
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  padding: 18px 4px 18px 0;
-  border-top: 1px solid var(--hairline);
-  color: var(--text-mute);
-  transition: color .2s;
-}
-.earlier-timeline > summary::-webkit-details-marker { display: none; }
-.earlier-timeline > summary::marker { content: ''; }
-.earlier-timeline > summary:hover { color: var(--text); }
-.earlier-timeline > summary::after {
-  content: '+';
-  display: inline-grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  margin-left: auto;
-  align-self: center;
-  border: 1px solid var(--hairline-2);
-  border-radius: 50%;
-  font-size: 14px;
-  line-height: 1;
-  color: var(--text-mute);
-  transition: color .2s, border-color .2s;
-  flex-shrink: 0;
-}
-.earlier-timeline[open] > summary::after {
-  content: '−';
-  color: var(--text);
-  border-color: var(--text-mute);
-}
-.earlier-timeline > summary .et-label {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 17px;
-  letter-spacing: 0;
-  color: var(--text);
-  font-variation-settings: "opsz" 36;
-}
-.earlier-timeline > summary .et-meta {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-}
-.earlier-timeline-content {
-  /* internal year-groups already have their own padding/borders, so we
-     just hold them in place. Top hairline drawn by the first year-group. */
-  padding-top: 4px;
-}
-
-/* shown when a mobile filter narrows the list to zero matches */
-.list-empty {
-  padding: 60px 0;
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-dim);
-  letter-spacing: 0.08em;
-}
-
-/* low-importance list entries collapse into a per-year toggle.
-   The toggle is built with native <details>/<summary>, so it works
-   on both desktop list view (rare; only narrow desktop) and mobile. */
-.year-more {
-  margin-top: 4px;
-}
-.year-more > summary {
-  list-style: none;
-  cursor: pointer;
-  user-select: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  border: 1px dashed var(--hairline-2);
-  border-radius: 100px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  background: transparent;
-  transition: color .2s, border-color .2s, background .2s;
-}
-.year-more > summary::-webkit-details-marker { display: none; }
-.year-more > summary::marker { content: ''; }
-.year-more > summary:hover {
-  color: var(--text);
-  border-color: var(--text-mute);
-  background: rgba(255,255,255,0.02);
-}
-.year-more > summary::before {
-  content: '+';
-  display: inline-block;
-  width: 12px;
-  text-align: center;
-  font-size: 14px;
-  line-height: 1;
-  color: var(--text-mute);
-}
-.year-more[open] > summary::before { content: '−'; }
-.year-more[open] > summary { color: var(--text-mute); }
-.year-minor-entries {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 4px;
-}
 
 /* ≤ 900px: matches the JS mobile list-view cutoff.
    Drop the decorative scope panel and trace pattern that don't carry
@@ -2219,26 +2239,9 @@ a:hover { border-color: var(--text); }
     line-height: 1.5;
   }
 
-  /* ---- timeline list: tighter cards, year-header inline ---- */
-  .year-group {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 18px 0;
-  }
-  .year-header {
-    position: static;
-    font-size: 13px;
-    color: var(--text-dim);
-    letter-spacing: 0.16em;
-    padding-bottom: 2px;
-    border-bottom: 1px dashed var(--hairline);
-    width: max-content;
-  }
-  .year-entries { gap: 10px; }
-  .list-entry { padding: 12px 14px; }
-  .list-entry .le-title { font-size: 17px; }
-  .list-entry .le-desc { font-size: 12.5px; }
-  .list-entry.is-quiet { padding: 8px 12px; }
+  /* ---- vertical swimlane: lanes are sized in JS (mobileLaneCount); just
+     trim the year-gutter labels a touch on small screens ---- */
+  .vyear-label { font-size: 9.5px; }
 
   /* ---- off-cuts ---- */
   .offcuts { padding: 16px 18px 36px; }
@@ -2297,8 +2300,6 @@ a:hover { border-color: var(--text); }
     font-size: 10.5px;
   }
 
-  /* the year-more toggle: align to entries (no year-header column on mobile) */
-  .year-more { margin-top: 2px; }
 }
 
 /* ≤ 380px: very small phones, pull the screws another quarter-turn */
